@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/wasm2zk-tritonvm"]
+members = ["crates/wasm2zk-tritonvm", "crates/wasm2zk-wasmparser"]
 exclude = []
 resolver = "2"
 
