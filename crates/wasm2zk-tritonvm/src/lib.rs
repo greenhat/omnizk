@@ -17,4 +17,3 @@
 // #![deny(clippy::todo)]
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
-#![recursion_limit = "550"]
