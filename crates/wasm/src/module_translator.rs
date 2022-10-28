@@ -2,13 +2,14 @@
 //!
 //! Translation skeleton that traverses the whole WebAssembly module and call helper functions
 //! to deal with each part of it.
-use c2zk_ir::ModuleInfo;
+
+use c2zk_ir::ir;
 
 use crate::error::WasmResult;
 // use wasmparser::{NameSectionReader, Parser, Payload, Validator};
 
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
-pub fn translate_module<'data>(_data: &'data [u8]) -> WasmResult<ModuleInfo> {
+pub fn translate_module(_data: &[u8]) -> WasmResult<ir::ModuleInfo> {
     // let module = ModuleInfo::new();
     // let mut module_translation_state = ModuleTranslationState::new();
     // let mut validator = Validator::new_with_features(module.wasm_features());

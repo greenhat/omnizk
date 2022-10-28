@@ -6,7 +6,7 @@
 #![deny(non_camel_case_types)]
 #![deny(non_snake_case)]
 #![deny(unused_mut)]
-#![deny(dead_code)]
+// #![deny(dead_code)]
 #![deny(unused_imports)]
 // #![deny(missing_docs)]
 // Clippy exclusions
@@ -18,8 +18,4 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
-mod entities;
-mod module_info;
-
-pub use entities::*;
-pub use module_info::*;
+pub mod ir;
