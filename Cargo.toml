@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/wasm2zk-tritonvm", "crates/wasm2zk-wasmparser"]
+members = ["crates/wasm", "crates/tritonvm", "crates/ir"]
 exclude = []
 resolver = "2"
 
@@ -7,9 +7,19 @@ resolver = "2"
 authors = [
     "Denys Zadorozhny <denys@zadorozhnyi.com>"
 ]
-repository = "https://github.com/greenhat/wasm2zk"
+repository = "https://github.com/greenhat/c2zk"
 edition = "2021"
 readme = "README.md"
 license = "Apache-2.0"
 keywords = ["wasm", "webassembly", "zk", "proof", "verification"]
 categories = ["wasm", "no-std", "virtualization"]
+
+[workspace.dependencies]
+c2zk-ir = { path = "crates/ir" }
+wasmparser = { version = "0.93", features = ["deterministic"] }
+log = { version = "0.4.8", default-features = false }
+smallvec = { version = "1.6.1", features = ["union"] }
+wat = "1.0.49"
+target-lexicon = { version = "0.12.3", default-features = false }
+derive_more = "0.99"
+thiserror = "1.0"

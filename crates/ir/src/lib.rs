@@ -1,4 +1,4 @@
-//! Wasm parser
+//! IR
 
 // Coding conventions
 // #![deny(unsafe_code)]
@@ -17,3 +17,7 @@
 // #![deny(clippy::todo)]
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
+
+mod entities;
+
+pub use entities::*;
