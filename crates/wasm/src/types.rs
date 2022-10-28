@@ -101,24 +101,28 @@ impl WasmFuncType {
     }
 
     /// Function params types.
+    #[allow(dead_code)]
     #[inline]
     pub fn params(&self) -> &[WasmType] {
         &self.params
     }
 
     /// How many `externref`s are in this function's params?
+    #[allow(dead_code)]
     #[inline]
     pub fn externref_params_count(&self) -> usize {
         self.externref_params_count
     }
 
     /// Returns params types.
+    #[allow(dead_code)]
     #[inline]
     pub fn returns(&self) -> &[WasmType] {
         &self.returns
     }
 
     /// How many `externref`s are in this function's returns?
+    #[allow(dead_code)]
     #[inline]
     pub fn externref_returns_count(&self) -> usize {
         self.externref_returns_count
@@ -319,6 +323,7 @@ pub enum GlobalInit {
 
 impl Global {
     /// Creates a new `Global` type from wasmparser's representation.
+    #[allow(dead_code)]
     pub fn new(ty: wasmparser::GlobalType, initializer: GlobalInit) -> WasmResult<Global> {
         Ok(Global {
             wasm_ty: ty.content_type.try_into()?,

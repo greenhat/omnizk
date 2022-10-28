@@ -21,6 +21,8 @@ use crate::error::WasmResult;
 )]
 /// Translates wasm operators into Cranelift IR instructions. Returns `true` if it inserted
 /// a return.
+#[allow(dead_code)]
+#[allow(unused_variables)]
 pub fn translate_operator(
     validator: &mut FuncValidator<impl WasmModuleResources>,
     op: &Operator,
