@@ -15,7 +15,6 @@ c2zk-ir = { workspace = true }
 wasmparser = { workspace = true }
 itertools = "0.10.0"
 log = { workspace = true }
-serde = { version = "1.0.94", features = ["derive"], optional = true }
 smallvec = { workspace = true }
 thiserror = { workspace = true }
 derive_more = { workspace = true }
@@ -24,6 +23,4 @@ derive_more = { workspace = true }
 wat = { workspace = true }
 target-lexicon = { workspace = true }
 
-[features]
-enable-serde = ["serde"]
 

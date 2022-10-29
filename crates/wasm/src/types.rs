@@ -6,14 +6,13 @@
 use derive_more::From;
 pub use wasmparser;
 
-use serde::{Deserialize, Serialize};
 use std::convert::{TryFrom, TryInto};
 use std::fmt;
 
 use crate::error::{WasmError, WasmResult};
 
 /// WebAssembly value type -- equivalent of `wasmparser`'s Type.
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum WasmType {
     /// I32 type
     I32,
@@ -76,7 +75,7 @@ impl fmt::Display for WasmType {
 }
 
 /// WebAssembly function type -- equivalent of `wasmparser`'s FuncType.
-#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct WasmFuncType {
     params: Box<[WasmType]>,
     externref_params_count: usize,
@@ -149,91 +148,63 @@ impl TryFrom<wasmparser::FuncType> for WasmFuncType {
 }
 
 /// Index type of a function (imported or defined) inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct FuncIndex(u32);
 
 /// Index type of a defined function inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct DefinedFuncIndex(u32);
 
 /// Index type of a defined table inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct DefinedTableIndex(u32);
 
 /// Index type of a defined memory inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct DefinedMemoryIndex(u32);
 
 /// Index type of a defined memory inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct OwnedMemoryIndex(u32);
 
 /// Index type of a defined global inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct DefinedGlobalIndex(u32);
 
 /// Index type of a table (imported or defined) inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct TableIndex(u32);
 
 /// Index type of a global variable (imported or defined) inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct GlobalIndex(u32);
 
 /// Index type of a linear memory (imported or defined) inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct MemoryIndex(u32);
 
 /// Index type of a signature (imported or defined) inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct SignatureIndex(u32);
 
 /// Index type of a passive data segment inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct DataIndex(u32);
 
 /// Index type of a passive element segment inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct ElemIndex(u32);
 
 /// Index type of a type inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct TypeIndex(u32);
 
 /// Index type of an event inside the WebAssembly module.
-#[derive(
-    Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize, From,
-)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct TagIndex(u32);
 
 /// An index of an entity.
-#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Serialize, Deserialize)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
 pub enum EntityIndex {
     /// Function index.
     Function(FuncIndex),
@@ -272,7 +243,7 @@ impl From<GlobalIndex> for EntityIndex {
 /// A type of an item in a wasm module where an item is typically something that
 /// can be exported.
 #[allow(missing_docs)]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum EntityType {
     /// A global variable with the specified content type
     Global(Global),
@@ -288,7 +259,7 @@ pub enum EntityType {
 }
 
 /// A WebAssembly global.
-#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq)]
 pub struct Global {
     /// The Wasm type of the value stored in the global.
     pub wasm_ty: WasmType,
@@ -299,7 +270,7 @@ pub struct Global {
 }
 
 /// Globals are initialized via the `const` operators or by referring to another import.
-#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq)]
 pub enum GlobalInit {
     /// An `i32.const`.
     I32Const(i32),
@@ -334,7 +305,7 @@ impl Global {
 }
 
 /// WebAssembly table.
-#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq)]
 pub struct Table {
     /// The table elements' Wasm type.
     pub wasm_ty: WasmType,
@@ -357,7 +328,7 @@ impl TryFrom<wasmparser::TableType> for Table {
 }
 
 /// WebAssembly linear memory.
-#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq)]
 pub struct Memory {
     /// The minimum number of pages in the memory.
     pub minimum: u64,
@@ -381,7 +352,7 @@ impl From<wasmparser::MemoryType> for Memory {
 }
 
 /// WebAssembly event.
-#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq)]
 pub struct Tag {
     /// The event signature type.
     pub ty: TypeIndex,
