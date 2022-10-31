@@ -7,6 +7,7 @@
 #![deny(non_snake_case)]
 #![deny(unused_mut)]
 // #![deny(dead_code)]
+#![allow(dead_code)]
 #![deny(unused_imports)]
 #![deny(missing_docs)]
 #![deny(trivial_numeric_casts)]

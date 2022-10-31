@@ -1,5 +1,7 @@
 mod entities;
-mod module_info;
+mod func;
+mod module;
 
 pub use entities::*;
-pub use module_info::*;
+pub use func::*;
+pub use module::*;
