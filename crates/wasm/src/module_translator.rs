@@ -6,11 +6,11 @@
 use c2zk_ir::ir;
 
 use crate::{error::WasmResult, module_trans_env::ModuleTranslationEnv};
-use wasmparser::{NameSectionReader, Parser, Payload, Type, Validator};
+use wasmparser::{Parser, Payload, Type, Validator};
 
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
 pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
-    let mut module = ir::Module::new();
+    let module = ir::Module::new();
     let mut validator = Validator::new();
     let mut module_translation_env = ModuleTranslationEnv::new();
 
@@ -34,84 +34,79 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
 
             Payload::ImportSection(imports) => {
                 validator.import_section(&imports)?;
-                parse_import_section(imports, module)?;
+                todo!()
             }
 
             Payload::FunctionSection(functions) => {
                 validator.function_section(&functions)?;
-                parse_function_section(functions, module)?;
+                todo!()
             }
 
             Payload::TableSection(tables) => {
                 validator.table_section(&tables)?;
-                parse_table_section(tables, module)?;
+                todo!()
             }
 
             Payload::MemorySection(memories) => {
                 validator.memory_section(&memories)?;
-                parse_memory_section(memories, module)?;
+                todo!()
             }
 
             Payload::TagSection(tags) => {
                 validator.tag_section(&tags)?;
-                parse_tag_section(tags, module)?;
+                todo!()
             }
 
             Payload::GlobalSection(globals) => {
                 validator.global_section(&globals)?;
-                parse_global_section(globals, module)?;
+                todo!()
             }
 
             Payload::ExportSection(exports) => {
                 validator.export_section(&exports)?;
-                parse_export_section(exports, module)?;
+                todo!()
             }
 
             Payload::StartSection { func, range } => {
                 validator.start_section(func, &range)?;
-                parse_start_section(func, module)?;
+                todo!()
             }
 
             Payload::ElementSection(elements) => {
                 validator.element_section(&elements)?;
-                parse_element_section(elements, module)?;
+                todo!()
             }
 
             Payload::CodeSectionStart { count, range, .. } => {
                 validator.code_section_start(count, &range)?;
-                module.reserve_function_bodies(count, range.start as u64);
+                todo!()
             }
 
             Payload::CodeSectionEntry(body) => {
-                let func_validator = validator
+                let _func_validator = validator
                     .code_section_entry(&body)?
                     .into_validator(Default::default());
-                module.define_function_body(func_validator, body)?;
+                todo!()
             }
 
             Payload::DataSection(data) => {
                 validator.data_section(&data)?;
-                parse_data_section(data, module)?;
+                todo!()
             }
 
             Payload::DataCountSection { count, range } => {
                 validator.data_count_section(count, &range)?;
-                module.reserve_passive_data(count)?;
+                todo!()
             }
 
             Payload::CustomSection(s) if s.name() == "name" => {
-                let result = NameSectionReader::new(s.data(), s.data_offset())
-                    .map_err(|e| e.into())
-                    .and_then(|s| parse_name_section(s, module));
-                if let Err(e) = result {
-                    log::warn!("failed to parse name section {:?}", e);
-                }
+                todo!()
             }
 
-            Payload::CustomSection(s) => module.custom_section(s.name(), s.data())?,
+            Payload::CustomSection(_) => todo!(),
             other => {
                 validator.payload(&other)?;
-                panic!("unimplemented section {:?}", other);
+                todo!()
             }
         }
     }
