@@ -5,147 +5,48 @@
 
 use derive_more::From;
 pub use wasmparser;
+use wasmparser::ValType;
 
-use std::convert::{TryFrom, TryInto};
-use std::fmt;
+use std::convert::TryFrom;
 
 use crate::error::{WasmError, WasmResult};
 
-/// WebAssembly value type -- equivalent of `wasmparser`'s Type.
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
-pub enum WasmType {
-    /// I32 type
-    I32,
-    /// I64 type
-    I64,
-    /// F32 type
-    F32,
-    /// F64 type
-    F64,
-    /// V128 type
-    V128,
-    /// FuncRef type
-    FuncRef,
-    /// ExternRef type
-    ExternRef,
-}
+// /// WebAssembly function type -- equivalent of `wasmparser`'s FuncType.
+// #[derive(Debug, Clone, Eq, PartialEq, Hash)]
+// pub struct WasmFuncType {
+//     params: Box<[ValType]>,
+//     returns: Box<[ValType]>,
+// }
 
-impl TryFrom<wasmparser::ValType> for WasmType {
-    type Error = WasmError;
-    fn try_from(ty: wasmparser::ValType) -> Result<Self, Self::Error> {
-        use wasmparser::ValType::*;
-        match ty {
-            I32 => Ok(WasmType::I32),
-            I64 => Ok(WasmType::I64),
-            F32 => Ok(WasmType::F32),
-            F64 => Ok(WasmType::F64),
-            V128 => Ok(WasmType::V128),
-            FuncRef => Ok(WasmType::FuncRef),
-            ExternRef => Ok(WasmType::ExternRef),
-        }
-    }
-}
+// impl WasmFuncType {
+//     #[inline]
+//     pub fn new(params: Box<[ValType]>, returns: Box<[ValType]>) -> Self {
+//         WasmFuncType { params, returns }
+//     }
 
-impl From<WasmType> for wasmparser::ValType {
-    fn from(ty: WasmType) -> wasmparser::ValType {
-        match ty {
-            WasmType::I32 => wasmparser::ValType::I32,
-            WasmType::I64 => wasmparser::ValType::I64,
-            WasmType::F32 => wasmparser::ValType::F32,
-            WasmType::F64 => wasmparser::ValType::F64,
-            WasmType::V128 => wasmparser::ValType::V128,
-            WasmType::FuncRef => wasmparser::ValType::FuncRef,
-            WasmType::ExternRef => wasmparser::ValType::ExternRef,
-        }
-    }
-}
+//     /// Function params types.
+//     #[allow(dead_code)]
+//     #[inline]
+//     pub fn params(&self) -> &[ValType] {
+//         &self.params
+//     }
 
-impl fmt::Display for WasmType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            WasmType::I32 => write!(f, "i32"),
-            WasmType::I64 => write!(f, "i64"),
-            WasmType::F32 => write!(f, "f32"),
-            WasmType::F64 => write!(f, "f64"),
-            WasmType::V128 => write!(f, "v128"),
-            WasmType::ExternRef => write!(f, "externref"),
-            WasmType::FuncRef => write!(f, "funcref"),
-        }
-    }
-}
+//     /// Returns params types.
+//     #[allow(dead_code)]
+//     #[inline]
+//     pub fn returns(&self) -> &[ValType] {
+//         &self.returns
+//     }
+// }
 
-/// WebAssembly function type -- equivalent of `wasmparser`'s FuncType.
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub struct WasmFuncType {
-    params: Box<[WasmType]>,
-    externref_params_count: usize,
-    returns: Box<[WasmType]>,
-    externref_returns_count: usize,
-}
-
-impl WasmFuncType {
-    #[inline]
-    pub fn new(params: Box<[WasmType]>, returns: Box<[WasmType]>) -> Self {
-        let externref_params_count = params.iter().filter(|p| **p == WasmType::ExternRef).count();
-        let externref_returns_count = returns
-            .iter()
-            .filter(|r| **r == WasmType::ExternRef)
-            .count();
-        WasmFuncType {
-            params,
-            externref_params_count,
-            returns,
-            externref_returns_count,
-        }
-    }
-
-    /// Function params types.
-    #[allow(dead_code)]
-    #[inline]
-    pub fn params(&self) -> &[WasmType] {
-        &self.params
-    }
-
-    /// How many `externref`s are in this function's params?
-    #[allow(dead_code)]
-    #[inline]
-    pub fn externref_params_count(&self) -> usize {
-        self.externref_params_count
-    }
-
-    /// Returns params types.
-    #[allow(dead_code)]
-    #[inline]
-    pub fn returns(&self) -> &[WasmType] {
-        &self.returns
-    }
-
-    /// How many `externref`s are in this function's returns?
-    #[allow(dead_code)]
-    #[inline]
-    pub fn externref_returns_count(&self) -> usize {
-        self.externref_returns_count
-    }
-}
-
-impl TryFrom<wasmparser::FuncType> for WasmFuncType {
-    type Error = WasmError;
-    fn try_from(ty: wasmparser::FuncType) -> Result<Self, Self::Error> {
-        let params = ty
-            .params()
-            .iter()
-            .copied()
-            .map(WasmType::try_from)
-            .collect::<Result<_, Self::Error>>()?;
-        let returns = ty
-            .results()
-            .iter()
-            .copied()
-            .map(WasmType::try_from)
-            .collect::<Result<_, Self::Error>>()?;
-        Ok(Self::new(params, returns))
-    }
-}
+// impl TryFrom<wasmparser::FuncType> for WasmFuncType {
+//     type Error = WasmError;
+//     fn try_from(ty: wasmparser::FuncType) -> Result<Self, Self::Error> {
+//         let params = Box::new(ty.params());
+//         let returns = Box::new(ty.results());
+//         Ok(Self::new(params, returns))
+//     }
+// }
 
 /// Index type of a function (imported or defined) inside the WebAssembly module.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
@@ -262,7 +163,7 @@ pub enum EntityType {
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq)]
 pub struct Global {
     /// The Wasm type of the value stored in the global.
-    pub wasm_ty: WasmType,
+    pub wasm_ty: ValType,
     /// A flag indicating whether the value may change at runtime.
     pub mutability: bool,
     /// The source of the initial value.
@@ -297,7 +198,7 @@ impl Global {
     #[allow(dead_code)]
     pub fn new(ty: wasmparser::GlobalType, initializer: GlobalInit) -> WasmResult<Global> {
         Ok(Global {
-            wasm_ty: ty.content_type.try_into()?,
+            wasm_ty: ty.content_type,
             mutability: ty.mutable,
             initializer,
         })
@@ -308,7 +209,7 @@ impl Global {
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq)]
 pub struct Table {
     /// The table elements' Wasm type.
-    pub wasm_ty: WasmType,
+    pub wasm_ty: ValType,
     /// The minimum number of elements in the table.
     pub minimum: u32,
     /// The maximum number of elements in the table.
@@ -320,7 +221,7 @@ impl TryFrom<wasmparser::TableType> for Table {
 
     fn try_from(ty: wasmparser::TableType) -> WasmResult<Table> {
         Ok(Table {
-            wasm_ty: ty.element_type.try_into()?,
+            wasm_ty: ty.element_type,
             minimum: ty.initial,
             maximum: ty.maximum,
         })

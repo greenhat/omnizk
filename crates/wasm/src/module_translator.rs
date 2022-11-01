@@ -5,13 +5,14 @@
 
 use c2zk_ir::ir;
 
-use crate::error::WasmResult;
-use wasmparser::{NameSectionReader, Parser, Payload, Validator};
+use crate::{error::WasmResult, module_trans_env::ModuleTranslationEnv};
+use wasmparser::{NameSectionReader, Parser, Payload, Type, Validator};
 
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
 pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
     let mut module = ir::Module::new();
     let mut validator = Validator::new();
+    let mut module_translation_env = ModuleTranslationEnv::new();
 
     for payload in Parser::new(0).parse_all(data) {
         match payload? {
@@ -28,12 +29,12 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
 
             Payload::TypeSection(types) => {
                 validator.type_section(&types)?;
-                // parse_type_section(types, &mut module_translation_state, module)?;
+                parse_type_section(types, &mut module_translation_env)?;
             }
 
             Payload::ImportSection(imports) => {
                 validator.import_section(&imports)?;
-                // parse_import_section(imports, module)?;
+                parse_import_section(imports, module)?;
             }
 
             Payload::FunctionSection(functions) => {
@@ -116,6 +117,20 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
     }
 
     Ok(module)
+}
+
+fn parse_type_section(
+    types: wasmparser::TypeSectionReader,
+    module_translation_env: &mut ModuleTranslationEnv,
+) -> WasmResult<()> {
+    for entry in types {
+        match entry? {
+            Type::Func(wasm_func_ty) => {
+                module_translation_env.types.push(wasm_func_ty);
+            }
+        }
+    }
+    Ok(())
 }
 
 #[allow(clippy::unwrap_used)]
