@@ -3,14 +3,19 @@
 //! Translation skeleton that traverses the whole WebAssembly module and call helper functions
 //! to deal with each part of it.
 
+use c2zk_frontend::FuncBuilder;
 use c2zk_ir::ir;
 
-use crate::{error::WasmResult, module_trans_env::ModuleTranslationEnv};
-use wasmparser::{Parser, Payload, Type, Validator};
+use crate::{
+    code_translator::translate_operator, error::WasmResult, module_trans_env::ModuleTranslationEnv,
+};
+use wasmparser::{
+    FuncValidator, FunctionBody, Parser, Payload, Type, Validator, ValidatorResources,
+};
 
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
 pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
-    let module = ir::Module::new();
+    let mut module = ir::Module::new();
     let mut validator = Validator::new();
     let mut module_translation_env = ModuleTranslationEnv::new();
 
@@ -39,7 +44,11 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
 
             Payload::FunctionSection(functions) => {
                 validator.function_section(&functions)?;
-                todo!()
+                dbg!(
+                    "Function section: {:?}",
+                    functions.into_iter().collect::<Vec<_>>()
+                );
+                // todo!()
             }
 
             Payload::TableSection(tables) => {
@@ -79,14 +88,19 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
 
             Payload::CodeSectionStart { count, range, .. } => {
                 validator.code_section_start(count, &range)?;
-                todo!()
+                // todo!()
             }
 
             Payload::CodeSectionEntry(body) => {
-                let _func_validator = validator
+                let mut func_validator = validator
                     .code_section_entry(&body)?
                     .into_validator(Default::default());
-                todo!()
+                parse_code_section_entry(
+                    &mut module,
+                    &mut module_translation_env,
+                    &mut func_validator,
+                    body,
+                )?;
             }
 
             Payload::DataSection(data) => {
@@ -124,6 +138,26 @@ fn parse_type_section(
                 module_translation_env.types.push(wasm_func_ty);
             }
         }
+    }
+    Ok(())
+}
+
+fn parse_code_section_entry(
+    module: &mut ir::Module,
+    module_translation_env: &mut ModuleTranslationEnv,
+    validator: &mut FuncValidator<ValidatorResources>,
+    body: FunctionBody,
+) -> WasmResult<()> {
+    let mut builder = FuncBuilder::new();
+    let mut reader = body.get_binary_reader();
+    // take care of wasm parameters
+    // take care of wasm func locals
+    // 
+    while !reader.eof() {
+        let pos = reader.original_position();
+        let op = reader.read_operator()?;
+        validator.op(pos, &op)?;
+        translate_operator(validator, &op, &mut builder)?;
     }
     Ok(())
 }

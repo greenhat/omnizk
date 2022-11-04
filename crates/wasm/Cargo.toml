@@ -12,6 +12,7 @@ edition.workspace = true
 
 [dependencies]
 c2zk-ir = { workspace = true }
+c2zk-frontend = { workspace = true }
 wasmparser = { workspace = true }
 itertools = "0.10.0"
 log = { workspace = true }

@@ -10,6 +10,7 @@
 //! block, it is pushed onto the control stack and popped off when encountering the corresponding
 //! `End`.
 
+use c2zk_frontend::FuncBuilder;
 use wasmparser::{FuncValidator, Operator, WasmModuleResources};
 
 use crate::error::WasmResult;
@@ -26,6 +27,7 @@ use crate::error::WasmResult;
 pub fn translate_operator(
     validator: &mut FuncValidator<impl WasmModuleResources>,
     op: &Operator,
+    builder: &mut FuncBuilder,
 ) -> WasmResult<()> {
     // if !state.reachable {
     //     // translate_unreachable_operator(validator, &op, builder, state, environ)?;

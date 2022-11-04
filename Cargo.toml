@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/wasm", "crates/tritonvm", "crates/ir"]
+members = ["crates/wasm", "crates/tritonvm", "crates/ir", "crates/frontend"]
 exclude = []
 resolver = "2"
 
@@ -16,6 +16,7 @@ categories = ["wasm", "no-std", "virtualization"]
 
 [workspace.dependencies]
 c2zk-ir = { path = "crates/ir" }
+c2zk-frontend = { path = "crates/frontend" }
 wasmparser = { version = "0.93", features = ["deterministic"] }
 log = { version = "0.4.8", default-features = false }
 smallvec = { version = "1.6.1", features = ["union"] }

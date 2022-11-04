@@ -1,0 +1,15 @@
+[package]
+name = "c2zk-frontend"
+version = "0.1.0"
+description = "IR builder helper for c2zk"
+authors.workspace = true
+repository.workspace = true
+edition.workspace = true
+readme.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+
+[dev-dependencies]
