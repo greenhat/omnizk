@@ -4,6 +4,7 @@ use wasmparser::{FuncValidator, Operator, WasmModuleResources};
 use crate::error::WasmResult;
 
 /// Translates wasm operators into c2zk IR instructions.
+#[allow(unused_variables)]
 pub fn translate_operator(
     validator: &mut FuncValidator<impl WasmModuleResources>,
     op: &Operator,
