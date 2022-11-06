@@ -11,43 +11,6 @@ use std::convert::TryFrom;
 
 use crate::error::{WasmError, WasmResult};
 
-// /// WebAssembly function type -- equivalent of `wasmparser`'s FuncType.
-// #[derive(Debug, Clone, Eq, PartialEq, Hash)]
-// pub struct WasmFuncType {
-//     params: Box<[ValType]>,
-//     returns: Box<[ValType]>,
-// }
-
-// impl WasmFuncType {
-//     #[inline]
-//     pub fn new(params: Box<[ValType]>, returns: Box<[ValType]>) -> Self {
-//         WasmFuncType { params, returns }
-//     }
-
-//     /// Function params types.
-//     #[allow(dead_code)]
-//     #[inline]
-//     pub fn params(&self) -> &[ValType] {
-//         &self.params
-//     }
-
-//     /// Returns params types.
-//     #[allow(dead_code)]
-//     #[inline]
-//     pub fn returns(&self) -> &[ValType] {
-//         &self.returns
-//     }
-// }
-
-// impl TryFrom<wasmparser::FuncType> for WasmFuncType {
-//     type Error = WasmError;
-//     fn try_from(ty: wasmparser::FuncType) -> Result<Self, Self::Error> {
-//         let params = Box::new(ty.params());
-//         let returns = Box::new(ty.results());
-//         Ok(Self::new(params, returns))
-//     }
-// }
-
 /// Index type of a function (imported or defined) inside the WebAssembly module.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
 pub struct FuncIndex(u32);

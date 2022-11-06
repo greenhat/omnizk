@@ -152,7 +152,7 @@ fn parse_code_section_entry(
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters
     // take care of wasm func locals
-    // 
+    //
     while !reader.eof() {
         let pos = reader.original_position();
         let op = reader.read_operator()?;

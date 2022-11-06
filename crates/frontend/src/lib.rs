@@ -19,5 +19,7 @@
 #![deny(clippy::panic)]
 
 mod func_builder;
+mod inst_builder;
 
 pub use crate::func_builder::*;
+pub use crate::inst_builder::*;
