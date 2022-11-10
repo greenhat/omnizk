@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/wasm", "crates/codegen-tritonvm", "crates/ir", "crates/frontend", "crates/codegen", "crates/codegen-shared"]
+members = ["crates/wasm", "crates/codegen-tritonvm", "crates/ir", "crates/frontend", "crates/codegen", "crates/codegen-shared", "crates/compiler"]
 exclude = []
 resolver = "2"
 
