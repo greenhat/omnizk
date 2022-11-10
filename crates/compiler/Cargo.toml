@@ -14,5 +14,7 @@ categories.workspace = true
 c2zk-codegen = { workspace = true }
 c2zk-frontend = { workspace = true }
 c2zk-ir = { workspace = true }
+c2zk-wasm = { workspace = true }
 
 [dev-dependencies]
+wat = { workspace = true }

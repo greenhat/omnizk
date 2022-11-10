@@ -168,7 +168,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_add() {
+    fn test_const() {
         let wat = r#"
             (module (func (param i32) (result i32)
               i32.const 1

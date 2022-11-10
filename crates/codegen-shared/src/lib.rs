@@ -1,4 +1,4 @@
-//! Wasm to TritonVM compiler
+//! Common codegen code
 
 // Coding conventions
 // #![deny(unsafe_code)]
@@ -17,3 +17,5 @@
 // #![deny(clippy::todo)]
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
+
+pub enum CodegenError {}

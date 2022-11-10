@@ -18,9 +18,12 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
+use c2zk_codegen::codegen;
 use c2zk_codegen::TargetConfig;
 use c2zk_frontend::FrontendConfig;
+use c2zk_wasm::translate_module;
 
+#[derive(Debug)]
 pub enum CompileError {}
 
 pub fn compile(
@@ -28,5 +31,36 @@ pub fn compile(
     frontend: FrontendConfig,
     target: TargetConfig,
 ) -> Result<Vec<u8>, CompileError> {
-    todo!()
+    match frontend {
+        FrontendConfig::Wasm => {
+            // TODO: hide behind a frontend func/trait
+            let module = translate_module(source.as_slice())?;
+            let code = codegen(&module, target)?;
+            Ok(code)
+        }
+    }
+}
+
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod tests {
+    use c2zk_codegen::TritonTargetConfig;
+
+    use super::*;
+    use crate::compile;
+
+    #[test]
+    fn test_const() {
+        let wat = r#"
+            (module (func (param i32) (result i32)
+              i32.const 1
+              return))"#;
+        let source = wat::parse_str(wat).unwrap();
+        let target = TargetConfig::Triton(TritonTargetConfig::default());
+        let out_bytes = compile(source, FrontendConfig::Wasm, target).unwrap();
+        let expected_triton = r#"
+           todo 
+        "#;
+        assert_eq!(expected_triton.as_bytes(), out_bytes);
+    }
 }

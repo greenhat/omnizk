@@ -11,6 +11,7 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
+c2zk-ir = { workspace = true }
 c2zk-codegen-shared = { workspace = true }
 c2zk-codegen-tritonvm = { workspace = true }
 

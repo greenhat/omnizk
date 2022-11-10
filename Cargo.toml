@@ -15,6 +15,7 @@ keywords = ["wasm", "webassembly", "zk", "proof", "verification"]
 categories = ["wasm", "no-std", "virtualization"]
 
 [workspace.dependencies]
+c2zk-wasm = { path = "crates/wasm" }
 c2zk-ir = { path = "crates/ir" }
 c2zk-frontend = { path = "crates/frontend" }
 c2zk-codegen = { path = "crates/codegen" }

@@ -11,6 +11,8 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
+c2zk-ir = { workspace = true }
+c2zk-codegen-shared = { workspace = true }
 triton-vm = { path = "../../../triton-vm/triton-vm" }
 
 [dev-dependencies]
