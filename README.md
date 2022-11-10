@@ -1,0 +1,1 @@
+The goal is to build a compiler framework with a similar to LLVM modular design to generate code for multiple ZK VMs backends (Miden, TritonVM, etc.) from various sources (frontends). The first frontend is planned to be WebAssembly, opening the path to compiling other languages (Rust, etc.). More frontends can be added later with support for Move, Solidity, etc.
