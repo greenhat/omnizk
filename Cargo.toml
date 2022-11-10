@@ -19,6 +19,7 @@ c2zk-ir = { path = "crates/ir" }
 c2zk-frontend = { path = "crates/frontend" }
 c2zk-codegen = { path = "crates/codegen" }
 c2zk-codegen-shared = { path = "crates/codegen-shared" }
+c2zk-codegen-tritonvm = { path = "crates/codegen-tritonvm" }
 wasmparser = { version = "0.94", features = ["deterministic"] }
 log = { version = "0.4.8", default-features = false }
 smallvec = { version = "1.6.1", features = ["union"] }

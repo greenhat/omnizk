@@ -17,3 +17,16 @@
 // #![deny(clippy::todo)]
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
+
+use c2zk_codegen::TargetConfig;
+use c2zk_frontend::FrontendConfig;
+
+pub enum CompileError {}
+
+pub fn compile(
+    source: Vec<u8>,
+    frontend: FrontendConfig,
+    target: TargetConfig,
+) -> Result<Vec<u8>, CompileError> {
+    todo!()
+}

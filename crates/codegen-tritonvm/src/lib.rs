@@ -17,3 +17,5 @@
 // #![deny(clippy::todo)]
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
+
+pub struct TritonTargetConfig {}

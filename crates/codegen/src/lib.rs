@@ -17,3 +17,9 @@
 // #![deny(clippy::todo)]
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
+
+use c2zk_codegen_tritonvm::TritonTargetConfig;
+
+pub enum TargetConfig {
+    Triton(TritonTargetConfig),
+}

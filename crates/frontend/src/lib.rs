@@ -23,3 +23,7 @@ mod inst_builder;
 
 pub use crate::func_builder::*;
 pub use crate::inst_builder::*;
+
+pub enum FrontendConfig {
+    Wasm,
+}

@@ -12,5 +12,6 @@ categories.workspace = true
 
 [dependencies]
 c2zk-codegen-shared = { workspace = true }
+c2zk-codegen-tritonvm = { workspace = true }
 
 [dev-dependencies]
