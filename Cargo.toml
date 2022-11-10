@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/wasm", "crates/tritonvm", "crates/ir", "crates/frontend"]
+members = ["crates/wasm", "crates/codegen-tritonvm", "crates/ir", "crates/frontend", "crates/codegen", "crates/codegen-shared"]
 exclude = []
 resolver = "2"
 
@@ -17,7 +17,9 @@ categories = ["wasm", "no-std", "virtualization"]
 [workspace.dependencies]
 c2zk-ir = { path = "crates/ir" }
 c2zk-frontend = { path = "crates/frontend" }
-wasmparser = { version = "0.93", features = ["deterministic"] }
+c2zk-codegen = { path = "crates/codegen" }
+c2zk-codegen-shared = { path = "crates/codegen-shared" }
+wasmparser = { version = "0.94", features = ["deterministic"] }
 log = { version = "0.4.8", default-features = false }
 smallvec = { version = "1.6.1", features = ["union"] }
 wat = "1.0.49"
