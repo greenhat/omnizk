@@ -159,6 +159,7 @@ fn parse_code_section_entry(
         validator.op(pos, &op)?;
         translate_operator(validator, &op, &mut builder)?;
     }
+    module.push_func(builder.finish());
     Ok(())
 }
 

@@ -1,3 +1,4 @@
+use c2zk_ir::ir::Func;
 use c2zk_ir::ir::Inst;
 
 use crate::InstBuilder;
@@ -9,6 +10,10 @@ pub struct FuncBuilder {
 impl FuncBuilder {
     pub fn new() -> FuncBuilder {
         FuncBuilder { ins: Vec::new() }
+    }
+
+    pub fn finish(self) -> Func {
+        Func::new(self.ins)
     }
 
     pub fn ins(&mut self) -> InstBuilder {
