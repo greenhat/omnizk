@@ -3,7 +3,7 @@
 //! Translation skeleton that traverses the whole WebAssembly module and call helper functions
 //! to deal with each part of it.
 
-use c2zk_frontend::FuncBuilder;
+use c2zk_frontend_shared::FuncBuilder;
 use c2zk_ir::ir;
 
 use crate::{

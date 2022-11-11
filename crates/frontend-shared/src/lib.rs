@@ -1,4 +1,4 @@
-//! Compiler
+//! IR builder helper
 
 // Coding conventions
 // #![deny(unsafe_code)]
@@ -6,7 +6,7 @@
 #![deny(non_camel_case_types)]
 #![deny(non_snake_case)]
 #![deny(unused_mut)]
-#![deny(dead_code)]
+// #![deny(dead_code)]
 #![deny(unused_imports)]
 // #![deny(missing_docs)]
 // Clippy exclusions
@@ -18,8 +18,8 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
-mod compile;
-mod error;
+mod func_builder;
+mod inst_builder;
 
-pub use crate::compile::*;
-pub use crate::error::*;
+pub use crate::func_builder::*;
+pub use crate::inst_builder::*;

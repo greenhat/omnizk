@@ -1,4 +1,4 @@
-use c2zk_frontend::FuncBuilder;
+use c2zk_frontend_shared::FuncBuilder;
 use wasmparser::{FuncValidator, Operator, WasmModuleResources};
 
 use crate::error::WasmResult;

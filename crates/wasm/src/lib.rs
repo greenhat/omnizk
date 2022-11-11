@@ -23,11 +23,14 @@
 #![warn(unused_import_braces)]
 
 mod code_translator;
+mod config;
 mod error;
 mod module_trans_env;
 mod module_translator;
 mod types;
 
+pub use crate::config::WasmFrontendConfig;
+pub use crate::error::WasmError;
 pub use crate::module_translator::translate_module;
 
 // Convenience reexport of the wasmparser crate that we're linking against,

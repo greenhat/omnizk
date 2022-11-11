@@ -18,17 +18,10 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
-use c2zk_codegen_shared::CodegenError;
-use c2zk_codegen_tritonvm::emit;
-pub use c2zk_codegen_tritonvm::TritonTargetConfig;
-use c2zk_ir::ir::Module;
+mod codegen;
+mod config;
+mod error;
 
-pub enum TargetConfig {
-    Triton(TritonTargetConfig),
-}
-
-pub fn codegen(module: &Module, target_config: TargetConfig) -> Result<Vec<u8>, CodegenError> {
-    match target_config {
-        TargetConfig::Triton(config) => emit(module, config),
-    }
-}
+pub use crate::codegen::*;
+pub use crate::config::*;
+pub use crate::error::*;

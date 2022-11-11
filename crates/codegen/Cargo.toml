@@ -14,5 +14,6 @@ categories.workspace = true
 c2zk-ir = { workspace = true }
 c2zk-codegen-shared = { workspace = true }
 c2zk-codegen-tritonvm = { workspace = true }
+derive_more = { workspace = true }
 
 [dev-dependencies]

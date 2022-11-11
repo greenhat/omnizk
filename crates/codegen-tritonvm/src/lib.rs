@@ -18,17 +18,10 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
-use c2zk_codegen_shared::CodegenError;
-use c2zk_ir::ir::Module;
+mod config;
+mod emit;
+mod error;
 
-pub struct TritonTargetConfig {}
-
-impl Default for TritonTargetConfig {
-    fn default() -> Self {
-        Self {}
-    }
-}
-
-pub fn emit(module: &Module, config: TritonTargetConfig) -> Result<Vec<u8>, CodegenError> {
-    todo!()
-}
+pub use crate::config::*;
+pub use crate::emit::*;
+pub use crate::error::*;

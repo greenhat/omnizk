@@ -1,4 +1,4 @@
-//! IR builder helper
+//! Frontend
 
 // Coding conventions
 // #![deny(unsafe_code)]
@@ -18,12 +18,10 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
-mod func_builder;
-mod inst_builder;
+mod config;
+mod error;
+mod translate;
 
-pub use crate::func_builder::*;
-pub use crate::inst_builder::*;
-
-pub enum FrontendConfig {
-    Wasm,
-}
+pub use crate::config::*;
+pub use crate::error::*;
+pub use crate::translate::*;

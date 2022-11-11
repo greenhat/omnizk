@@ -18,6 +18,7 @@ categories = ["wasm", "no-std", "virtualization"]
 c2zk-wasm = { path = "crates/wasm" }
 c2zk-ir = { path = "crates/ir" }
 c2zk-frontend = { path = "crates/frontend" }
+c2zk-frontend-shared = { path = "crates/frontend-shared" }
 c2zk-codegen = { path = "crates/codegen" }
 c2zk-codegen-shared = { path = "crates/codegen-shared" }
 c2zk-codegen-tritonvm = { path = "crates/codegen-tritonvm" }
