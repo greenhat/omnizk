@@ -14,5 +14,6 @@ categories.workspace = true
 c2zk-ir = { workspace = true }
 c2zk-codegen-shared = { workspace = true }
 triton-vm = { path = "../../../triton-vm/triton-vm" }
+twenty-first = { version = "0.3.2" }
 
 [dev-dependencies]
