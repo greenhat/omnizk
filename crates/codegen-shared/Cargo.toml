@@ -11,5 +11,6 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
+c2zk-ir = { workspace = true }
 
 [dev-dependencies]

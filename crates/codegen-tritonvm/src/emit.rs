@@ -1,11 +1,11 @@
+use c2zk_codegen_shared::CodegenError;
 use c2zk_ir::ir;
 use c2zk_ir::ir::Module;
 
-use crate::TritonError;
 use crate::TritonTargetConfig;
 
 #[allow(unused_variables)]
-pub fn emit(module: &Module, config: TritonTargetConfig) -> Result<Vec<u8>, TritonError> {
+pub fn emit(module: &Module, config: TritonTargetConfig) -> Result<Vec<u8>, CodegenError> {
     for func in module.functions() {
         for ins in func.inst() {
             match ins {

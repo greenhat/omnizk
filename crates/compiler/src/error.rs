@@ -1,4 +1,4 @@
-use c2zk_codegen::CodegenError;
+use c2zk_codegen_shared::CodegenError;
 use c2zk_frontend::FrontendError;
 use derive_more::From;
 

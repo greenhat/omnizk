@@ -20,8 +20,6 @@
 
 mod codegen;
 mod config;
-mod error;
 
 pub use crate::codegen::*;
 pub use crate::config::*;
-pub use crate::error::*;
