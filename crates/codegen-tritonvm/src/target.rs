@@ -11,7 +11,7 @@ pub struct TritonTarget {
 
 impl Target for TritonTarget {
     fn name(&self) -> &str {
-        "triton"
+        "TritonVM"
     }
 
     fn compile_module(&self, module: &Module) -> Result<Vec<u8>, CodegenError> {
