@@ -2,7 +2,7 @@ use c2zk_codegen_shared::CodegenError;
 use c2zk_codegen_shared::Target;
 use c2zk_ir::ir::Module;
 
-use crate::codegen;
+use crate::emit;
 use crate::TritonTargetConfig;
 
 pub struct TritonTarget {
@@ -18,7 +18,7 @@ impl Target for TritonTarget {
         let mut code = Vec::new();
         for func in module.functions() {
             for ins in func.inst() {
-                let bytes = codegen(ins, &self.config)?;
+                let bytes = emit(ins, &self.config)?;
                 code.extend(bytes);
             }
         }

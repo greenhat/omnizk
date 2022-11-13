@@ -4,7 +4,7 @@ use c2zk_ir::ir::Inst;
 use crate::TritonTargetConfig;
 
 #[allow(unused_variables)]
-pub fn codegen(ins: &Inst, config: &TritonTargetConfig) -> Result<Vec<u8>, CodegenError> {
+pub fn emit(ins: &Inst, config: &TritonTargetConfig) -> Result<Vec<u8>, CodegenError> {
     match ins {
         Inst::Unreachable => todo!(),
         Inst::Nop => todo!(),
