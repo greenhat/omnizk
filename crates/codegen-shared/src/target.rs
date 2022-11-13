@@ -1,8 +1,8 @@
-use c2zk_ir::ir::Func;
+use c2zk_ir::ir::Module;
 
 use crate::CodegenError;
 
 pub trait Target {
     fn name(&self) -> &str;
-    fn compile_function(&self, func: &Func) -> Result<Vec<u8>, CodegenError>;
+    fn compile_module(&self, module: &Module) -> Result<Vec<u8>, CodegenError>;
 }

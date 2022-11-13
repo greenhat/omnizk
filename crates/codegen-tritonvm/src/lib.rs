@@ -18,10 +18,12 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
+mod codegen;
 mod config;
-mod emit;
 mod error;
+mod target;
 
+pub use crate::codegen::*;
 pub use crate::config::*;
-pub use crate::emit::*;
 pub use crate::error::*;
+pub use crate::target::*;
