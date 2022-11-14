@@ -3,6 +3,7 @@ use c2zk_codegen_shared::Target;
 use c2zk_ir::ir::Module;
 
 use crate::emit;
+use crate::InstBuffer;
 use crate::TritonTargetConfig;
 
 pub struct TritonTarget {
@@ -15,14 +16,13 @@ impl Target for TritonTarget {
     }
 
     fn compile_module(&self, module: &Module) -> Result<Vec<u8>, CodegenError> {
-        let mut code = Vec::new();
+        let mut sink = InstBuffer::new(&self.config);
         for func in module.functions() {
             for ins in func.inst() {
-                let bytes = emit(ins, &self.config)?;
-                code.extend(bytes);
+                emit(ins, &self.config, &mut sink)?;
             }
         }
-        Ok(code)
+        Ok(sink.pretty_print().into_bytes())
     }
 }
 
