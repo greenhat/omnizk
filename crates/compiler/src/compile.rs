@@ -43,9 +43,25 @@ mod tests {
     fn test_const() {
         check(
             r#"
-            (module (func (param i32) (result i32)
+            (module (func 
               i32.const 1
               return))"#,
+            expect![[r#"
+               push 1
+               return"#]],
+        );
+    }
+
+    #[test]
+    fn test_start_section() {
+        check(
+            r#"
+            (module 
+            (start $f1)
+            (func $f1 
+              i32.const 1
+              return)
+              )"#,
             expect![[r#"
                push 1
                return"#]],

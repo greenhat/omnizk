@@ -44,10 +44,10 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
 
             Payload::FunctionSection(functions) => {
                 validator.function_section(&functions)?;
-                dbg!(
-                    "Function section: {:?}",
-                    functions.into_iter().collect::<Vec<_>>()
-                );
+                // dbg!(
+                //     "Function section: {:?}",
+                //     functions.into_iter().collect::<Vec<_>>()
+                // );
                 // todo!()
             }
 
@@ -78,7 +78,7 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
 
             Payload::StartSection { func, range } => {
                 validator.start_section(func, &range)?;
-                todo!()
+                module.set_start_func(func);
             }
 
             Payload::ElementSection(elements) => {
@@ -114,7 +114,8 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
             }
 
             Payload::CustomSection(s) if s.name() == "name" => {
-                todo!()
+                dbg!("Custom section: {:?}", s);
+                // todo!()
             }
 
             Payload::CustomSection(_) => todo!(),
@@ -124,7 +125,7 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
             }
         }
     }
-
+    // TODO: throw error if start section is not present
     Ok(module)
 }
 
