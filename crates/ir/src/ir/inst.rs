@@ -5,4 +5,7 @@ pub enum Inst {
     End,
     Return,
     I32Const { value: i32 },
+    LocalGet { local_index: u32 },
+    I32Add,
+    Call { func_index: u32 },
 }

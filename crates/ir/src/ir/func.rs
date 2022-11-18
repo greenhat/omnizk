@@ -9,7 +9,7 @@ impl Func {
         Self { ins }
     }
 
-    pub fn inst(&self) -> &[Inst] {
+    pub fn instructions(&self) -> &[Inst] {
         &self.ins
     }
 }

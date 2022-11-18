@@ -22,4 +22,16 @@ impl<'a> InstBuilder<'a> {
     pub fn end(&mut self) {
         self.fbuilder.add_inst(Inst::End);
     }
+
+    pub fn local_get(&mut self, local_index: u32) {
+        self.fbuilder.add_inst(Inst::LocalGet { local_index });
+    }
+
+    pub fn i32add(&mut self) {
+        self.fbuilder.add_inst(Inst::I32Add);
+    }
+
+    pub fn call(&mut self, func_index: u32) {
+        self.fbuilder.add_inst(Inst::Call { func_index });
+    }
 }

@@ -47,8 +47,9 @@ mod tests {
               i32.const 1
               return))"#,
             expect![[r#"
-               push 1
-               return"#]],
+                push 1
+                return
+                halt"#]],
         );
     }
 
@@ -63,8 +64,38 @@ mod tests {
               return)
               )"#,
             expect![[r#"
-               push 1
-               return"#]],
+                push 1
+                return
+                halt"#]],
+        );
+    }
+
+    #[test]
+    fn test_func_call() {
+        check(
+            r#"
+(module 
+    (start $main)
+    (func $add (param i32 i32) (result i32)
+        get_local 0
+        get_local 1
+        i32.add
+        return)
+    (func $main
+        i32.const 1
+        i32.const 2
+        call $add
+        return)
+)"#,
+            expect![[r#"
+                push 1
+                push 2
+                call 0
+                return
+                halt
+                0:
+                add
+                return"#]],
         );
     }
 }
