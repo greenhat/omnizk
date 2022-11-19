@@ -1,5 +1,6 @@
 use triton_vm::instruction::AnInstruction;
 use triton_vm::instruction::LabelledInstruction;
+use triton_vm::vm::Program;
 
 use crate::TritonOutputFormat;
 use crate::TritonTargetConfig;
@@ -13,6 +14,10 @@ impl InstBuffer {
             TritonOutputFormat::Binary => todo!(),
             TritonOutputFormat::Source => Self { inner: Vec::new() },
         }
+    }
+
+    pub(crate) fn program(&self) -> Program {
+        Program::new(&self.inner)
     }
 
     pub(crate) fn pretty_print(&self) -> String {
