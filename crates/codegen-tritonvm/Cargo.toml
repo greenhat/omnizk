@@ -17,3 +17,6 @@ triton-vm = { path = "../../../triton-vm/triton-vm" }
 twenty-first = { version = "0.5.0" }
 
 [dev-dependencies]
+c2zk-frontend = { workspace = true }
+wat = { workspace = true }
+expect-test = "1.0.1"

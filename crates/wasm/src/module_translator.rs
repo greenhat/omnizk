@@ -114,7 +114,7 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
             }
 
             Payload::CustomSection(s) if s.name() == "name" => {
-                dbg!("Custom section: {:?}", s);
+                // dbg!("Custom section: {:?}", s);
                 // todo!()
             }
 

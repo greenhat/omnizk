@@ -20,5 +20,3 @@ c2zk-wasm = { workspace = true }
 derive_more = { workspace = true }
 
 [dev-dependencies]
-wat = { workspace = true }
-expect-test = "1.0.1"

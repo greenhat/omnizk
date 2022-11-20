@@ -1,14 +1,35 @@
-mod inst_buf;
-use c2zk_ir::ir::Func;
-pub use inst_buf::InstBuffer;
-
 use c2zk_codegen_shared::CodegenError;
-use c2zk_ir::ir::Inst;
-use twenty_first::shared_math::b_field_element::BFieldElement;
+use c2zk_ir::ir::Func;
+use c2zk_ir::ir::Module;
+
+mod inst_buf;
+pub use inst_buf::InstBuffer;
+mod emit;
+pub use emit::emit_inst;
+
+use triton_vm::instruction::AnInstruction;
 
 use crate::TritonTargetConfig;
 
-pub fn emit_function(
+use self::emit::func_index_to_label;
+
+pub fn compile_module(
+    module: &Module,
+    config: &TritonTargetConfig,
+) -> Result<InstBuffer, CodegenError> {
+    let mut sink = InstBuffer::new(config);
+    sink.push(AnInstruction::Call(func_index_to_label(
+        module.start_func_idx,
+    )));
+    sink.push(AnInstruction::Halt);
+    for (idx, func) in module.functions().iter().enumerate() {
+        sink.push_label(func_index_to_label(idx as u32));
+        compile_function(func, config, &mut sink)?;
+    }
+    Ok(sink)
+}
+
+pub fn compile_function(
     func: &Func,
     config: &TritonTargetConfig,
     sink: &mut InstBuffer,
@@ -19,28 +40,94 @@ pub fn emit_function(
     Ok(())
 }
 
-#[allow(unused_variables)]
-pub fn emit_inst(
-    ins: &Inst,
-    config: &TritonTargetConfig,
-    sink: &mut InstBuffer,
-) -> Result<(), CodegenError> {
-    // TODO: rename Inst to HIR and introduce MIR?
-    use triton_vm::instruction::AnInstruction;
-    match ins {
-        Inst::Unreachable => todo!(),
-        Inst::Nop => todo!(),
-        Inst::End => (), // should be eliminated at this point
-        Inst::Return => sink.push(AnInstruction::Return),
-        Inst::I32Const { value } => sink.push(AnInstruction::Push(felt(*value))),
-        Inst::LocalGet { local_index } => (), // do nothing for now, func param access is done via stack
-        Inst::I32Add => sink.push(AnInstruction::Add),
-        Inst::Call { func_index } => sink.push(AnInstruction::Call(func_index.to_string())),
-    }
-    Ok(())
-}
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+mod tests {
+    use expect_test::expect;
 
-fn felt(v: i32) -> BFieldElement {
-    // TODO: implement according to https://github.com/Neptune-Crypto/twenty-first/issues/32
-    BFieldElement::new(v as u64)
+    use super::*;
+
+    #[cfg(test)]
+    fn check(input: &str, expected_tree: expect_test::Expect) {
+        use c2zk_frontend::translate;
+        use c2zk_frontend::FrontendConfig;
+        use c2zk_frontend::WasmFrontendConfig;
+
+        let source = wat::parse_str(input).unwrap();
+        let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
+        let module = translate(&source, frontend).unwrap();
+        let inst_buf = compile_module(&module, &TritonTargetConfig::default()).unwrap();
+        let out_source = inst_buf.pretty_print();
+        expected_tree.assert_eq(&out_source);
+        let program = inst_buf.program();
+        let (_trace, _out, err) = program.run(vec![], vec![]);
+        dbg!(&err);
+        assert!(err.is_none());
+    }
+
+    #[test]
+    fn test_const() {
+        check(
+            r#"
+            (module (func 
+              i32.const 1
+              return))"#,
+            expect![[r#"
+                call f0
+                halt
+                f0:
+                push 1
+                return"#]],
+        );
+    }
+
+    #[test]
+    fn test_start_section() {
+        check(
+            r#"
+(module 
+    (start $f1)
+    (func $f1 
+        i32.const 1
+        return)
+)"#,
+            expect![[r#"
+                call f0
+                halt
+                f0:
+                push 1
+                return"#]],
+        );
+    }
+
+    #[test]
+    fn test_func_call() {
+        check(
+            r#"
+(module 
+    (start $main)
+    (func $add (param i32 i32) (result i32)
+        get_local 0
+        get_local 1
+        i32.add
+        return)
+    (func $main
+        i32.const 1
+        i32.const 2
+        call $add
+        return)
+)"#,
+            expect![[r#"
+                call f1
+                halt
+                f0:
+                add
+                return
+                f1:
+                push 1
+                push 2
+                call f0
+                return"#]],
+        );
+    }
 }
