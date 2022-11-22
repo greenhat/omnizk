@@ -16,7 +16,7 @@ pub fn emit_inst(
     match ins {
         Inst::Unreachable => todo!(),
         Inst::Nop => todo!(),
-        Inst::End => (), // should be eliminated at this point
+        Inst::End => sink.push(AnInstruction::Return),
         Inst::Return => sink.push(AnInstruction::Return),
         Inst::I32Const { value } => sink.push(AnInstruction::Push(felt(*value))),
         Inst::LocalGet { local_index } => (), // do nothing for now, func param access is done via stack

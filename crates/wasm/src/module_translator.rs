@@ -58,7 +58,7 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
 
             Payload::MemorySection(memories) => {
                 validator.memory_section(&memories)?;
-                todo!()
+                // todo!()
             }
 
             Payload::TagSection(tags) => {
@@ -68,16 +68,21 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
 
             Payload::GlobalSection(globals) => {
                 validator.global_section(&globals)?;
-                todo!()
+                // todo!()
             }
 
             Payload::ExportSection(exports) => {
                 validator.export_section(&exports)?;
-                todo!()
+                dbg!(
+                    "Export section: {:?}",
+                    exports.into_iter().collect::<Vec<_>>()
+                );
+                // todo!()
             }
 
             Payload::StartSection { func, range } => {
                 validator.start_section(func, &range)?;
+                dbg!("Start section: {:?}", func);
                 module.set_start_func(func);
             }
 
@@ -88,6 +93,7 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
 
             Payload::CodeSectionStart { count, range, .. } => {
                 validator.code_section_start(count, &range)?;
+                dbg!("Code section start: {:?}", count);
                 // todo!()
             }
 
@@ -153,7 +159,6 @@ fn parse_code_section_entry(
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters
     // take care of wasm func locals
-    //
     while !reader.eof() {
         let pos = reader.original_position();
         let op = reader.read_operator()?;

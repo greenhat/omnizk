@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/wasm", "crates/codegen-tritonvm", "crates/ir", "crates/frontend", "crates/codegen", "crates/codegen-shared", "crates/compiler"]
+members = ["crates/wasm", "crates/codegen-tritonvm", "crates/ir", "crates/frontend", "crates/codegen", "crates/codegen-shared", "crates/compiler", "crates/stdlib"]
 exclude = []
 resolver = "2"
 
@@ -26,6 +26,7 @@ wasmparser = { version = "0.94", features = ["deterministic"] }
 log = { version = "0.4.8", default-features = false }
 smallvec = { version = "1.6.1", features = ["union"] }
 wat = "1.0.49"
+wasmprinter = "0.2"
 target-lexicon = { version = "0.12.3", default-features = false }
 derive_more = "0.99"
 thiserror = "1.0"
