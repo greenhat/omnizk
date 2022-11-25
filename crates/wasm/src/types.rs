@@ -238,6 +238,27 @@ pub(crate) trait IntoIr<T> {
 
 impl IntoIr<ir::FuncType> for wasmparser::FuncType {
     fn into_ir(self) -> ir::FuncType {
-        todo!()
+        let params = self.params().iter().copied().map(IntoIr::into_ir).collect();
+        let results = self
+            .results()
+            .iter()
+            .copied()
+            .map(IntoIr::into_ir)
+            .collect();
+        ir::FuncType { params, results }
+    }
+}
+
+impl IntoIr<ir::Ty> for wasmparser::ValType {
+    fn into_ir(self) -> ir::Ty {
+        match self {
+            wasmparser::ValType::I32 => ir::Ty::I32,
+            wasmparser::ValType::I64 => ir::Ty::I64,
+            wasmparser::ValType::F32 => ir::Ty::F32,
+            wasmparser::ValType::F64 => ir::Ty::F64,
+            wasmparser::ValType::V128 => ir::Ty::V128,
+            wasmparser::ValType::ExternRef => ir::Ty::ExternRef,
+            wasmparser::ValType::FuncRef => ir::Ty::FuncRef,
+        }
     }
 }

@@ -1,3 +1,4 @@
+use c2zk_frontend_shared::ModuleBuilderError;
 use thiserror::Error;
 
 /// A WebAssembly translation error.
@@ -36,6 +37,10 @@ pub enum WasmError {
     /// Any user-defined error.
     #[error("User error: {0}")]
     User(String),
+
+    /// Error in module builder
+    #[error("ModuleBuilderError: {0:?}")]
+    ModuleBuilderError(#[from] ModuleBuilderError),
 }
 
 /// Return an `Err(WasmError::Unsupported(msg))` where `msg` the string built by calling `format!`

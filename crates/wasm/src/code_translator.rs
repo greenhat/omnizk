@@ -134,7 +134,7 @@ pub fn translate_operator(
         Operator::I64Clz => todo!(),
         Operator::I64Ctz => todo!(),
         Operator::I64Popcnt => todo!(),
-        Operator::I64Add => todo!(),
+        Operator::I64Add => builder.ins().i64add(),
         Operator::I64Sub => todo!(),
         Operator::I64Mul => todo!(),
         Operator::I64DivS => todo!(),

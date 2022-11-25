@@ -31,6 +31,10 @@ impl<'a> InstBuilder<'a> {
         self.fbuilder.add_inst(Inst::I32Add);
     }
 
+    pub fn i64add(&mut self) {
+        self.fbuilder.add_inst(Inst::I32Add);
+    }
+
     pub fn call(&mut self, func_index: u32) {
         self.fbuilder.add_inst(Inst::Call { func_index });
     }

@@ -21,6 +21,7 @@ pub fn emit_inst(
         Inst::I32Const { value } => sink.push(AnInstruction::Push(felt(*value))),
         Inst::LocalGet { local_index } => (), // do nothing for now, func param access is done via stack
         Inst::I32Add => sink.push(AnInstruction::Add),
+        Inst::I64Add => sink.push(AnInstruction::Add),
         Inst::Call { func_index } => {
             sink.push(AnInstruction::Call(func_index_to_label(*func_index)))
         }

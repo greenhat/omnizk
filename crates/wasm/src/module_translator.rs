@@ -6,13 +6,15 @@
 use c2zk_frontend_shared::{FuncBuilder, ModuleBuilder};
 use c2zk_ir::ir;
 
-use crate::{code_translator::translate_operator, error::WasmResult, types::IntoIr};
+use crate::code_translator::translate_operator;
+use crate::error::{WasmError, WasmResult};
+use crate::types::IntoIr;
 use wasmparser::{
     FuncValidator, FunctionBody, Parser, Payload, Type, TypeRef, Validator, ValidatorResources,
 };
 
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
-pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
+pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
     let mut validator = Validator::new();
     let mut mod_builder = ModuleBuilder::new();
 
@@ -50,7 +52,10 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
 
             Payload::TableSection(tables) => {
                 validator.table_section(&tables)?;
-                todo!()
+                dbg!(
+                    "Table section: {:?}",
+                    tables.into_iter().collect::<Vec<_>>()
+                );
             }
 
             Payload::MemorySection(memories) => {
@@ -116,14 +121,16 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
                 // todo!()
             }
 
-            Payload::CustomSection(_) => todo!(),
+            Payload::CustomSection(custom_section) => {
+                dbg!("Custom section: {:?}", custom_section);
+            }
             other => {
                 validator.payload(&other)?;
-                todo!()
+                dbg!("Other: {:?}", other);
             }
         }
     }
-    Ok(mod_builder.build())
+    Ok(mod_builder.build()?)
 }
 
 fn parse_type_section(

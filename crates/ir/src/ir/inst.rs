@@ -7,5 +7,6 @@ pub enum Inst {
     I32Const { value: i32 },
     LocalGet { local_index: u32 },
     I32Add,
+    I64Add,
     Call { func_index: u32 },
 }
