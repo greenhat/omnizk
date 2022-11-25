@@ -2,10 +2,10 @@ mod func;
 mod inst;
 mod layout;
 mod module;
-mod primitives;
+mod ty;
 
 pub use func::*;
 pub use inst::*;
 pub use layout::*;
 pub use module::*;
-pub use primitives::*;
+pub use ty::*;

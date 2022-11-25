@@ -25,7 +25,6 @@
 mod code_translator;
 mod config;
 mod error;
-mod module_trans_env;
 mod module_translator;
 mod types;
 

@@ -3,6 +3,7 @@
 //! Internal dependency of Wasmtime and c2zk that defines types for
 //! WebAssembly.
 
+use c2zk_ir::ir;
 use derive_more::From;
 pub use wasmparser;
 use wasmparser::ValType;
@@ -106,7 +107,6 @@ impl From<GlobalIndex> for EntityIndex {
 
 /// A type of an item in a wasm module where an item is typically something that
 /// can be exported.
-#[allow(missing_docs)]
 #[derive(Clone, Debug)]
 pub enum EntityType {
     /// A global variable with the specified content type
@@ -229,5 +229,15 @@ impl From<wasmparser::TagType> for Tag {
                 ty: TypeIndex(ty.func_type_idx),
             },
         }
+    }
+}
+
+pub(crate) trait IntoIr<T> {
+    fn into_ir(self) -> T;
+}
+
+impl IntoIr<ir::FuncType> for wasmparser::FuncType {
+    fn into_ir(self) -> ir::FuncType {
+        todo!()
     }
 }

@@ -3,21 +3,18 @@
 //! Translation skeleton that traverses the whole WebAssembly module and call helper functions
 //! to deal with each part of it.
 
-use c2zk_frontend_shared::FuncBuilder;
+use c2zk_frontend_shared::{FuncBuilder, ModuleBuilder};
 use c2zk_ir::ir;
 
-use crate::{
-    code_translator::translate_operator, error::WasmResult, module_trans_env::ModuleTranslationEnv,
-};
+use crate::{code_translator::translate_operator, error::WasmResult, types::IntoIr};
 use wasmparser::{
-    FuncValidator, FunctionBody, Parser, Payload, Type, Validator, ValidatorResources,
+    FuncValidator, FunctionBody, Parser, Payload, Type, TypeRef, Validator, ValidatorResources,
 };
 
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
 pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
-    let mut module = ir::Module::new();
     let mut validator = Validator::new();
-    let mut module_translation_env = ModuleTranslationEnv::new();
+    let mut mod_builder = ModuleBuilder::new();
 
     for payload in Parser::new(0).parse_all(data) {
         match payload? {
@@ -34,12 +31,12 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
 
             Payload::TypeSection(types) => {
                 validator.type_section(&types)?;
-                parse_type_section(types, &mut module_translation_env)?;
+                parse_type_section(types, &mut mod_builder)?;
             }
 
             Payload::ImportSection(imports) => {
                 validator.import_section(&imports)?;
-                todo!()
+                parse_imports_section(imports, &mut mod_builder)?;
             }
 
             Payload::FunctionSection(functions) => {
@@ -83,7 +80,7 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
             Payload::StartSection { func, range } => {
                 validator.start_section(func, &range)?;
                 dbg!("Start section: {:?}", func);
-                module.set_start_func(func);
+                mod_builder.set_start_func(func);
             }
 
             Payload::ElementSection(elements) => {
@@ -101,12 +98,7 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
                 let mut func_validator = validator
                     .code_section_entry(&body)?
                     .into_validator(Default::default());
-                parse_code_section_entry(
-                    &mut module,
-                    &mut module_translation_env,
-                    &mut func_validator,
-                    body,
-                )?;
+                parse_code_section_entry(&mut mod_builder, &mut func_validator, body)?;
             }
 
             Payload::DataSection(data) => {
@@ -131,18 +123,17 @@ pub fn translate_module(data: &[u8]) -> WasmResult<ir::Module> {
             }
         }
     }
-    // TODO: throw error if start section is not present
-    Ok(module)
+    Ok(mod_builder.build())
 }
 
 fn parse_type_section(
     types: wasmparser::TypeSectionReader,
-    module_translation_env: &mut ModuleTranslationEnv,
+    mod_builder: &mut ModuleBuilder,
 ) -> WasmResult<()> {
     for entry in types {
         match entry? {
             Type::Func(wasm_func_ty) => {
-                module_translation_env.types.push(wasm_func_ty);
+                mod_builder.push_type(wasm_func_ty.into_ir());
             }
         }
     }
@@ -150,8 +141,7 @@ fn parse_type_section(
 }
 
 fn parse_code_section_entry(
-    module: &mut ir::Module,
-    module_translation_env: &mut ModuleTranslationEnv,
+    mod_builder: &mut ModuleBuilder,
     validator: &mut FuncValidator<ValidatorResources>,
     body: FunctionBody,
 ) -> WasmResult<()> {
@@ -165,7 +155,39 @@ fn parse_code_section_entry(
         validator.op(pos, &op)?;
         translate_operator(validator, &op, &mut builder)?;
     }
-    module.push_func(builder.finish());
+    mod_builder.push_func(builder.finish());
+    Ok(())
+}
+
+fn parse_imports_section(
+    imports: wasmparser::ImportSectionReader,
+    module_translation_env: &mut ModuleBuilder,
+) -> WasmResult<()> {
+    for entry in imports {
+        let import = entry?;
+        match import.ty {
+            TypeRef::Func(sig) => {
+                dbg!("Imported function: {:?}, import: {:?}", sig, import);
+                // environ.declare_func_import(
+                //     TypeIndex::from_u32(sig),
+                //     import.module,
+                //     import.name,
+                // )?;
+            }
+            TypeRef::Memory(ty) => {
+                todo!()
+            }
+            TypeRef::Tag(e) => {
+                todo!()
+            }
+            TypeRef::Global(ty) => {
+                todo!()
+            }
+            TypeRef::Table(ty) => {
+                todo!()
+            }
+        }
+    }
     Ok(())
 }
 
