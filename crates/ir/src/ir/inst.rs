@@ -1,3 +1,5 @@
+use super::FuncIndex;
+
 #[derive(Debug, Clone)]
 pub enum Inst {
     Unreachable,
@@ -5,8 +7,10 @@ pub enum Inst {
     End,
     Return,
     I32Const { value: i32 },
-    LocalGet { local_index: u32 },
+    LocalGet { local_idx: u32 },
     I32Add,
     I64Add,
-    Call { func_index: u32 },
+    Call { func_idx: FuncIndex },
+    PubInputRead,
+    PubOutputWrite,
 }

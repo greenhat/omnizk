@@ -118,7 +118,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
                 // todo!()
             }
 
-            Payload::CustomSection(custom_section) => {
+            Payload::CustomSection(_custom_section) => {
                 // dbg!("Custom section: {:?}", custom_section);
             }
             other => {
@@ -178,7 +178,7 @@ fn parse_code_section_entry(
         let pos = reader.original_position();
         let op = reader.read_operator()?;
         validator.op(pos, &op)?;
-        translate_operator(validator, &op, &mut builder)?;
+        translate_operator(validator, &op, &mut builder, mod_builder)?;
     }
     mod_builder.push_func(builder.finish());
     Ok(())
@@ -192,12 +192,8 @@ fn parse_imports_section(
         let import = entry?;
         match import.ty {
             TypeRef::Func(sig) => {
-                dbg!("Imported function: {:?}, import: {:?}", sig, import);
-                // environ.declare_func_import(
-                //     TypeIndex::from_u32(sig),
-                //     import.module,
-                //     import.name,
-                // )?;
+                // dbg!("Imported function: {:?}, import: {:?}", sig, import);
+                mod_builder.push_import_func(sig, import.module, import.name)
             }
             TypeRef::Memory(ty) => {
                 todo!()
@@ -218,16 +214,4 @@ fn parse_imports_section(
 
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_const() {
-        let wat = r#"
-            (module (func (param i32) (result i32)
-              i32.const 1
-              return))"#;
-        let data = wat::parse_str(wat).unwrap();
-        translate_module(data.as_ref()).unwrap();
-    }
-}
+mod tests {}

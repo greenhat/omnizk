@@ -1,4 +1,5 @@
 use c2zk_codegen_shared::CodegenError;
+use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Inst;
 use twenty_first::shared_math::b_field_element::BFieldElement;
 
@@ -19,18 +20,22 @@ pub fn emit_inst(
         Inst::End => sink.push(AnInstruction::Return),
         Inst::Return => sink.push(AnInstruction::Return),
         Inst::I32Const { value } => sink.push(AnInstruction::Push(felt(*value))),
-        Inst::LocalGet { local_index } => (), // do nothing for now, func param access is done via stack
+        Inst::LocalGet {
+            local_idx: local_index,
+        } => (), // do nothing for now, func param access is done via stack
         Inst::I32Add => sink.push(AnInstruction::Add),
         Inst::I64Add => sink.push(AnInstruction::Add),
-        Inst::Call { func_index } => {
-            sink.push(AnInstruction::Call(func_index_to_label(*func_index)))
-        }
+        Inst::Call {
+            func_idx: func_index,
+        } => sink.push(AnInstruction::Call(func_index_to_label(*func_index))),
+        Inst::PubInputRead => sink.push(AnInstruction::ReadIo),
+        Inst::PubOutputWrite => sink.push(AnInstruction::WriteIo),
     }
     Ok(())
 }
 
-pub(crate) fn func_index_to_label(func_index: u32) -> String {
-    format!("f{}", func_index)
+pub(crate) fn func_index_to_label(func_index: FuncIndex) -> String {
+    format!("f{}", func_index.as_u32())
 }
 
 fn felt(v: i32) -> BFieldElement {

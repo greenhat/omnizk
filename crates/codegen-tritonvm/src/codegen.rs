@@ -1,5 +1,6 @@
 use c2zk_codegen_shared::CodegenError;
 use c2zk_ir::ir::Func;
+use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Module;
 
 mod inst_buf;
@@ -23,7 +24,8 @@ pub fn compile_module(
     )));
     sink.push(AnInstruction::Halt);
     for (idx, func) in module.functions().iter().enumerate() {
-        sink.push_label(func_index_to_label(idx as u32));
+        let idx = FuncIndex::from(idx as u32);
+        sink.push_label(func_index_to_label(idx));
         compile_function(func, config, &mut sink)?;
     }
     Ok(sink)
@@ -85,23 +87,6 @@ mod tests {
         // let (_trace, _out, err) = program.run(vec![], vec![]);
         // dbg!(&err);
         // assert!(err.is_none());
-    }
-
-    #[test]
-    fn test_const() {
-        check(
-            r#"
-            (module (func 
-              i32.const 1
-              return))"#,
-            expect![[r#"
-                call f0
-                halt
-                f0:
-                push 1
-                return
-                return"#]],
-        );
     }
 
     #[test]
@@ -191,8 +176,8 @@ mod tests {
                   (type (;1;) (func (param i64)))
                   (type (;2;) (func (param i64 i64) (result i64)))
                   (type (;3;) (func))
-                  (import "env" "c2zk_read_io" (func $c2zk_read_io (;0;) (type 0)))
-                  (import "env" "c2zk_write_io" (func $c2zk_write_io (;1;) (type 1)))
+                  (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
+                  (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
                   (func $_ZN8min_wasm3add17h2e14c324dea9847eE (;2;) (type 2) (param i64 i64) (result i64)
                     local.get 1
                     local.get 0
@@ -205,11 +190,11 @@ mod tests {
                     call $_ZN11c2zk_stdlib8write_io17h09140579133ceb18E
                   )
                   (func $_ZN11c2zk_stdlib7read_io17h05a04a2d1566f3b2E (;4;) (type 0) (result i64)
-                    call $c2zk_read_io
+                    call $c2zk_stdlib_pub_input
                   )
                   (func $_ZN11c2zk_stdlib8write_io17h09140579133ceb18E (;5;) (type 1) (param i64)
                     local.get 0
-                    call $c2zk_write_io
+                    call $c2zk_stdlib_pub_output
                   )
                   (table (;0;) 1 1 funcref)
                   (memory (;0;) 16)
@@ -228,10 +213,10 @@ mod tests {
                 add
                 return
                 f1:
-                call f4
-                call f4
+                read_io
+                read_io
                 call f2
-                call f5
+                write_io
                 return
                 f2:
                 call f0

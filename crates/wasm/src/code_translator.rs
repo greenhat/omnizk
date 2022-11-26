@@ -1,4 +1,4 @@
-use c2zk_frontend_shared::FuncBuilder;
+use c2zk_frontend_shared::{FuncBuilder, ModuleBuilder};
 use wasmparser::{FuncValidator, Operator, WasmModuleResources};
 
 use crate::error::WasmResult;
@@ -8,7 +8,8 @@ use crate::error::WasmResult;
 pub fn translate_operator(
     validator: &mut FuncValidator<impl WasmModuleResources>,
     op: &Operator,
-    builder: &mut FuncBuilder,
+    func_builder: &mut FuncBuilder,
+    mod_builder: &mut ModuleBuilder,
 ) -> WasmResult<()> {
     match op {
         Operator::Unreachable => (),
@@ -21,12 +22,14 @@ pub fn translate_operator(
         Operator::Catch { tag_index } => todo!(),
         Operator::Throw { tag_index } => todo!(),
         Operator::Rethrow { relative_depth } => todo!(),
-        Operator::End => builder.ins().end(),
+        Operator::End => func_builder.ins().end(),
         Operator::Br { relative_depth } => todo!(),
         Operator::BrIf { relative_depth } => todo!(),
         Operator::BrTable { targets } => todo!(),
-        Operator::Return => builder.ins().ret(),
-        Operator::Call { function_index } => builder.ins().call(*function_index),
+        Operator::Return => func_builder.ins().ret(),
+        Operator::Call { function_index } => {
+            func_builder.push_insts(mod_builder.build_func_call(*function_index)?)
+        }
         Operator::CallIndirect {
             type_index,
             table_index,
@@ -42,7 +45,7 @@ pub fn translate_operator(
         Operator::Drop => todo!(),
         Operator::Select => todo!(),
         Operator::TypedSelect { ty } => todo!(),
-        Operator::LocalGet { local_index } => builder.ins().local_get(*local_index),
+        Operator::LocalGet { local_index } => func_builder.ins().local_get(*local_index),
         Operator::LocalSet { local_index } => todo!(),
         Operator::LocalTee { local_index } => todo!(),
         Operator::GlobalGet { global_index } => todo!(),
@@ -72,7 +75,7 @@ pub fn translate_operator(
         Operator::I64Store32 { memarg } => todo!(),
         Operator::MemorySize { mem, mem_byte } => todo!(),
         Operator::MemoryGrow { mem, mem_byte } => todo!(),
-        Operator::I32Const { value } => builder.ins().i32const(*value),
+        Operator::I32Const { value } => func_builder.ins().i32const(*value),
         Operator::I64Const { value } => todo!(),
         Operator::F32Const { value } => todo!(),
         Operator::F64Const { value } => todo!(),
@@ -116,7 +119,7 @@ pub fn translate_operator(
         Operator::I32Clz => todo!(),
         Operator::I32Ctz => todo!(),
         Operator::I32Popcnt => todo!(),
-        Operator::I32Add => builder.ins().i32add(),
+        Operator::I32Add => func_builder.ins().i32add(),
         Operator::I32Sub => todo!(),
         Operator::I32Mul => todo!(),
         Operator::I32DivS => todo!(),
@@ -134,7 +137,7 @@ pub fn translate_operator(
         Operator::I64Clz => todo!(),
         Operator::I64Ctz => todo!(),
         Operator::I64Popcnt => todo!(),
-        Operator::I64Add => builder.ins().i64add(),
+        Operator::I64Add => func_builder.ins().i64add(),
         Operator::I64Sub => todo!(),
         Operator::I64Mul => todo!(),
         Operator::I64DivS => todo!(),

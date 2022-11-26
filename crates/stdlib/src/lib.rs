@@ -40,14 +40,14 @@ macro_rules! entry {
 }
 
 extern "C" {
-    fn c2zk_read_io() -> u64;
-    fn c2zk_write_io(x: u64);
+    fn c2zk_stdlib_pub_input() -> u64;
+    fn c2zk_stdlib_pub_output(x: u64);
 }
 
 pub fn read_io() -> u64 {
-    unsafe { c2zk_read_io() }
+    unsafe { c2zk_stdlib_pub_input() }
 }
 
 pub fn write_io(x: u64) {
-    unsafe { c2zk_write_io(x) }
+    unsafe { c2zk_stdlib_pub_output(x) }
 }

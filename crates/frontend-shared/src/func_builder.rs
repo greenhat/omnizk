@@ -20,7 +20,11 @@ impl FuncBuilder {
         InstBuilder::new(self)
     }
 
-    pub fn add_inst(&mut self, inst: Inst) {
+    pub fn push_inst(&mut self, inst: Inst) {
         self.ins.push(inst);
+    }
+
+    pub fn push_insts(&mut self, insts: Vec<Inst>) {
+        self.ins.extend(insts);
     }
 }
