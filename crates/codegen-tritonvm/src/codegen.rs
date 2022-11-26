@@ -222,14 +222,22 @@ mod tests {
                   (export "__heap_base" (global 2))
                 )"#]],
             expect![[r#"
-                call f0
-
+                call f3
                 halt
                 f0:
                 add
                 return
                 f1:
+                call f4
+                call f4
+                call f2
+                call f5
+                return
+                f2:
                 call f0
+                return
+                f3:
+                call f1
                 return"#]],
         )
     }

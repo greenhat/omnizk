@@ -10,7 +10,8 @@ use crate::code_translator::translate_operator;
 use crate::error::{WasmError, WasmResult};
 use crate::types::IntoIr;
 use wasmparser::{
-    FuncValidator, FunctionBody, Parser, Payload, Type, TypeRef, Validator, ValidatorResources,
+    ExternalKind, FuncValidator, FunctionBody, Parser, Payload, Type, TypeRef, Validator,
+    ValidatorResources,
 };
 
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
@@ -52,10 +53,10 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
 
             Payload::TableSection(tables) => {
                 validator.table_section(&tables)?;
-                dbg!(
-                    "Table section: {:?}",
-                    tables.into_iter().collect::<Vec<_>>()
-                );
+                // dbg!(
+                //     "Table section: {:?}",
+                //     tables.into_iter().collect::<Vec<_>>()
+                // );
             }
 
             Payload::MemorySection(memories) => {
@@ -75,16 +76,12 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
 
             Payload::ExportSection(exports) => {
                 validator.export_section(&exports)?;
-                dbg!(
-                    "Export section: {:?}",
-                    exports.into_iter().collect::<Vec<_>>()
-                );
-                // todo!()
+                parse_export_section(exports, &mut mod_builder)?;
             }
 
             Payload::StartSection { func, range } => {
                 validator.start_section(func, &range)?;
-                dbg!("Start section: {:?}", func);
+                // dbg!("Start section: {:?}", func);
                 mod_builder.set_start_func(func);
             }
 
@@ -95,7 +92,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
 
             Payload::CodeSectionStart { count, range, .. } => {
                 validator.code_section_start(count, &range)?;
-                dbg!("Code section start: {:?}", count);
+                // dbg!("Code section start: {:?}", count);
                 // todo!()
             }
 
@@ -122,7 +119,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
             }
 
             Payload::CustomSection(custom_section) => {
-                dbg!("Custom section: {:?}", custom_section);
+                // dbg!("Custom section: {:?}", custom_section);
             }
             other => {
                 validator.payload(&other)?;
@@ -131,6 +128,27 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
         }
     }
     Ok(mod_builder.build()?)
+}
+
+fn parse_export_section(
+    exports: wasmparser::ExportSectionReader,
+    mod_builder: &mut ModuleBuilder,
+) -> WasmResult<()> {
+    for export in exports {
+        let export = export?;
+        match export.kind {
+            ExternalKind::Func => {
+                // dbg!(&export);
+                if export.name == "__main" {
+                    mod_builder.set_start_func(export.index);
+                }
+            }
+            _ => {
+                // dbg!(&export);
+            }
+        }
+    }
+    Ok(())
 }
 
 fn parse_type_section(
@@ -168,7 +186,7 @@ fn parse_code_section_entry(
 
 fn parse_imports_section(
     imports: wasmparser::ImportSectionReader,
-    module_translation_env: &mut ModuleBuilder,
+    mod_builder: &mut ModuleBuilder,
 ) -> WasmResult<()> {
     for entry in imports {
         let import = entry?;
