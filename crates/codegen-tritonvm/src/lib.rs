@@ -22,8 +22,10 @@ mod codegen;
 mod config;
 mod error;
 mod target;
+mod ty;
 
 pub use crate::codegen::*;
 pub use crate::config::*;
 pub use crate::error::*;
 pub use crate::target::*;
+pub use crate::ty::*;

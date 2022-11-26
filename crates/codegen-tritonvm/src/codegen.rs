@@ -47,6 +47,8 @@ pub fn compile_function(
 mod tests {
     use expect_test::expect;
 
+    use crate::felt;
+
     use super::*;
 
     #[cfg(test)]
@@ -69,6 +71,8 @@ mod tests {
 
     fn check_wasm(
         source: &[u8],
+        input: Vec<i32>,
+        expected_output: Vec<u64>,
         expected_wat: expect_test::Expect,
         expected_triton: expect_test::Expect,
     ) {
@@ -84,9 +88,14 @@ mod tests {
         let out_source = inst_buf.pretty_print();
         expected_triton.assert_eq(&out_source);
         let program = inst_buf.program();
-        // let (_trace, _out, err) = program.run(vec![], vec![]);
-        // dbg!(&err);
-        // assert!(err.is_none());
+        let input = input.into_iter().map(felt).collect();
+        let (_trace, out, err) = program.run(input, vec![]);
+        dbg!(&err);
+        assert!(err.is_none());
+        assert_eq!(
+            out.into_iter().map(|b| b.into()).collect::<Vec<u64>>(),
+            expected_output
+        );
     }
 
     #[test]
@@ -170,6 +179,8 @@ mod tests {
         let wasm_bytes = include_bytes!("../../../rust_wasm/min-wasm.wasm");
         check_wasm(
             wasm_bytes,
+            vec![11, 7],
+            vec![18],
             expect![[r#"
                 (module
                   (type (;0;) (func (result i64)))

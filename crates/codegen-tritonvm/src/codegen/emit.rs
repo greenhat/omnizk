@@ -1,8 +1,8 @@
 use c2zk_codegen_shared::CodegenError;
 use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Inst;
-use twenty_first::shared_math::b_field_element::BFieldElement;
 
+use crate::felt;
 use crate::InstBuffer;
 use crate::TritonTargetConfig;
 
@@ -36,9 +36,4 @@ pub fn emit_inst(
 
 pub(crate) fn func_index_to_label(func_index: FuncIndex) -> String {
     format!("f{}", func_index.as_u32())
-}
-
-fn felt(v: i32) -> BFieldElement {
-    // TODO: implement according to https://github.com/Neptune-Crypto/twenty-first/issues/32
-    BFieldElement::new(v as u64)
 }
