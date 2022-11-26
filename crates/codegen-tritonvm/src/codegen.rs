@@ -195,15 +195,15 @@ mod tests {
                     i64.add
                   )
                   (func $__main (;3;) (type 3)
-                    call $_ZN11c2zk_stdlib7read_io17h05a04a2d1566f3b2E
-                    call $_ZN11c2zk_stdlib7read_io17h05a04a2d1566f3b2E
+                    call $_ZN11c2zk_stdlib9pub_input17h3f499c90892073faE
+                    call $_ZN11c2zk_stdlib9pub_input17h3f499c90892073faE
                     call $_ZN8min_wasm3add17h2e14c324dea9847eE
-                    call $_ZN11c2zk_stdlib8write_io17h09140579133ceb18E
+                    call $_ZN11c2zk_stdlib10pub_output17h7eb302ce547eb541E
                   )
-                  (func $_ZN11c2zk_stdlib7read_io17h05a04a2d1566f3b2E (;4;) (type 0) (result i64)
+                  (func $_ZN11c2zk_stdlib9pub_input17h3f499c90892073faE (;4;) (type 0) (result i64)
                     call $c2zk_stdlib_pub_input
                   )
-                  (func $_ZN11c2zk_stdlib8write_io17h09140579133ceb18E (;5;) (type 1) (param i64)
+                  (func $_ZN11c2zk_stdlib10pub_output17h7eb302ce547eb541E (;5;) (type 1) (param i64)
                     local.get 0
                     call $c2zk_stdlib_pub_output
                   )
