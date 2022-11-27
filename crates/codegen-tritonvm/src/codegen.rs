@@ -25,6 +25,7 @@ pub fn compile_module(
     sink.push(AnInstruction::Halt);
     for (idx, func) in module.functions().iter().enumerate() {
         let idx = FuncIndex::from(idx as u32);
+        // TODO: add a hint to generate a comment with original function name in codegen
         sink.push_label(func_index_to_label(idx));
         compile_function(func, config, &mut sink)?;
     }
