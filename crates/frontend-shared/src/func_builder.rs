@@ -12,7 +12,7 @@ impl FuncBuilder {
         FuncBuilder { ins: Vec::new() }
     }
 
-    pub fn finish(self) -> Func {
+    pub fn build(self) -> Func {
         Func::new(self.ins)
     }
 

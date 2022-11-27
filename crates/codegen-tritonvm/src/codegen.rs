@@ -221,18 +221,24 @@ mod tests {
                 call f3
                 halt
                 f0:
-                add
+                read_io
                 return
                 f1:
-                read_io
-                read_io
-                call f2
                 write_io
                 return
                 f2:
-                call f0
+                add
                 return
                 f3:
+                call f4
+                call f4
+                call f2
+                call f5
+                return
+                f4:
+                call f0
+                return
+                f5:
                 call f1
                 return"#]],
         )

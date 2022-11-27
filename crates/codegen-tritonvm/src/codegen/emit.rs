@@ -35,5 +35,5 @@ pub fn emit_inst(
 }
 
 pub(crate) fn func_index_to_label(func_index: FuncIndex) -> String {
-    format!("f{}", func_index.as_u32())
+    format!("f{}", u32::from(func_index))
 }

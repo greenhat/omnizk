@@ -1,4 +1,5 @@
 use derive_more::From;
+use derive_more::Into;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Ty {
@@ -13,16 +14,20 @@ pub enum Ty {
     ExternRef,
 }
 
+#[derive(Debug, Eq, Hash, PartialEq, Clone)]
 pub struct FuncType {
     pub params: Vec<Ty>,
     pub results: Vec<Ty>,
 }
 
-#[derive(Debug, Clone, Copy, From, PartialEq, Eq, Hash)]
-pub struct FuncIndex(pub u32);
-
-impl FuncIndex {
-    pub fn as_u32(self) -> u32 {
-        self.0
+impl FuncType {
+    pub fn new(params: Vec<Ty>, results: Vec<Ty>) -> Self {
+        Self { params, results }
     }
 }
+
+#[derive(Debug, Clone, Copy, From, Into, PartialEq, Eq, Hash)]
+pub struct FuncIndex(u32);
+
+#[derive(Debug, Clone, Copy, From, Into, PartialEq, Eq, Hash)]
+pub struct TypeIndex(u32);

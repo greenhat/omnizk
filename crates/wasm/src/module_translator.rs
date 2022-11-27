@@ -180,7 +180,7 @@ fn parse_code_section_entry(
         validator.op(pos, &op)?;
         translate_operator(validator, &op, &mut builder, mod_builder)?;
     }
-    mod_builder.push_func(builder.finish());
+    mod_builder.push_func(builder.build());
     Ok(())
 }
 
@@ -191,9 +191,8 @@ fn parse_imports_section(
     for entry in imports {
         let import = entry?;
         match import.ty {
-            TypeRef::Func(sig) => {
-                // dbg!("Imported function: {:?}, import: {:?}", sig, import);
-                mod_builder.push_import_func(sig, import.module, import.name)
+            TypeRef::Func(type_index) => {
+                mod_builder.push_import_func(type_index, import.module, import.name)?;
             }
             TypeRef::Memory(ty) => {
                 todo!()
