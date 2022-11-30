@@ -1,12 +1,12 @@
 //! Compiler
-
+#![no_std]
 // Coding conventions
 // #![deny(unsafe_code)]
 #![deny(non_upper_case_globals)]
 #![deny(non_camel_case_types)]
 #![deny(non_snake_case)]
 #![deny(unused_mut)]
-#![deny(dead_code)]
+// #![deny(dead_code)]
 #![deny(unused_imports)]
 // #![deny(missing_docs)]
 // Clippy exclusions
@@ -17,6 +17,12 @@
 // #![deny(clippy::todo)]
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
+
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) mod io_native;
+
+#[cfg(target_arch = "wasm32")]
+mod io_wasm;
 
 /// Used for defining a main entry point.
 ///
@@ -39,15 +45,18 @@ macro_rules! entry {
     };
 }
 
-extern "C" {
-    fn c2zk_stdlib_pub_input() -> u64;
-    fn c2zk_stdlib_pub_output(x: u64);
-}
-
 pub fn pub_input() -> u64 {
-    unsafe { c2zk_stdlib_pub_input() }
+    #[cfg(not(target_arch = "wasm32"))]
+    return io_native::pub_input();
+
+    #[cfg(target_arch = "wasm32")]
+    return io_wasm::pub_input();
 }
 
 pub fn pub_output(x: u64) {
-    unsafe { c2zk_stdlib_pub_output(x) }
+    #[cfg(not(target_arch = "wasm32"))]
+    return io_native::pub_output(x);
+
+    #[cfg(target_arch = "wasm32")]
+    return io_wasm::pub_output(x);
 }

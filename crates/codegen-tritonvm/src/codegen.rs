@@ -25,7 +25,7 @@ pub fn compile_module(
     sink.push(AnInstruction::Halt);
     for (idx, func) in module.functions().iter().enumerate() {
         let idx = FuncIndex::from(idx as u32);
-        // TODO: add a hint to generate a comment with original function name in codegen
+        // TODO: use the original function name as label?
         sink.push_label(func_index_to_label(idx));
         compile_function(func, config, &mut sink)?;
     }
@@ -177,7 +177,10 @@ mod tests {
         }
         ```
         */
-        let wasm_bytes = include_bytes!("../../../rust_wasm/min-wasm.wasm");
+        let rust_wasm_code = c2zk_frontend_shared::rust_wasm_tests::add_test();
+        let native_output = (rust_wasm_code.main_func)(vec![1, 2]);
+        // let wasm_bytes = include_bytes!("../../../rust_wasm/min-wasm.wasm");
+        let wasm_bytes = &rust_wasm_code.wasm_bytes;
         check_wasm(
             wasm_bytes,
             vec![11, 7],

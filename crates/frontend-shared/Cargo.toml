@@ -13,5 +13,11 @@ categories.workspace = true
 [dependencies]
 c2zk-ir = { workspace = true }
 thiserror = { workspace = true }
+c2zk-stdlib = { workspace = true }
+c2zk-rust-wasm-tests-bundle1 = { workspace = true, optional = true }
+
+[features]
+rust-wasm-tests = ["c2zk-rust-wasm-tests-bundle1"]
+
 
 [dev-dependencies]
