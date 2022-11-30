@@ -8,9 +8,9 @@ members = [
   "crates/codegen-shared",
   "crates/compiler",
   "crates/stdlib",
-  "crates/rust-wasm-tests/bundle1"
+  "crates/rust-wasm-tests/bundle1",
 ]
-exclude = []
+exclude = [ "crates/rust-wasm-tests/bundle1-bin"]
 resolver = "2"
 
 [workspace.package]
