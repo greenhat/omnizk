@@ -29,6 +29,8 @@ fn compile_rust_wasm(file_path: &str) -> Vec<u8> {
         .arg("--target=wasm32-unknown-unknown")
         .arg("--manifest-path")
         .arg(file_path)
+        .arg("--target-dir")
+        .arg("/tmp/c2zk-rust-wasm-tests")
         .status()
         .unwrap();
     dbg!(&comp_status);
