@@ -9,11 +9,12 @@ pub struct RustWasmTestCode {
 
 fn wrap_main_with_io(main_func: &'static dyn Fn()) -> Box<dyn Fn(Vec<u64>) -> Vec<u64>> {
     Box::new(|input: Vec<u64>| {
-        // TODO: pass input
-        main_func();
-        // TODO: collect output
-        let output = vec![];
-        output
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            c2zk_stdlib::io_native::set_pub_input(input);
+            main_func();
+            c2zk_stdlib::io_native::get_pub_output()
+        }
     })
 }
 
@@ -25,16 +26,18 @@ fn compile_rust_wasm_tests_bundle1(bin_name: &str) -> Vec<u8> {
     dbg!(&pwd);
     let comp_status = std::process::Command::new("cargo")
         .arg("build")
-        .arg("--release")
-        .arg(format!("--bin {}", bin_name))
-        .arg("--target=wasm32-unknown-unknown")
         .arg("--manifest-path")
         .arg(manifest_path)
+        .arg("--release")
+        // .arg(format!("--bin {}", bin_name))
+        .arg("--bins")
+        .arg("--target=wasm32-unknown-unknown")
         .arg("--target-dir")
         .arg("/tmp/c2zk-rust-wasm-tests")
         .status()
         .unwrap();
     dbg!(&comp_status);
+    assert!(comp_status.success());
     let target_bin_file_path = std::path::Path::new("/tmp/c2zk-rust-wasm-tests")
         .join("wasm32-unknown-unknown")
         .join("release")

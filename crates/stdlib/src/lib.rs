@@ -1,4 +1,4 @@
-//! Compiler
+//! std lib for c2zk runtime
 #![no_std]
 // Coding conventions
 // #![deny(unsafe_code)]
@@ -18,8 +18,12 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
+#[allow(unused_imports)]
+#[macro_use]
+extern crate alloc;
+
 #[cfg(not(target_arch = "wasm32"))]
-pub(crate) mod io_native;
+pub mod io_native;
 
 #[cfg(target_arch = "wasm32")]
 mod io_wasm;

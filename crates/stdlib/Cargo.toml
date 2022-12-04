@@ -11,5 +11,7 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
+lazy_static = { workspace = true }
+spin = { workspace = true }
 
 [dev-dependencies]

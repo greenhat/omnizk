@@ -158,6 +158,8 @@ mod tests {
         let native_output = (rust_wasm_code.main_func)(input.clone());
         assert_eq!(native_output, expected_output);
         let wasm_bytes = &rust_wasm_code.wasm_bytes;
+        // TODO: extract the wat expected into a separate file (think of a larger code examples)
+        // TODO: call native entry function here (one shortcut away)
         check_wasm(
             wasm_bytes,
             input,
