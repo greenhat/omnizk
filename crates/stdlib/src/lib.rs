@@ -18,7 +18,7 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
-#[allow(unused_imports)]
+#[cfg(not(target_arch = "wasm32"))]
 #[macro_use]
 extern crate alloc;
 

@@ -173,23 +173,23 @@ mod tests {
                   (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
                   (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
                   (func $__main (;2;) (type 2)
-                    call $_ZN28c2zk_rust_wasm_tests_bundle14main17hb96f283006a7604fE
+                    call $_ZN28c2zk_rust_wasm_tests_bundle14main17h8dbeeb4f115b4d38E
                   )
-                  (func $_ZN28c2zk_rust_wasm_tests_bundle13add17hcc2dd65fbb480a03E (;3;) (type 3) (param i64 i64) (result i64)
+                  (func $_ZN28c2zk_rust_wasm_tests_bundle13add17hb70bbe9cd7dead81E (;3;) (type 3) (param i64 i64) (result i64)
                     local.get 1
                     local.get 0
                     i64.add
                   )
-                  (func $_ZN28c2zk_rust_wasm_tests_bundle14main17hb96f283006a7604fE (;4;) (type 2)
-                    call $_ZN11c2zk_stdlib9pub_input17h3f499c90892073faE
-                    call $_ZN11c2zk_stdlib9pub_input17h3f499c90892073faE
-                    call $_ZN28c2zk_rust_wasm_tests_bundle13add17hcc2dd65fbb480a03E
-                    call $_ZN11c2zk_stdlib10pub_output17h7eb302ce547eb541E
+                  (func $_ZN28c2zk_rust_wasm_tests_bundle14main17h8dbeeb4f115b4d38E (;4;) (type 2)
+                    call $_ZN11c2zk_stdlib9pub_input17h0dee22ae2ec5e4e8E
+                    call $_ZN11c2zk_stdlib9pub_input17h0dee22ae2ec5e4e8E
+                    call $_ZN28c2zk_rust_wasm_tests_bundle13add17hb70bbe9cd7dead81E
+                    call $_ZN11c2zk_stdlib10pub_output17h07b1e1ebe272f489E
                   )
-                  (func $_ZN11c2zk_stdlib9pub_input17h3f499c90892073faE (;5;) (type 0) (result i64)
+                  (func $_ZN11c2zk_stdlib9pub_input17h0dee22ae2ec5e4e8E (;5;) (type 0) (result i64)
                     call $c2zk_stdlib_pub_input
                   )
-                  (func $_ZN11c2zk_stdlib10pub_output17h7eb302ce547eb541E (;6;) (type 1) (param i64)
+                  (func $_ZN11c2zk_stdlib10pub_output17h07b1e1ebe272f489E (;6;) (type 1) (param i64)
                     local.get 0
                     call $c2zk_stdlib_pub_output
                   )
