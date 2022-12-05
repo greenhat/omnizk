@@ -1,5 +1,3 @@
-// #[cfg_attr(feature = "rust-wasm-tests")]
-#[cfg(feature = "rust-wasm-tests")]
 extern crate c2zk_rust_wasm_tests_bundle1;
 
 pub struct RustWasmTestCode {
@@ -49,7 +47,6 @@ fn compile_rust_wasm_tests_bundle1(bin_name: &str) -> Vec<u8> {
     wasm_bytes
 }
 
-#[cfg(feature = "rust-wasm-tests")]
 pub fn add_test() -> RustWasmTestCode {
     let wasm_bytes = compile_rust_wasm_tests_bundle1("main");
     let main_func = &c2zk_rust_wasm_tests_bundle1::main;
