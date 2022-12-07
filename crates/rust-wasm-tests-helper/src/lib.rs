@@ -34,7 +34,7 @@ pub fn wrap_main_with_io(main_func: &'static dyn Fn()) -> Box<dyn Fn(Vec<u64>) -
 #[allow(clippy::unwrap_used)]
 pub fn compile_rust_wasm_tests_bundle1_bin(bin_name: &str) -> Vec<u8> {
     // TODO: make it relative to this crate (not the one it is called from)
-    let manifest_path = "../../rust-wasm-tests/bundle1-bin/Cargo.toml";
+    let manifest_path = "../rust-wasm-tests/bundle1-bin/Cargo.toml";
     let pwd = std::process::Command::new("pwd").output().unwrap();
     dbg!(&pwd);
     let target_dir = "/tmp/c2zk-rust-wasm-tests/bundle1-bin";
