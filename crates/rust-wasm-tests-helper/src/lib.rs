@@ -32,11 +32,12 @@ pub fn wrap_main_with_io(main_func: &'static dyn Fn()) -> Box<dyn Fn(Vec<u64>) -
 }
 
 #[allow(clippy::unwrap_used)]
-pub fn compile_rust_wasm_tests_bundle1(bin_name: &str) -> Vec<u8> {
-    // TODO: make it relative to the root crate (not the one it is called from)
-    let manifest_path = "../rust-wasm-tests/bundle1-bin/Cargo.toml";
+pub fn compile_rust_wasm_tests_bundle1_bin(bin_name: &str) -> Vec<u8> {
+    // TODO: make it relative to this crate (not the one it is called from)
+    let manifest_path = "../../rust-wasm-tests/bundle1-bin/Cargo.toml";
     let pwd = std::process::Command::new("pwd").output().unwrap();
     dbg!(&pwd);
+    let target_dir = "/tmp/c2zk-rust-wasm-tests/bundle1-bin";
     let comp_status = std::process::Command::new("cargo")
         .arg("build")
         .arg("--manifest-path")
@@ -46,12 +47,12 @@ pub fn compile_rust_wasm_tests_bundle1(bin_name: &str) -> Vec<u8> {
         .arg("--bins")
         .arg("--target=wasm32-unknown-unknown")
         .arg("--target-dir")
-        .arg("/tmp/c2zk-rust-wasm-tests")
+        .arg(target_dir)
         .status()
         .unwrap();
     dbg!(&comp_status);
     assert!(comp_status.success());
-    let target_bin_file_path = std::path::Path::new("/tmp/c2zk-rust-wasm-tests")
+    let target_bin_file_path = std::path::Path::new(target_dir)
         .join("wasm32-unknown-unknown")
         .join("release")
         .join(bin_name)
