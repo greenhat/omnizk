@@ -154,14 +154,14 @@ mod tests {
     fn test_from_rust() {
         let input = vec![11, 7];
         let expected_output = vec![18];
-        let rust_wasm_code = c2zk_frontend_shared::rust_wasm_tests::add_test();
-        let native_output = (rust_wasm_code.main_func)(input.clone());
+        let native_output = c2zk_rust_wasm_tests_helper::wrap_main_with_io(
+            &c2zk_rust_wasm_tests_bundle1::main,
+        )(input.clone());
         assert_eq!(native_output, expected_output);
-        let wasm_bytes = &rust_wasm_code.wasm_bytes;
+        let wasm_bytes = c2zk_rust_wasm_tests_helper::compile_rust_wasm_tests_bundle1("main");
         // TODO: extract the wat expected into a separate file (think of a larger code examples)
-        // TODO: call native entry function here (one shortcut away)
         check_wasm(
-            wasm_bytes,
+            &wasm_bytes,
             input,
             expected_output,
             expect![[r#"

@@ -21,9 +21,6 @@
 mod func_builder;
 mod inst_builder;
 mod mod_builder;
-#[cfg(feature = "rust-wasm-tests")]
-// #[cfg_attr(feature = "rust-wasm-tests")]
-pub mod rust_wasm_tests;
 
 pub use crate::func_builder::*;
 pub use crate::inst_builder::*;

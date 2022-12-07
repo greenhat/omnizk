@@ -1,11 +1,26 @@
+//! Rust-to-Wasm tests helper library.
+
+// Coding conventions
+// #![deny(unsafe_code)]
+#![deny(non_upper_case_globals)]
+#![deny(non_camel_case_types)]
+#![deny(non_snake_case)]
+#![deny(unused_mut)]
+// #![deny(dead_code)]
+#![deny(unused_imports)]
+// #![deny(missing_docs)]
+// Clippy exclusions
+#![deny(rustdoc::broken_intra_doc_links)]
+#![deny(clippy::wildcard_enum_match_arm)]
+#![deny(clippy::unwrap_used)]
+#![deny(clippy::expect_used)]
+// #![deny(clippy::todo)]
+#![deny(clippy::unimplemented)]
+#![deny(clippy::panic)]
+
 extern crate c2zk_rust_wasm_tests_bundle1;
 
-pub struct RustWasmTestCode {
-    pub wasm_bytes: Vec<u8>,
-    pub main_func: Box<dyn Fn(Vec<u64>) -> Vec<u64>>,
-}
-
-fn wrap_main_with_io(main_func: &'static dyn Fn()) -> Box<dyn Fn(Vec<u64>) -> Vec<u64>> {
+pub fn wrap_main_with_io(main_func: &'static dyn Fn()) -> Box<dyn Fn(Vec<u64>) -> Vec<u64>> {
     Box::new(|input: Vec<u64>| {
         #[cfg(not(target_arch = "wasm32"))]
         {
@@ -17,7 +32,7 @@ fn wrap_main_with_io(main_func: &'static dyn Fn()) -> Box<dyn Fn(Vec<u64>) -> Ve
 }
 
 #[allow(clippy::unwrap_used)]
-fn compile_rust_wasm_tests_bundle1(bin_name: &str) -> Vec<u8> {
+pub fn compile_rust_wasm_tests_bundle1(bin_name: &str) -> Vec<u8> {
     // TODO: make it relative to the root crate (not the one it is called from)
     let manifest_path = "../rust-wasm-tests/bundle1-bin/Cargo.toml";
     let pwd = std::process::Command::new("pwd").output().unwrap();
@@ -45,13 +60,4 @@ fn compile_rust_wasm_tests_bundle1(bin_name: &str) -> Vec<u8> {
     let mut wasm_bytes = vec![];
     std::io::Read::read_to_end(&mut target_bin_file, &mut wasm_bytes).unwrap();
     wasm_bytes
-}
-
-pub fn add_test() -> RustWasmTestCode {
-    let wasm_bytes = compile_rust_wasm_tests_bundle1("main");
-    let main_func = &c2zk_rust_wasm_tests_bundle1::main;
-    RustWasmTestCode {
-        wasm_bytes,
-        main_func: wrap_main_with_io(main_func),
-    }
 }

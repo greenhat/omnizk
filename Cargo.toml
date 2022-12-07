@@ -9,6 +9,7 @@ members = [
   "crates/compiler",
   "crates/stdlib",
   "crates/rust-wasm-tests/bundle1",
+  "crates/rust-wasm-tests-helper",
 ]
 exclude = [ "crates/rust-wasm-tests/bundle1-bin"]
 resolver = "2"
@@ -34,6 +35,7 @@ c2zk-codegen-shared = { path = "crates/codegen-shared" }
 c2zk-codegen-tritonvm = { path = "crates/codegen-tritonvm" }
 c2zk-stdlib = { path = "crates/stdlib" }
 c2zk-rust-wasm-tests-bundle1 = { path = "crates/rust-wasm-tests/bundle1" }
+c2zk-rust-wasm-tests-helper = { path = "crates/rust-wasm-tests-helper" }
 wasmparser = { version = "0.94", features = ["deterministic"] }
 log = { version = "0.4.8", default-features = false }
 smallvec = { version = "1.6.1", features = ["union"] }
