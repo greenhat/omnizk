@@ -159,7 +159,7 @@ mod tests {
         )(input.clone());
         assert_eq!(native_output, expected_output);
         let wasm_bytes = c2zk_rust_wasm_tests_helper::compile_rust_wasm_tests_bundle1_bin("main");
-        // TODO: extract the wat expected into a separate file (think of a larger code examples)
+        // TODO: extract this test into a separate file (think of a larger code examples)
         check_wasm(
             &wasm_bytes,
             input,
