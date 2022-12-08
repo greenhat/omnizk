@@ -9,5 +9,5 @@ fn my_panic(_info: &core::panic::PanicInfo) -> ! {
 }
 
 pub fn main() {
-    c2zk_rust_wasm_tests_bundle1::main();
+    c2zk_rust_wasm_tests_bundle1::add::main();
 }

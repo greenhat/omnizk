@@ -3,9 +3,6 @@ name = "c2zk-rust-wasm-tests-bundle1-bin"
 version = "0.1.0"
 edition = "2021"
 
-[[bin]]
-name = "main"
-
 [dependencies]
 c2zk-stdlib = { path = "../../stdlib" }
 c2zk-rust-wasm-tests-bundle1 = { path = "../bundle1" }
