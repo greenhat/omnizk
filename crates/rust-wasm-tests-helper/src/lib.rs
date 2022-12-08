@@ -20,11 +20,14 @@
 
 extern crate c2zk_rust_wasm_tests_bundle1;
 
-pub fn wrap_main_with_io(main_func: &'static dyn Fn()) -> Box<dyn Fn(Vec<u64>) -> Vec<u64>> {
-    Box::new(|input: Vec<u64>| {
+pub fn wrap_main_with_io(
+    main_func: &'static dyn Fn(),
+) -> Box<dyn Fn(Vec<u64>, Vec<u64>) -> Vec<u64>> {
+    Box::new(|input: Vec<u64>, secret_input: Vec<u64>| {
         #[cfg(not(target_arch = "wasm32"))]
         {
             c2zk_stdlib::io_native::set_pub_input(input);
+            c2zk_stdlib::io_native::set_secret_input(secret_input);
             main_func();
             c2zk_stdlib::io_native::get_pub_output()
         }

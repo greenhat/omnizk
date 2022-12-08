@@ -10,6 +10,7 @@ use crate::TritonTargetConfig;
 fn check_wasm(
     source: &[u8],
     input: Vec<u64>,
+    secret_input: Vec<u64>,
     expected_output: Vec<u64>,
     expected_wat: expect_test::Expect,
     expected_triton: expect_test::Expect,
@@ -27,7 +28,8 @@ fn check_wasm(
     expected_triton.assert_eq(&out_source);
     let program = inst_buf.program();
     let input = input.into_iter().map(Into::into).collect();
-    let (_trace, out, err) = program.run(input, vec![]);
+    let secret_input = secret_input.into_iter().map(Into::into).collect();
+    let (_trace, out, err) = program.run(input, secret_input);
     dbg!(&err);
     assert!(err.is_none());
     assert_eq!(

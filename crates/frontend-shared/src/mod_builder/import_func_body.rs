@@ -24,6 +24,10 @@ impl ImportFuncBody {
     pub const PUB_OUTPUT_FUNC_NAME: &str = "c2zk_stdlib_pub_output";
     pub const PUB_OUTPUT_OP: Inst = Inst::PubOutputWrite;
 
+    pub const SECRET_INPUT_FUNC_MODULE: &str = "env";
+    pub const SECRET_INPUT_FUNC_NAME: &str = "c2zk_stdlib_secret_input";
+    pub const SECRET_INPUT_OP: Inst = Inst::SecretInputRead;
+
     pub fn new_stdlib() -> Self {
         Self {
             mapping: vec![
@@ -42,6 +46,14 @@ impl ImportFuncBody {
                         ty: FuncType::new(vec![Ty::I64], vec![]),
                     },
                     vec![Self::PUB_OUTPUT_OP, Inst::Return],
+                ),
+                (
+                    ImportFunc {
+                        module: Self::SECRET_INPUT_FUNC_MODULE.to_string(),
+                        name: Self::SECRET_INPUT_FUNC_NAME.to_string(),
+                        ty: FuncType::new(vec![], vec![Ty::I64]),
+                    },
+                    vec![Self::SECRET_INPUT_OP, Inst::Return],
                 ),
             ]
             .into_iter()

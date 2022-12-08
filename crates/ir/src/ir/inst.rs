@@ -13,4 +13,5 @@ pub enum Inst {
     Call { func_idx: FuncIndex },
     PubInputRead,
     PubOutputWrite,
+    SecretInputRead,
 }

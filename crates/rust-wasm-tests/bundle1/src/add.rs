@@ -9,5 +9,7 @@ pub fn main() {
     let a = pub_input();
     let b = pub_input();
     let r = add(a, b);
-    pub_output(r);
+    let c = secret_input();
+    let r2 = add(r, c);
+    pub_output(r2);
 }

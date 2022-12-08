@@ -30,6 +30,7 @@ pub fn emit_inst(
         } => sink.push(AnInstruction::Call(func_index_to_label(*func_index))),
         Inst::PubInputRead => sink.push(AnInstruction::ReadIo),
         Inst::PubOutputWrite => sink.push(AnInstruction::WriteIo),
+        Inst::SecretInputRead => sink.push(AnInstruction::Divine(None)),
     }
     Ok(())
 }

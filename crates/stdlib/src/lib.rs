@@ -64,3 +64,11 @@ pub fn pub_output(x: u64) {
     #[cfg(target_arch = "wasm32")]
     return io_wasm::pub_output(x);
 }
+
+pub fn secret_input() -> u64 {
+    #[cfg(not(target_arch = "wasm32"))]
+    return io_native::secret_input();
+
+    #[cfg(target_arch = "wasm32")]
+    return io_wasm::secret_input();
+}
