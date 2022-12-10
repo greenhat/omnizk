@@ -15,8 +15,8 @@ pub fn emit_inst(
     // TODO: rename Inst to HIR and introduce MIR?
     use triton_vm::instruction::AnInstruction;
     match ins {
-        Inst::Unreachable => todo!(),
-        Inst::Nop => todo!(),
+        Inst::Unreachable => (),
+        Inst::Nop => (),
         Inst::End => sink.push(AnInstruction::Return),
         Inst::Return => sink.push(AnInstruction::Return),
         Inst::I32Const { value } => sink.push(AnInstruction::Push(felt(*value))),

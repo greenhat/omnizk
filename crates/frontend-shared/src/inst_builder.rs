@@ -42,4 +42,12 @@ impl<'a> InstBuilder<'a> {
             func_idx: func_index.into(),
         });
     }
+
+    pub fn nop(&mut self) {
+        self.fbuilder.push_inst(Inst::Nop);
+    }
+
+    pub fn unreachable(&mut self) {
+        self.fbuilder.push_inst(Inst::Unreachable);
+    }
 }

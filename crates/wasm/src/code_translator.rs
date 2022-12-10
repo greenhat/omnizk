@@ -12,8 +12,12 @@ pub fn translate_operator(
     mod_builder: &mut ModuleBuilder,
 ) -> WasmResult<()> {
     match op {
-        Operator::Unreachable => (),
-        Operator::Nop => todo!(),
+        Operator::Unreachable => {
+            func_builder.ins().unreachable();
+        }
+        Operator::Nop => {
+            func_builder.ins().nop();
+        }
         Operator::Block { blockty } => todo!(),
         Operator::Loop { blockty } => todo!(),
         Operator::If { blockty } => todo!(),

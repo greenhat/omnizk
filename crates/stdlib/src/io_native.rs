@@ -8,28 +8,30 @@ lazy_static! {
     static ref SECRET_INPUT: Mutex<Vec<u64>> = Mutex::new(vec![]);
 }
 
-pub fn set_pub_input(input: Vec<u64>) {
-    *PUB_INPUT.lock() = input;
+pub fn init_io(pub_input: Vec<u64>, secret_input: Vec<u64>) {
+    let mut pub_input_reversed = pub_input;
+    pub_input_reversed.reverse();
+    let mut secret_input_reversed = secret_input;
+    secret_input_reversed.reverse();
+    *PUB_INPUT.lock() = pub_input_reversed;
+    *SECRET_INPUT.lock() = secret_input_reversed;
+    *PUB_OUTPUT.lock() = vec![];
 }
 
 pub fn get_pub_output() -> Vec<u64> {
     PUB_OUTPUT.lock().clone()
 }
 
-pub fn set_secret_input(input: Vec<u64>) {
-    *SECRET_INPUT.lock() = input;
-}
-
-pub fn pub_input() -> u64 {
+pub(crate) fn pub_input() -> u64 {
     #[allow(clippy::unwrap_used)]
     PUB_INPUT.lock().pop().unwrap()
 }
 
-pub fn pub_output(x: u64) {
+pub(crate) fn pub_output(x: u64) {
     PUB_OUTPUT.lock().push(x);
 }
 
-pub fn secret_input() -> u64 {
+pub(crate) fn secret_input() -> u64 {
     #[allow(clippy::unwrap_used)]
     SECRET_INPUT.lock().pop().unwrap()
 }

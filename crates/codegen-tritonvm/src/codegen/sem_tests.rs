@@ -3,6 +3,7 @@
 #![allow(clippy::unwrap_used)]
 
 mod add;
+mod fib;
 
 use crate::compile_module;
 use crate::TritonTargetConfig;
