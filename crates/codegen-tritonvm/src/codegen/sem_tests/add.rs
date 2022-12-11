@@ -27,29 +27,29 @@ fn test_add() {
               (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
               (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
               (func $__main (;3;) (type 2)
-                call $_ZN28c2zk_rust_wasm_tests_bundle13add4main17hb9ca2d9cba28e087E
+                call $_ZN28c2zk_rust_wasm_tests_bundle13add4main17hab51675481e443caE
               )
-              (func $_ZN28c2zk_rust_wasm_tests_bundle13add3add17h1d8242aadf5ab846E (;4;) (type 3) (param i64 i64) (result i64)
+              (func $_ZN28c2zk_rust_wasm_tests_bundle13add3add17hd10e69d3d128fc14E (;4;) (type 3) (param i64 i64) (result i64)
                 local.get 1
                 local.get 0
                 i64.add
               )
-              (func $_ZN28c2zk_rust_wasm_tests_bundle13add4main17hb9ca2d9cba28e087E (;5;) (type 2)
-                call $_ZN11c2zk_stdlib9pub_input17h0dee22ae2ec5e4e8E
-                call $_ZN11c2zk_stdlib9pub_input17h0dee22ae2ec5e4e8E
-                call $_ZN28c2zk_rust_wasm_tests_bundle13add3add17h1d8242aadf5ab846E
-                call $_ZN11c2zk_stdlib12secret_input17ha93a82c316e394d7E
-                call $_ZN28c2zk_rust_wasm_tests_bundle13add3add17h1d8242aadf5ab846E
-                call $_ZN11c2zk_stdlib10pub_output17h07b1e1ebe272f489E
+              (func $_ZN28c2zk_rust_wasm_tests_bundle13add4main17hab51675481e443caE (;5;) (type 2)
+                call $_ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E
+                call $_ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E
+                call $_ZN28c2zk_rust_wasm_tests_bundle13add3add17hd10e69d3d128fc14E
+                call $_ZN11c2zk_stdlib12secret_input17hfc353234bd7a7fadE
+                call $_ZN28c2zk_rust_wasm_tests_bundle13add3add17hd10e69d3d128fc14E
+                call $_ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
               )
-              (func $_ZN11c2zk_stdlib9pub_input17h0dee22ae2ec5e4e8E (;6;) (type 0) (result i64)
+              (func $_ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E (;6;) (type 0) (result i64)
                 call $c2zk_stdlib_pub_input
               )
-              (func $_ZN11c2zk_stdlib10pub_output17h07b1e1ebe272f489E (;7;) (type 1) (param i64)
+              (func $_ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E (;7;) (type 1) (param i64)
                 local.get 0
                 call $c2zk_stdlib_pub_output
               )
-              (func $_ZN11c2zk_stdlib12secret_input17ha93a82c316e394d7E (;8;) (type 0) (result i64)
+              (func $_ZN11c2zk_stdlib12secret_input17hfc353234bd7a7fadE (;8;) (type 0) (result i64)
                 call $c2zk_stdlib_secret_input
               )
               (memory (;0;) 16)

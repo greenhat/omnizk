@@ -25,18 +25,18 @@ fn test_fib() {
               (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
               (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
               (func $__main (;2;) (type 2)
-                call $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17he8323164ea650ecbE
+                call $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE
               )
-              (func $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17he8323164ea650ecbE (;3;) (type 2)
+              (func $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE (;3;) (type 2)
                 (local i64 i64 i64 i64)
                 block ;; label = @1
-                  call $_ZN11c2zk_stdlib9pub_input17h0dee22ae2ec5e4e8E
+                  call $_ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E
                   local.tee 0
                   i64.eqz
                   i32.eqz
                   br_if 0 (;@1;)
                   i64.const 0
-                  call $_ZN11c2zk_stdlib10pub_output17h07b1e1ebe272f489E
+                  call $_ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
                   return
                 end
                 local.get 0
@@ -124,12 +124,12 @@ fn test_fib() {
                   end
                 end
                 local.get 2
-                call $_ZN11c2zk_stdlib10pub_output17h07b1e1ebe272f489E
+                call $_ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
               )
-              (func $_ZN11c2zk_stdlib9pub_input17h0dee22ae2ec5e4e8E (;4;) (type 0) (result i64)
+              (func $_ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E (;4;) (type 0) (result i64)
                 call $c2zk_stdlib_pub_input
               )
-              (func $_ZN11c2zk_stdlib10pub_output17h07b1e1ebe272f489E (;5;) (type 1) (param i64)
+              (func $_ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E (;5;) (type 1) (param i64)
                 local.get 0
                 call $c2zk_stdlib_pub_output
               )

@@ -14,4 +14,10 @@ categories.workspace = true
 lazy_static = { workspace = true }
 spin = { workspace = true }
 
+[features]
+default = []
+
+# The "std" feature enables use of libstd. 
+std = []
+
 [dev-dependencies]

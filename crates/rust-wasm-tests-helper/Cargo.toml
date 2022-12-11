@@ -11,7 +11,7 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
-c2zk-stdlib = { workspace = true }
+c2zk-stdlib = { workspace = true, features = ["std"] }
 c2zk-rust-wasm-tests-bundle1 = { workspace = true }
 
 [dev-dependencies]
