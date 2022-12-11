@@ -10,8 +10,8 @@ use crate::code_translator::translate_operator;
 use crate::error::{WasmError, WasmResult};
 use crate::types::IntoIr;
 use wasmparser::{
-    ExternalKind, FuncValidator, FunctionBody, Parser, Payload, Type, TypeRef, Validator,
-    ValidatorResources,
+    BinaryReader, ExternalKind, FuncValidator, FunctionBody, Parser, Payload, Type, TypeRef,
+    Validator, ValidatorResources, WasmModuleResources,
 };
 
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
@@ -20,6 +20,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
     let mut mod_builder = ModuleBuilder::new();
 
     for payload in Parser::new(0).parse_all(data) {
+        dbg!(&mod_builder);
         match payload? {
             Payload::Version {
                 num,
@@ -172,15 +173,36 @@ fn parse_code_section_entry(
 ) -> WasmResult<()> {
     let mut builder = FuncBuilder::new();
     let mut reader = body.get_binary_reader();
-    // take care of wasm parameters
-    // take care of wasm func locals
+    // take care of wasm parameters and pass the next local as num_params
+    let num_params = 0;
+    parse_local_decls(&mut reader, &mut builder, num_params, validator)?;
     while !reader.eof() {
+        dbg!(&builder);
         let pos = reader.original_position();
         let op = reader.read_operator()?;
+        dbg!(&op);
         validator.op(pos, &op)?;
         translate_operator(validator, &op, &mut builder, mod_builder)?;
     }
     mod_builder.push_func(builder.build());
+    Ok(())
+}
+
+/// Parse the local variable declarations that precede the function body.
+fn parse_local_decls(
+    reader: &mut BinaryReader,
+    builder: &mut FuncBuilder,
+    num_params: usize,
+    validator: &mut FuncValidator<impl WasmModuleResources>,
+) -> WasmResult<()> {
+    let local_count = reader.read_var_u32()?;
+    for _ in 0..local_count {
+        let pos = reader.original_position();
+        let count = reader.read_var_u32()?;
+        let ty = reader.read_val_type()?;
+        validator.define_locals(pos, count, ty)?;
+        // TODO: add locals to builder
+    }
     Ok(())
 }
 

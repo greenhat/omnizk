@@ -3,6 +3,7 @@ use c2zk_ir::ir::Inst;
 
 use crate::InstBuilder;
 
+#[derive(Debug)]
 pub struct FuncBuilder {
     ins: Vec<Inst>,
 }

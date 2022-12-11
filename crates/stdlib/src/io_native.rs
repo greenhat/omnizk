@@ -9,6 +9,7 @@ lazy_static! {
 }
 
 pub fn init_io(pub_input: Vec<u64>, secret_input: Vec<u64>) {
+    //TODO: do not share this state with other runs (parallel test runs)
     let mut pub_input_reversed = pub_input;
     pub_input_reversed.reverse();
     let mut secret_input_reversed = secret_input;

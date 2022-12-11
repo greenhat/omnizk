@@ -11,6 +11,7 @@ pub struct ImportFunc {
     pub ty: FuncType,
 }
 
+#[derive(Debug)]
 pub struct ImportFuncBody {
     mapping: HashMap<ImportFunc, Vec<Inst>>,
 }

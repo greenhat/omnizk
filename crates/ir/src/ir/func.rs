@@ -1,5 +1,6 @@
 use super::Inst;
 
+#[derive(Debug)]
 pub struct Func {
     ins: Vec<Inst>,
 }

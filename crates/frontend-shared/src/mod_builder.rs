@@ -13,6 +13,7 @@ use crate::FuncBuilder;
 
 use self::import_func_body::ImportFunc;
 
+#[derive(Debug)]
 pub struct ModuleBuilder {
     types: Vec<FuncType>,
     start_func_idx: Option<FuncIndex>,
