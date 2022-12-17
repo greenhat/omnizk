@@ -31,3 +31,14 @@ pub struct FuncIndex(u32);
 
 #[derive(Debug, Clone, Copy, From, Into, PartialEq, Eq, Hash)]
 pub struct TypeIndex(u32);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum BlockType {
+    /// The block consumes nor produces any values.
+    Empty,
+    /// The block produces a singular value of the given type ([] -> \[t]).
+    Type(Ty),
+    /// The block is described by a function type.
+    /// The index is to a function type in the types section.
+    FuncType(TypeIndex),
+}

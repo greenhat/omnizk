@@ -12,7 +12,6 @@ pub fn emit_inst(
     config: &TritonTargetConfig,
     sink: &mut InstBuffer,
 ) -> Result<(), CodegenError> {
-    // TODO: rename Inst to HIR and introduce MIR?
     use triton_vm::instruction::AnInstruction;
     match ins {
         Inst::Unreachable => (),
@@ -31,6 +30,18 @@ pub fn emit_inst(
         Inst::PubInputRead => sink.push(AnInstruction::ReadIo),
         Inst::PubOutputWrite => sink.push(AnInstruction::WriteIo),
         Inst::SecretInputRead => sink.push(AnInstruction::Divine(None)),
+        Inst::Block { blockty } => todo!(),
+        Inst::LocalTee { local_idx } => todo!(),
+        Inst::I64Eqz => todo!(),
+        Inst::I32Eqz => todo!(),
+        Inst::BrIf { relative_depth } => todo!(),
+        Inst::Br { relative_depth } => todo!(),
+        Inst::I64Const { value } => todo!(),
+        Inst::I64And => todo!(),
+        Inst::LocalSet { local_idx } => todo!(),
+        Inst::I64GeU => todo!(),
+        Inst::Loop { block_type } => todo!(),
+        Inst::I64Ne => todo!(),
     }
     Ok(())
 }

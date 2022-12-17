@@ -6,7 +6,7 @@
 use c2zk_ir::ir;
 use derive_more::From;
 pub use wasmparser;
-use wasmparser::ValType;
+use wasmparser::{BlockType, ValType};
 
 use std::convert::TryFrom;
 
@@ -259,6 +259,16 @@ impl IntoIr<ir::Ty> for wasmparser::ValType {
             wasmparser::ValType::V128 => ir::Ty::V128,
             wasmparser::ValType::ExternRef => ir::Ty::ExternRef,
             wasmparser::ValType::FuncRef => ir::Ty::FuncRef,
+        }
+    }
+}
+
+impl IntoIr<ir::BlockType> for &BlockType {
+    fn into_ir(self) -> ir::BlockType {
+        match self {
+            BlockType::Empty => ir::BlockType::Empty,
+            BlockType::Type(ty) => ir::BlockType::Type(ty.into_ir()),
+            BlockType::FuncType(_) => todo!(),
         }
     }
 }
