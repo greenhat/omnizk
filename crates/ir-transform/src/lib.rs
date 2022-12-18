@@ -1,4 +1,4 @@
-//! IR
+//! IR transformations
 
 // Coding conventions
 // #![deny(unsafe_code)]
@@ -18,5 +18,6 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
-pub mod ir;
-pub mod pass;
+mod convert_blocks;
+
+pub use convert_blocks::ConvertBlocksPass;

@@ -18,7 +18,7 @@ use crate::TritonTargetConfig;
 use self::emit::func_index_to_label;
 
 pub fn compile_module(
-    module: &Module,
+    module: Module,
     config: &TritonTargetConfig,
 ) -> Result<InstBuffer, CodegenError> {
     let mut sink = InstBuffer::new(config);
@@ -62,7 +62,7 @@ mod tests {
         let source = wat::parse_str(input).unwrap();
         let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
         let module = translate(&source, frontend).unwrap();
-        let inst_buf = compile_module(&module, &TritonTargetConfig::default()).unwrap();
+        let inst_buf = compile_module(module, &TritonTargetConfig::default()).unwrap();
         let out_source = inst_buf.pretty_print();
         expected_tree.assert_eq(&out_source);
         let program = inst_buf.program();

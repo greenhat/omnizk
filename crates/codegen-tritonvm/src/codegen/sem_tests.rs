@@ -24,7 +24,7 @@ fn check_wasm(
     expected_wat.assert_eq(&wat);
     let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
     let module = translate(source, frontend).unwrap();
-    let inst_buf = compile_module(&module, &TritonTargetConfig::default()).unwrap();
+    let inst_buf = compile_module(module, &TritonTargetConfig::default()).unwrap();
     let out_source = inst_buf.pretty_print();
     expected_triton.assert_eq(&out_source);
     let program = inst_buf.program();

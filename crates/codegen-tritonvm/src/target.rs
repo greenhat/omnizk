@@ -1,6 +1,7 @@
 use c2zk_codegen_shared::CodegenError;
 use c2zk_codegen_shared::Target;
 use c2zk_ir::ir::Module;
+use c2zk_ir_transform::ConvertBlocksPass;
 
 use crate::compile_module;
 use crate::TritonTargetConfig;
@@ -14,7 +15,11 @@ impl Target for TritonTarget {
         "TritonVM"
     }
 
-    fn compile_module(&self, module: &Module) -> Result<Vec<u8>, CodegenError> {
+    fn ir_passes(&self) -> Vec<Box<dyn c2zk_ir::pass::IrPass>> {
+        vec![Box::new(ConvertBlocksPass::new())]
+    }
+
+    fn compile_module(&self, module: Module) -> Result<Vec<u8>, CodegenError> {
         let inst_buf = compile_module(module, &self.config)?;
         Ok(inst_buf.pretty_print().into_bytes())
     }

@@ -2,7 +2,7 @@ use super::Func;
 use super::FuncIndex;
 
 pub struct Module {
-    functions: Vec<Func>,
+    pub functions: Vec<Func>,
     pub start_func_idx: FuncIndex,
 }
 
