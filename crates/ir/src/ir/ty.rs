@@ -42,3 +42,15 @@ pub enum BlockType {
     /// The index is to a function type in the types section.
     FuncType(TypeIndex),
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum BlockKind {
+    Block,
+    Loop,
+}
+
+impl From<usize> for FuncIndex {
+    fn from(idx: usize) -> Self {
+        Self(idx as u32)
+    }
+}

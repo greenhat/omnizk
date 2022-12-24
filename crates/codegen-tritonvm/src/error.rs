@@ -1,2 +1,5 @@
 #[derive(Debug)]
-pub enum TritonError {}
+pub enum TritonError {
+    UnexpectedInst(String),
+    InvalidInst(String),
+}

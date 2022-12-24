@@ -1,4 +1,3 @@
-use c2zk_codegen_shared::CodegenError;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Module;
@@ -13,6 +12,7 @@ mod sem_tests;
 
 use triton_vm::instruction::AnInstruction;
 
+use crate::TritonError;
 use crate::TritonTargetConfig;
 
 use self::emit::func_index_to_label;
@@ -20,7 +20,7 @@ use self::emit::func_index_to_label;
 pub fn compile_module(
     module: Module,
     config: &TritonTargetConfig,
-) -> Result<InstBuffer, CodegenError> {
+) -> Result<InstBuffer, TritonError> {
     let mut sink = InstBuffer::new(config);
     sink.push(AnInstruction::Call(func_index_to_label(
         module.start_func_idx,
@@ -39,7 +39,7 @@ pub fn compile_function(
     func: &Func,
     config: &TritonTargetConfig,
     sink: &mut InstBuffer,
-) -> Result<(), CodegenError> {
+) -> Result<(), TritonError> {
     for ins in func.instructions() {
         emit_inst(ins, config, sink)?;
     }

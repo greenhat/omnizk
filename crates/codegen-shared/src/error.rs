@@ -1,2 +1,4 @@
 #[derive(Debug)]
-pub enum CodegenError {}
+pub enum CodegenError {
+    Triton(String),
+}

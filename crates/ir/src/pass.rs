@@ -13,6 +13,17 @@ pub trait IrPass {
         }
     }
 
-    // TODO: some ModuleCtx(add new funcs, query info, etc.) instead of Module
-    fn run_pass(&self, func: &mut Func, module: &mut Module);
+    fn run_mod_pass(&self, module: &mut Module) {
+        for func in module.functions_mut().iter_mut() {
+            self.run_func_pass(func);
+        }
+    }
+
+    fn run_func_pass(&self, func: &mut Func);
+}
+
+pub fn run_ir_passes(module: &mut Module, passes: &[Box<dyn IrPass>]) {
+    for pass in passes {
+        pass.run_mod_pass(module);
+    }
 }

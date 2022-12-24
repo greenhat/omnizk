@@ -53,10 +53,9 @@ impl ModuleBuilder {
         let func_body = self
             .import_func_body
             .body(&import_func)
-            .ok_or(ModuleBuilderError::ImportFuncBodyNotFound(import_func))?
-            .clone();
+            .ok_or(ModuleBuilderError::ImportFuncBodyNotFound(import_func))?;
         let mut func_builder = FuncBuilder::new();
-        func_builder.push_insts(func_body);
+        func_builder.push_insts(func_body.clone());
         self.functions.push(func_builder.build());
         Ok(())
     }

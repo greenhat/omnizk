@@ -20,4 +20,4 @@
 
 mod convert_blocks;
 
-pub use convert_blocks::ConvertBlocksPass;
+pub use convert_blocks::BlocksToFuncPass;

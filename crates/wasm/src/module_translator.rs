@@ -20,7 +20,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
     let mut mod_builder = ModuleBuilder::new();
 
     for payload in Parser::new(0).parse_all(data) {
-        dbg!(&mod_builder);
+        // dbg!(&mod_builder);
         match payload? {
             Payload::Version {
                 num,
@@ -177,10 +177,10 @@ fn parse_code_section_entry(
     let num_params = 0;
     parse_local_decls(&mut reader, &mut builder, num_params, validator)?;
     while !reader.eof() {
-        dbg!(&builder);
+        // dbg!(&builder);
         let pos = reader.original_position();
         let op = reader.read_operator()?;
-        dbg!(&op);
+        // dbg!(&op);
         validator.op(pos, &op)?;
         translate_operator(validator, &op, &mut builder, mod_builder)?;
     }

@@ -1,5 +1,9 @@
+use self::ext::Ext;
+
 use super::BlockType;
 use super::FuncIndex;
+
+pub mod ext;
 
 #[derive(Debug, Clone)]
 pub enum Inst {
@@ -10,7 +14,7 @@ pub enum Inst {
     Return,
     Loop { block_type: BlockType },
     Block { blockty: BlockType },
-    BrIf { relative_depth: u32 },
+    BrIf { relative_depth: u32 }, // branch out of the current block if the top of the stack is not zero
     Br { relative_depth: u32 },
     I32Const { value: i32 },
     I64Const { value: i64 },
@@ -27,4 +31,5 @@ pub enum Inst {
     PubInputRead,
     PubOutputWrite,
     SecretInputRead,
+    Ext(Ext),
 }

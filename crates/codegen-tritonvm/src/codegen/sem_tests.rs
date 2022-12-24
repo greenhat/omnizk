@@ -5,6 +5,8 @@
 mod add;
 mod fib;
 
+use c2zk_ir::pass::run_ir_passes;
+
 use crate::compile_module;
 use crate::TritonTargetConfig;
 
@@ -23,8 +25,11 @@ fn check_wasm(
     let wat = wasmprinter::print_bytes(source).unwrap();
     expected_wat.assert_eq(&wat);
     let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
-    let module = translate(source, frontend).unwrap();
-    let inst_buf = compile_module(module, &TritonTargetConfig::default()).unwrap();
+    let triton_target_config = TritonTargetConfig::default();
+
+    let mut module = translate(source, frontend).unwrap();
+    run_ir_passes(&mut module, &triton_target_config.ir_passes);
+    let inst_buf = compile_module(module, &triton_target_config).unwrap();
     let out_source = inst_buf.pretty_print();
     expected_triton.assert_eq(&out_source);
     let program = inst_buf.program();
