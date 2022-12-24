@@ -1,4 +1,5 @@
 use c2zk_ir::ir::ext::Ext;
+use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Inst;
 
@@ -45,14 +46,14 @@ pub fn emit_inst(
         Inst::Loop { block_type } => todo!(),
         Inst::I64Ne => todo!(),
         Inst::Ext(Ext::Triton(eop)) => match eop {
-            c2zk_ir::ir::ext::TritonExt::Pop => sink.push(AnInstruction::Pop),
-            c2zk_ir::ir::ext::TritonExt::Skiz => sink.push(AnInstruction::Skiz),
-            c2zk_ir::ir::ext::TritonExt::Swap { idx } => {
+            TritonExt::Pop => sink.push(AnInstruction::Pop),
+            TritonExt::Skiz => sink.push(AnInstruction::Skiz),
+            TritonExt::Swap { idx } => {
                 sink.push(AnInstruction::Swap((*idx as u32).try_into().map_err(
                     |e| TritonError::InvalidInst(format!("invalid Swap index: {}", idx)),
                 )?))
             }
-            c2zk_ir::ir::ext::TritonExt::Recurse => sink.push(AnInstruction::Recurse),
+            TritonExt::Recurse => sink.push(AnInstruction::Recurse),
         },
     }
     Ok(())
