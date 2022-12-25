@@ -22,6 +22,7 @@ pub enum Inst {
     LocalTee { local_idx: u32 },
     LocalSet { local_idx: u32 },
     I32Add,
+    I32Sub,
     I32Eqz,
     I64Add,
     I64Eqz,

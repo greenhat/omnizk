@@ -32,6 +32,14 @@ impl InstBuffer {
         self.inner.push(LabelledInstruction::Instruction(inst));
     }
 
+    pub(crate) fn append(&mut self, insts: Vec<AnInstruction<String>>) {
+        let mut insts = insts
+            .into_iter()
+            .map(LabelledInstruction::Instruction)
+            .collect::<Vec<_>>();
+        self.inner.append(&mut insts);
+    }
+
     pub(crate) fn push_label(&mut self, label: String) {
         self.inner.push(LabelledInstruction::Label(label));
     }

@@ -2,7 +2,9 @@ use c2zk_ir::ir::ext::Ext;
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Inst;
+use triton_vm::ord_n::Ord16;
 
+use crate::codegen::pseudo_inst::*;
 use crate::felt_i32;
 use crate::felt_i64;
 use crate::InstBuffer;
@@ -17,6 +19,10 @@ pub fn emit_inst(
 ) -> Result<(), TritonError> {
     use triton_vm::instruction::AnInstruction;
     match ins {
+        Inst::Block { blockty } => return Err(unexpected_inst(ins)),
+        Inst::Loop { block_type } => return Err(unexpected_inst(ins)),
+        Inst::BrIf { relative_depth } => return Err(unexpected_inst(ins)),
+        Inst::Br { relative_depth } => return Err(unexpected_inst(ins)),
         Inst::Unreachable => (),
         Inst::Nop => (),
         Inst::End => sink.push(AnInstruction::Return),
@@ -26,6 +32,7 @@ pub fn emit_inst(
             local_idx: local_index,
         } => (), // do nothing for now, func param access is done via stack
         Inst::I32Add => sink.push(AnInstruction::Add),
+        Inst::I32Sub => sink.append(sub_i32()),
         Inst::I64Add => sink.push(AnInstruction::Add),
         Inst::Call {
             func_idx: func_index,
@@ -33,26 +40,18 @@ pub fn emit_inst(
         Inst::PubInputRead => sink.push(AnInstruction::ReadIo),
         Inst::PubOutputWrite => sink.push(AnInstruction::WriteIo),
         Inst::SecretInputRead => sink.push(AnInstruction::Divine(None)),
-        Inst::Block { blockty } => todo!(),
-        Inst::LocalTee { local_idx } => todo!(),
-        Inst::I64Eqz => todo!(),
-        Inst::I32Eqz => todo!(),
-        Inst::BrIf { relative_depth } => todo!(),
-        Inst::Br { relative_depth } => todo!(),
+        Inst::LocalTee { local_idx } => sink.push(AnInstruction::Nop), // TODO: implement
+        Inst::I64Eqz => sink.push(AnInstruction::Nop),                 // TODO: implement
+        Inst::I32Eqz => sink.push(AnInstruction::Nop),                 // TODO: implement
         Inst::I64Const { value } => sink.push(AnInstruction::Push(felt_i64(*value))),
-        Inst::I64And => todo!(),
-        Inst::LocalSet { local_idx } => todo!(),
-        Inst::I64GeU => todo!(),
-        Inst::Loop { block_type } => todo!(),
-        Inst::I64Ne => todo!(),
+        Inst::I64And => sink.append(and_i32()),
+        Inst::LocalSet { local_idx } => sink.push(AnInstruction::Nop), // TODO: implement
+        Inst::I64GeU => sink.push(AnInstruction::Nop),                 // TODO: implement
+        Inst::I64Ne => sink.push(AnInstruction::Nop),                  // TODO: implement
         Inst::Ext(Ext::Triton(eop)) => match eop {
             TritonExt::Pop => sink.push(AnInstruction::Pop),
             TritonExt::Skiz => sink.push(AnInstruction::Skiz),
-            TritonExt::Swap { idx } => {
-                sink.push(AnInstruction::Swap((*idx as u32).try_into().map_err(
-                    |e| TritonError::InvalidInst(format!("invalid Swap index: {}", idx)),
-                )?))
-            }
+            TritonExt::Swap { idx } => sink.push(AnInstruction::Swap(ord16_u8(*idx)?)),
             TritonExt::Recurse => sink.push(AnInstruction::Recurse),
         },
     }
@@ -61,4 +60,14 @@ pub fn emit_inst(
 
 pub(crate) fn func_index_to_label(func_index: FuncIndex) -> String {
     format!("f{}", u32::from(func_index))
+}
+
+fn ord16_u8(x: u8) -> Result<Ord16, TritonError> {
+    (x as u32)
+        .try_into()
+        .map_err(|_| TritonError::InvalidInst(format!("invalid Ord16 index: {}", x)))
+}
+
+fn unexpected_inst(inst: &Inst) -> TritonError {
+    TritonError::InvalidInst(format!("unexpected instruction: {:?}", inst))
 }

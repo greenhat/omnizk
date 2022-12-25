@@ -6,6 +6,7 @@ mod inst_buf;
 pub use inst_buf::InstBuffer;
 mod emit;
 pub use emit::emit_inst;
+mod pseudo_inst;
 
 #[cfg(test)]
 mod sem_tests;

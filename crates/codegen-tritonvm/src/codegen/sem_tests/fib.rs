@@ -143,7 +143,7 @@ fn test_fib() {
               (export "__heap_base" (global 2))
             )"#]],
         expect![[r#"
-            call f3
+            call f2
             halt
             f0:
             read_io
@@ -152,30 +152,134 @@ fn test_fib() {
             write_io
             return
             f2:
-            divine
+            call f3
             return
             f3:
+            call f6
+            push -1
+            add
+            skiz
+            return
+            push 7
+            nop
+            nop
+            call f7
+            push -1
+            add
+            skiz
+            return
+            push -8
+            nop
+            nop
+            push 1
+            nop
+            push 0
+            nop
+            call f8
+            push -1
+            add
+            skiz
+            return
+            return
+            call f9
+            push -1
+            add
+            skiz
+            return
+            return
             call f5
             return
             f4:
-            add
-            return
-            f5:
-            call f6
-            call f6
-            call f4
-            call f8
-            call f4
-            call f7
-            return
-            f6:
             call f0
             return
-            f7:
+            f5:
             call f1
             return
+            f6:
+            call f4
+            nop
+            nop
+            nop
+            push 1
+            swap1
+            skiz
+            return
+            pop
+            push 0
+            call f5
+            return
+            push 1
+            return
+            f7:
+            push -1
+            add
+            push 7
+            nop
+            push 1
+            swap1
+            skiz
+            return
+            pop
+            push 1
+            nop
+            push 0
+            nop
+            push 2
+            return
+            push 1
+            return
             f8:
-            call f2
+            add
+            nop
+            add
+            nop
+            add
+            nop
+            add
+            nop
+            add
+            nop
+            add
+            nop
+            add
+            nop
+            add
+            nop
+            push -8
+            add
+            nop
+            nop
+            nop
+            push 1
+            swap1
+            skiz
+            return
+            pop
+            push 1
+            return
+            f9:
+            nop
+            push 1
+            swap1
+            skiz
+            return
+            pop
+            nop
+            nop
+            add
+            nop
+            nop
+            push -1
+            add
+            nop
+            push 0
+            nop
+            push 1
+            swap1
+            skiz
+            return
+            pop
+            push 1
             return"#]],
     )
 }
