@@ -156,37 +156,23 @@ fn test_fib() {
             return
             f3:
             call f6
-            push -1
+            push -1 // Begin: propagate Br* in block (0)
             add
             skiz
-            return
+            return // End: propagate Br* in block
             push 7
             nop
             nop
             call f7
-            push -1
+            push -1 // Begin: propagate Br* in block (0)
             add
             skiz
-            return
-            push -8
-            nop
-            nop
-            push 1
-            nop
-            push 0
-            nop
-            call f8
-            push -1
+            return // End: propagate Br* in block
+            call f10
+            push -1 // Begin: propagate Br* in block (0)
             add
             skiz
-            return
-            return
-            call f9
-            push -1
-            add
-            skiz
-            return
-            return
+            return // End: propagate Br* in block
             call f5
             return
             f4:
@@ -200,35 +186,44 @@ fn test_fib() {
             nop
             nop
             nop
-            push 1
-            swap1
-            skiz
-            return
-            pop
             push 0
             call f5
             return
             push 1
             return
             f7:
+            call f8
+            push -1 // Begin: propagate Br* in block (1)
+            add
+            skiz
+            return // End: propagate Br* in block
+            push -8
+            nop
+            nop
+            push 1
+            nop
+            push 0
+            nop
+            call f9
+            push -1
+            add // Begin: propagate Br* in loop (1)
+            skiz
+            return
+            recurse // End: propagate Br* in loop
+            push 1
+            return
+            f8:
             push -1
             add
             push 7
             nop
             push 1
-            swap1
-            skiz
-            return
-            pop
-            push 1
             nop
             push 0
             nop
-            push 2
-            return
             push 1
             return
-            f8:
+            f9:
             add
             nop
             add
@@ -251,20 +246,24 @@ fn test_fib() {
             nop
             nop
             push 1
+            return
+            f10:
+            nop
+            nop
+            call f11
+            push -1
+            add // Begin: propagate Br* in loop (1)
+            skiz
+            return
+            recurse // End: propagate Br* in loop
+            push 1
+            return
+            f11:
+            push 1
             swap1
             skiz
             return
             pop
-            push 1
-            return
-            f9:
-            nop
-            push 1
-            swap1
-            skiz
-            return
-            pop
-            nop
             nop
             add
             nop
@@ -274,11 +273,6 @@ fn test_fib() {
             nop
             push 0
             nop
-            push 1
-            swap1
-            skiz
-            return
-            pop
             push 1
             return"#]],
     )

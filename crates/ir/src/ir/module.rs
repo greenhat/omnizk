@@ -18,6 +18,10 @@ impl Module {
         &self.functions
     }
 
+    pub fn into_functions(self) -> Vec<Func> {
+        self.functions
+    }
+
     pub fn functions_mut(&mut self) -> &mut [Func] {
         &mut self.functions
     }
