@@ -30,7 +30,7 @@ impl IrPass for BlocksToFuncPass {
             // TODO: this cloned Func is a hack to get around the borrow checker
             dbg!(&func_in);
             let func_out = run(func_in, module, 0);
-            module.set_function(i as u32, func_out);
+            module.set_function(i.into(), func_out);
         }
     }
 
@@ -107,22 +107,11 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                 match capture_opt {
                     Some(mut capture) => {
                         if capture.nested_level == 0 {
-                            // extracted func prologue
-                            extracted_func_comments.insert(
-                                extracted_func_inst.len(),
-                                format!("Begin: extracted func prologue ({block_nested_level})"),
-                            );
-                            extracted_func_inst.push(Inst::I32Const { value: 1 }); // exiting the function not with a Br* op and stop exit propagation
-                            extracted_func_comments.insert(
-                                extracted_func_inst.len(),
-                                "End: extracted func prologue".to_string(),
-                            );
-                            extracted_func_inst.push(Inst::Return);
+                            dbg!(&extracted_func_inst);
                             let extracted_func = Func::new_with_comments(
                                 extracted_func_inst.clone(),
                                 extracted_func_comments.clone(),
                             );
-                            dbg!(&extracted_func_inst);
                             extracted_func_inst.clear();
                             extracted_func_comments.clear();
                             let extracted_func_idx = module.push_function(extracted_func.clone());
@@ -144,7 +133,8 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                                     new_func_insts.push(Inst::I32Add);
                                     // if not zero then return to the parent func(block), keep bailing out
                                     // zero is expected when we exited the targeted by Br op block
-                                    // TODO: does it mean we have to put on stack increased relative_depth for Block and untouched for Loop?
+                                    // TODO: does it mean we have to put on stack increased relative_depth for Block
+                                    // and untouched for Loop?
                                     new_func_insts.push(TritonExt::Skiz.into());
                                     new_func_comments.insert(
                                         new_func_insts.len(),
@@ -173,9 +163,23 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                                 }
                             }
                             // recursevely extract nested blocks into functions
-                            let func = run(extracted_func, module, block_nested_level + 1);
-                            // TODO: comments in the replaced func are lost
-                            module.set_function(extracted_func_idx.into(), func);
+                            let mut processed_func =
+                                run(extracted_func, module, block_nested_level + 1);
+
+                            // extracted func prologue
+                            processed_func.set_comment(
+                                processed_func.instructions().len(),
+                                format!("Begin: extracted func prologue ({block_nested_level})"),
+                            );
+                            // exiting the function not with a Br* op and stop exit propagation
+                            processed_func.push_instruction(Inst::I32Const { value: 1 });
+                            processed_func.set_comment(
+                                processed_func.instructions().len(),
+                                "End: extracted func prologue".to_string(),
+                            );
+                            processed_func.push_instruction(Inst::Return);
+
+                            module.set_function(extracted_func_idx, processed_func);
                             capture_opt = None;
                         } else {
                             capture.dec_nested_level();

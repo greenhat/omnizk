@@ -35,7 +35,7 @@ impl Module {
         FuncIndex::from(self.functions.len() - 1)
     }
 
-    pub fn set_function(&mut self, idx: u32, func: Func) {
-        self.functions[idx as usize] = func;
+    pub fn set_function(&mut self, idx: FuncIndex, func: Func) {
+        self.functions[u32::from(idx) as usize] = func;
     }
 }

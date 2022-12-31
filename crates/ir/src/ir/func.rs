@@ -27,4 +27,12 @@ impl Func {
     pub fn comments(&self) -> &HashMap<usize, String> {
         &self.comments
     }
+
+    pub fn push_instruction(&mut self, inst: Inst) {
+        self.ins.push(inst);
+    }
+
+    pub fn set_comment(&mut self, idx: usize, comment: String) {
+        self.comments.insert(idx, comment);
+    }
 }

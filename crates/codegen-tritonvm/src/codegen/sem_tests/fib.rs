@@ -189,8 +189,8 @@ fn test_fib() {
             push 0
             call f5
             return
-            push 1
-            return
+            push 1 // Begin: extracted func prologue (0)
+            return // End: extracted func prologue
             f7:
             call f8
             push -1 // Begin: propagate Br* in block (1)
@@ -210,8 +210,8 @@ fn test_fib() {
             skiz
             return
             recurse // End: propagate Br* in loop
-            push 1
-            return
+            push 1 // Begin: extracted func prologue (0)
+            return // End: extracted func prologue
             f8:
             push -1
             add
@@ -221,8 +221,8 @@ fn test_fib() {
             nop
             push 0
             nop
-            push 1
-            return
+            push 1 // Begin: extracted func prologue (1)
+            return // End: extracted func prologue
             f9:
             add
             nop
@@ -245,8 +245,8 @@ fn test_fib() {
             nop
             nop
             nop
-            push 1
-            return
+            push 1 // Begin: extracted func prologue (1)
+            return // End: extracted func prologue
             f10:
             nop
             nop
@@ -256,8 +256,8 @@ fn test_fib() {
             skiz
             return
             recurse // End: propagate Br* in loop
-            push 1
-            return
+            push 1 // Begin: extracted func prologue (0)
+            return // End: extracted func prologue
             f11:
             push 1
             swap1
@@ -273,7 +273,7 @@ fn test_fib() {
             nop
             push 0
             nop
-            push 1
-            return"#]],
+            push 1 // Begin: extracted func prologue (1)
+            return // End: extracted func prologue"#]],
     )
 }
