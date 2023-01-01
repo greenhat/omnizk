@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::BlockKind;
 use c2zk_ir::ir::Func;
@@ -72,11 +70,9 @@ impl Capture {
 fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
     // dbg!(&block_nested_level);
     // TODO: exit early if there are no blocks
-    let mut new_func_insts = Vec::new();
-    let mut new_func_comments = HashMap::new();
+    let mut new_func = Func::new(Vec::new());
     let mut capture_opt: Option<Capture> = None;
-    let mut extracted_func_inst = Vec::new();
-    let mut extracted_func_comments = HashMap::new();
+    let mut extracted_func = Func::new(Vec::new());
     for inst in func.instructions() {
         // dbg!(&capture_opt);
         #[allow(clippy::wildcard_enum_match_arm)]
@@ -89,7 +85,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                     capture.inc_nested_level();
                     capture_opt = Some(capture);
                     // nested block, keep extracting
-                    extracted_func_inst.push(inst.clone());
+                    extracted_func.push(inst.clone());
                 }
             },
             Inst::Loop { block_type: _ } => match capture_opt {
@@ -98,73 +94,65 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                 }
                 Some(mut capture) => {
                     capture.inc_nested_level();
+                    // TODO: rewrite to avoid this
                     capture_opt = Some(capture);
                     // nested block, keep extracting
-                    extracted_func_inst.push(inst.clone());
+                    extracted_func.push(inst.clone());
                 }
             },
             Inst::End => {
                 match capture_opt {
                     Some(mut capture) => {
                         if capture.nested_level == 0 {
-                            dbg!(&extracted_func_inst);
-                            let extracted_func = Func::new_with_comments(
-                                extracted_func_inst.clone(),
-                                extracted_func_comments.clone(),
-                            );
-                            extracted_func_inst.clear();
-                            extracted_func_comments.clear();
+                            dbg!(&extracted_func);
                             let extracted_func_idx = module.push_function(extracted_func.clone());
                             // call the extracted func
-                            new_func_insts.push(Inst::Call {
+                            new_func.push(Inst::Call {
                                 func_idx: extracted_func_idx,
                             });
 
                             // handle Br* op
                             match capture.block_kind {
                                 BlockKind::Block => {
-                                    new_func_comments.insert(
-                                        new_func_insts.len(),
+                                    new_func.push_with_comment(
+                                        Inst::I32Const { value: -1 },
                                         format!(
                                             "Begin: propagate Br* in block ({block_nested_level})"
                                         ),
                                     );
-                                    new_func_insts.push(Inst::I32Const { value: -1 });
-                                    new_func_insts.push(Inst::I32Add);
+                                    new_func.push(Inst::I32Add);
                                     // if not zero then return to the parent func(block), keep bailing out
                                     // zero is expected when we exited the targeted by Br op block
                                     // TODO: does it mean we have to put on stack increased relative_depth for Block
                                     // and untouched for Loop?
-                                    new_func_insts.push(TritonExt::Skiz.into());
-                                    new_func_comments.insert(
-                                        new_func_insts.len(),
+                                    new_func.push(TritonExt::Skiz.into());
+                                    new_func.push_with_comment(
+                                        Inst::Return,
                                         "End: propagate Br* in block".to_string(),
                                     );
-                                    new_func_insts.push(Inst::Return);
                                 }
                                 BlockKind::Loop => {
-                                    new_func_insts.push(Inst::I32Const { value: -1 });
-                                    new_func_comments.insert(
-                                        new_func_insts.len(),
+                                    new_func.push(Inst::I32Const { value: -1 });
+                                    new_func.push_with_comment(
+                                        Inst::I32Add,
                                         format!(
                                             "Begin: propagate Br* in loop ({block_nested_level})"
                                         ),
                                     );
-                                    new_func_insts.push(Inst::I32Add);
                                     // if not zero then return to the parent func(block), keep bailing out
                                     // zero is expected when we exited into the targeted by Br op loop
-                                    new_func_insts.push(TritonExt::Skiz.into());
-                                    new_func_insts.push(Inst::Return);
-                                    new_func_comments.insert(
-                                        new_func_insts.len(),
+                                    new_func.push(TritonExt::Skiz.into());
+                                    new_func.push(Inst::Return);
+                                    new_func.push_with_comment(
+                                        TritonExt::Recurse.into(),
                                         "End: propagate Br* in loop".to_string(),
                                     );
-                                    new_func_insts.push(TritonExt::Recurse.into());
                                 }
                             }
                             // recursevely extract nested blocks into functions
                             let mut processed_func =
                                 run(extracted_func, module, block_nested_level + 1);
+                            extracted_func = Func::new(Vec::new());
 
                             // extracted func prologue
                             processed_func.set_comment(
@@ -172,12 +160,12 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                                 format!("Begin: extracted func prologue ({block_nested_level})"),
                             );
                             // exiting the function not with a Br* op and stop exit propagation
-                            processed_func.push_instruction(Inst::I32Const { value: 1 });
+                            processed_func.push(Inst::I32Const { value: 1 });
                             processed_func.set_comment(
                                 processed_func.instructions().len(),
                                 "End: extracted func prologue".to_string(),
                             );
-                            processed_func.push_instruction(Inst::Return);
+                            processed_func.push(Inst::Return);
 
                             module.set_function(extracted_func_idx, processed_func);
                             capture_opt = None;
@@ -185,63 +173,59 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                             capture.dec_nested_level();
                             capture_opt = Some(capture);
                             // nested block, keep extracting
-                            extracted_func_inst.push(inst.clone());
+                            extracted_func.push(inst.clone());
                         }
                     }
                     None => {
-                        new_func_insts.push(inst.clone());
+                        new_func.push(inst.clone());
                     }
                 }
             }
             Inst::Br { relative_depth } => {
                 if capture_opt.is_none() {
-                    extracted_func_comments.insert(
-                        extracted_func_inst.len(),
+                    extracted_func.push_with_comment(
+                        Inst::I32Const {
+                            value: (relative_depth + 1) as i32,
+                        },
                         format!("Begin: Br call on nested ({block_nested_level})"),
                     );
-                    extracted_func_inst.push(Inst::I32Const {
-                        value: (relative_depth + 1) as i32,
-                    });
-                    extracted_func_comments.insert(
-                        extracted_func_inst.len(),
+                    extracted_func.push_with_comment(
+                        Inst::Return,
                         format!("End: Br call on nested ({block_nested_level})"),
                     );
-                    extracted_func_inst.push(Inst::Return);
                 } else {
-                    extracted_func_inst.push(inst.clone());
+                    extracted_func.push(inst.clone());
                 }
             }
             Inst::BrIf { relative_depth } => {
                 if capture_opt.is_none() {
-                    extracted_func_comments.insert(
-                        extracted_func_inst.len(),
+                    extracted_func.push_with_comment(
+                        Inst::I32Const {
+                            value: (relative_depth + 1) as i32,
+                        },
                         format!("Begin: BrIf call on nested ({block_nested_level})"),
                     );
-                    extracted_func_inst.push(Inst::I32Const {
-                        value: (relative_depth + 1) as i32,
-                    });
-                    extracted_func_inst.push(TritonExt::Swap { idx: 1 }.into());
+                    extracted_func.push(TritonExt::Swap { idx: 1 }.into());
                     // TODO: "invert stack value since BrIf jumps on true (non zero)"
-                    extracted_func_inst.push(TritonExt::Skiz.into());
-                    extracted_func_inst.push(Inst::Return);
-                    extracted_func_comments.insert(
-                        extracted_func_inst.len(),
+                    extracted_func.push(TritonExt::Skiz.into());
+                    extracted_func.push(Inst::Return);
+                    extracted_func.push_with_comment(
+                        TritonExt::Pop.into(),
                         format!("End: BrIf call on nested ({block_nested_level})"),
                     );
-                    extracted_func_inst.push(TritonExt::Pop.into());
                 } else {
-                    extracted_func_inst.push(inst.clone());
+                    extracted_func.push(inst.clone());
                 }
             }
             _ => {
                 if capture_opt.is_some() {
-                    extracted_func_inst.push(inst.clone());
+                    extracted_func.push(inst.clone());
                 } else {
-                    new_func_insts.push(inst.clone())
+                    new_func.push(inst.clone())
                 }
             }
         }
     }
-    dbg!(&new_func_insts);
-    Func::new_with_comments(new_func_insts, new_func_comments)
+    dbg!(&new_func);
+    new_func
 }

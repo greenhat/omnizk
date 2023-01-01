@@ -28,8 +28,13 @@ impl Func {
         &self.comments
     }
 
-    pub fn push_instruction(&mut self, inst: Inst) {
+    pub fn push(&mut self, inst: Inst) {
         self.ins.push(inst);
+    }
+
+    pub fn push_with_comment(&mut self, inst: Inst, comment: String) {
+        self.ins.push(inst);
+        self.comments.insert(self.ins.len() - 1, comment);
     }
 
     pub fn set_comment(&mut self, idx: usize, comment: String) {
