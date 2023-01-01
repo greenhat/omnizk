@@ -16,6 +16,7 @@ pub fn emit_inst(
     ins: &Inst,
     config: &TritonTargetConfig,
     sink: &mut InstBuffer,
+    func_names: &[String],
 ) -> Result<(), TritonError> {
     use triton_vm::instruction::AnInstruction;
     match ins {
@@ -36,7 +37,10 @@ pub fn emit_inst(
         Inst::I64Add => sink.push(AnInstruction::Add),
         Inst::Call {
             func_idx: func_index,
-        } => sink.push(AnInstruction::Call(func_index_to_label(*func_index))),
+        } => sink.push(AnInstruction::Call(func_index_to_label(
+            *func_index,
+            func_names,
+        ))),
         Inst::PubInputRead => sink.push(AnInstruction::ReadIo),
         Inst::PubOutputWrite => sink.push(AnInstruction::WriteIo),
         Inst::SecretInputRead => sink.push(AnInstruction::Divine(None)),
@@ -58,8 +62,11 @@ pub fn emit_inst(
     Ok(())
 }
 
-pub(crate) fn func_index_to_label(func_index: FuncIndex) -> String {
-    format!("f{}", u32::from(func_index))
+pub(crate) fn func_index_to_label(func_index: FuncIndex, func_names: &[String]) -> String {
+    func_names
+        .get(usize::from(func_index))
+        .unwrap_or(&format!("f{}", u32::from(func_index)))
+        .to_string()
 }
 
 fn ord16_u8(x: u8) -> Result<Ord16, TritonError> {

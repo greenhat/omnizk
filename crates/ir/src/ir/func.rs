@@ -4,20 +4,22 @@ use super::Inst;
 
 #[derive(Debug, Clone)]
 pub struct Func {
+    name: String,
     ins: Vec<Inst>,
     comments: HashMap<usize, String>,
 }
 
 impl Func {
-    pub fn new(ins: Vec<Inst>) -> Self {
+    pub fn new(name: String, ins: Vec<Inst>) -> Self {
         Self {
+            name,
             ins,
             comments: HashMap::new(),
         }
     }
 
-    pub fn new_with_comments(ins: Vec<Inst>, comments: HashMap<usize, String>) -> Self {
-        Self { ins, comments }
+    pub fn name(&self) -> &str {
+        &self.name
     }
 
     pub fn instructions(&self) -> &[Inst] {

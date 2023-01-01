@@ -171,7 +171,9 @@ fn parse_code_section_entry(
     validator: &mut FuncValidator<ValidatorResources>,
     body: FunctionBody,
 ) -> WasmResult<()> {
-    let mut builder = FuncBuilder::new();
+    // TODO: get the real function name
+    // TODO: demangle the function name
+    let mut builder = FuncBuilder::new("f".to_string());
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters and pass the next local as num_params
     let num_params = 0;

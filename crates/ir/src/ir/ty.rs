@@ -54,3 +54,9 @@ impl From<usize> for FuncIndex {
         Self(idx as u32)
     }
 }
+
+impl From<FuncIndex> for usize {
+    fn from(fi: FuncIndex) -> Self {
+        fi.0 as usize
+    }
+}

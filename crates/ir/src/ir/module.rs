@@ -38,4 +38,11 @@ impl Module {
     pub fn set_function(&mut self, idx: FuncIndex, func: Func) {
         self.functions[u32::from(idx) as usize] = func;
     }
+
+    pub fn func_names(&self) -> Vec<String> {
+        self.functions
+            .iter()
+            .map(|func| func.name().to_string())
+            .collect()
+    }
 }

@@ -5,16 +5,20 @@ use crate::InstBuilder;
 
 #[derive(Debug)]
 pub struct FuncBuilder {
+    name: String,
     ins: Vec<Inst>,
 }
 
 impl FuncBuilder {
-    pub fn new() -> FuncBuilder {
-        FuncBuilder { ins: Vec::new() }
+    pub fn new(name: String) -> FuncBuilder {
+        FuncBuilder {
+            name,
+            ins: Vec::new(),
+        }
     }
 
     pub fn build(self) -> Func {
-        Func::new(self.ins)
+        Func::new(self.name, self.ins)
     }
 
     pub fn ins(&mut self) -> InstBuilder {

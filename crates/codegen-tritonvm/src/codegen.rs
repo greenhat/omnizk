@@ -23,15 +23,17 @@ pub fn compile_module(
     config: &TritonTargetConfig,
 ) -> Result<InstBuffer, TritonError> {
     let mut sink = InstBuffer::new(config);
+    let func_names = module.func_names();
     sink.push(AnInstruction::Call(func_index_to_label(
         module.start_func_idx,
+        &func_names,
     )));
     sink.push(AnInstruction::Halt);
     for (idx, func) in module.into_functions().into_iter().enumerate() {
         let idx = FuncIndex::from(idx as u32);
         // TODO: use the original function name as label?
-        sink.push_label(func_index_to_label(idx));
-        compile_function(func, config, &mut sink)?;
+        sink.push_label(func_index_to_label(idx, &func_names));
+        compile_function(func, config, &mut sink, &func_names)?;
     }
     Ok(sink)
 }
@@ -40,13 +42,14 @@ pub fn compile_function(
     func: Func,
     config: &TritonTargetConfig,
     sink: &mut InstBuffer,
+    func_names: &[String],
 ) -> Result<(), TritonError> {
     for (idx, ins) in func.instructions().iter().enumerate() {
         if let Some(comment) = func.comments().get(&idx) {
             sink.push_comment(comment.clone());
         } else {
         }
-        let res = emit_inst(ins, config, sink);
+        let res = emit_inst(ins, config, sink, func_names);
         if let Err(e) = res {
             dbg!(&func);
             return Err(e);
@@ -91,9 +94,9 @@ mod tests {
         return)
 )"#,
             expect![[r#"
-                call f0
+                call f
                 halt
-                f0:
+                f:
                 push 1
                 return
                 return"#]],
@@ -118,16 +121,16 @@ mod tests {
         return)
 )"#,
             expect![[r#"
-                call f1
+                call f
                 halt
-                f0:
+                f:
                 add
                 return
                 return
-                f1:
+                f:
                 push 1
                 push 2
-                call f0
+                call f
                 return
                 return"#]],
         );

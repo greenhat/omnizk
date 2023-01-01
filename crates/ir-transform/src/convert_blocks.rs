@@ -70,9 +70,17 @@ impl Capture {
 fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
     // dbg!(&block_nested_level);
     // TODO: exit early if there are no blocks
-    let mut new_func = Func::new(Vec::new());
+    let mut new_func = Func::new(func.name().to_string(), Vec::new());
     let mut capture_opt: Option<Capture> = None;
-    let mut extracted_func = Func::new(Vec::new());
+    let mut extracted_func_count = 0;
+    // TODO: extract into a closure (use in "reset" below)
+    let mut extracted_func = Func::new(
+        format!(
+            "{}_l{block_nested_level}_b{extracted_func_count}",
+            func.name()
+        ),
+        Vec::new(),
+    );
     for inst in func.instructions() {
         // dbg!(&capture_opt);
         #[allow(clippy::wildcard_enum_match_arm)]
@@ -152,7 +160,14 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                             // recursevely extract nested blocks into functions
                             let mut processed_func =
                                 run(extracted_func, module, block_nested_level + 1);
-                            extracted_func = Func::new(Vec::new());
+                            extracted_func_count += 1;
+                            extracted_func = Func::new(
+                                format!(
+                                    "{}_l{block_nested_level}_b{extracted_func_count}",
+                                    func.name()
+                                ),
+                                Vec::new(),
+                            );
 
                             // extracted func prologue
                             processed_func.set_comment(
