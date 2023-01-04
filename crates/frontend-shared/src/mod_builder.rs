@@ -81,6 +81,10 @@ impl ModuleBuilder {
             Err(ModuleBuilderError::StartFuncUndefined)
         }
     }
+
+    pub fn next_func_idx(&self) -> FuncIndex {
+        self.functions.len().into()
+    }
 }
 
 #[derive(Error, Debug)]

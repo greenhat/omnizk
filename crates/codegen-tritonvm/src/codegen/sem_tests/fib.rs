@@ -143,7 +143,7 @@ fn test_fib() {
               (export "__heap_base" (global 2))
             )"#]],
         expect![[r#"
-            call f
+            call f2
             halt
             c2zk_stdlib_pub_input:
             read_io
@@ -151,11 +151,11 @@ fn test_fib() {
             c2zk_stdlib_pub_output:
             write_io
             return
-            f:
-            call f
+            f2:
+            call f3
             return
-            f:
-            call f_l0_b0
+            f3:
+            call f3_l0_b0
             push -1 // Begin: propagate Br* in block (0)
             add
             skiz
@@ -163,36 +163,36 @@ fn test_fib() {
             push 7
             nop
             nop
-            call f_l0_b1
+            call f3_l0_b1
             push -1 // Begin: propagate Br* in block (0)
             add
             skiz
             return // End: propagate Br* in block
-            call f_l0_b2
+            call f3_l0_b2
             push -1 // Begin: propagate Br* in block (0)
             add
             skiz
             return // End: propagate Br* in block
-            call f
+            call f5
             return
-            f:
+            f4:
             call c2zk_stdlib_pub_input
             return
-            f:
+            f5:
             call c2zk_stdlib_pub_output
             return
-            f_l0_b0:
-            call f
+            f3_l0_b0:
+            call f4
             nop
             nop
             nop
             push 0
-            call f
+            call f5
             return
             push 1 // Begin: extracted func prologue (0)
             return // End: extracted func prologue
-            f_l0_b1:
-            call f_l0_b1_l1_b0
+            f3_l0_b1:
+            call f3_l0_b1_l1_b0
             push -1 // Begin: propagate Br* in block (1)
             add
             skiz
@@ -204,7 +204,7 @@ fn test_fib() {
             nop
             push 0
             nop
-            call f_l0_b1_l1_b1
+            call f3_l0_b1_l1_b1
             push -1
             add // Begin: propagate Br* in loop (1)
             skiz
@@ -212,7 +212,7 @@ fn test_fib() {
             recurse // End: propagate Br* in loop
             push 1 // Begin: extracted func prologue (0)
             return // End: extracted func prologue
-            f_l0_b1_l1_b0:
+            f3_l0_b1_l1_b0:
             push -1
             add
             push 7
@@ -223,7 +223,7 @@ fn test_fib() {
             nop
             push 1 // Begin: extracted func prologue (1)
             return // End: extracted func prologue
-            f_l0_b1_l1_b1:
+            f3_l0_b1_l1_b1:
             add
             nop
             add
@@ -247,10 +247,10 @@ fn test_fib() {
             nop
             push 1 // Begin: extracted func prologue (1)
             return // End: extracted func prologue
-            f_l0_b2:
+            f3_l0_b2:
             nop
             nop
-            call f_l0_b2_l1_b0
+            call f3_l0_b2_l1_b0
             push -1
             add // Begin: propagate Br* in loop (1)
             skiz
@@ -258,7 +258,7 @@ fn test_fib() {
             recurse // End: propagate Br* in loop
             push 1 // Begin: extracted func prologue (0)
             return // End: extracted func prologue
-            f_l0_b2_l1_b0:
+            f3_l0_b2_l1_b0:
             push 1
             swap1
             skiz

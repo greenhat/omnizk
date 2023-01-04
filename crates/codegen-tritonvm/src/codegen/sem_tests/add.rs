@@ -62,7 +62,7 @@ fn test_add() {
               (export "__heap_base" (global 2))
             )"#]],
         expect![[r#"
-            call f
+            call f3
             halt
             c2zk_stdlib_pub_input:
             read_io
@@ -73,27 +73,27 @@ fn test_add() {
             c2zk_stdlib_secret_input:
             divine
             return
-            f:
-            call f
+            f3:
+            call f5
             return
-            f:
+            f4:
             add
             return
-            f:
-            call f
-            call f
-            call f
-            call f
-            call f
-            call f
+            f5:
+            call f6
+            call f6
+            call f4
+            call f8
+            call f4
+            call f7
             return
-            f:
+            f6:
             call c2zk_stdlib_pub_input
             return
-            f:
+            f7:
             call c2zk_stdlib_pub_output
             return
-            f:
+            f8:
             call c2zk_stdlib_secret_input
             return"#]],
     )

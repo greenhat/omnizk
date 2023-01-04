@@ -173,7 +173,8 @@ fn parse_code_section_entry(
 ) -> WasmResult<()> {
     // TODO: get the real function name
     // TODO: demangle the function name
-    let mut builder = FuncBuilder::new("f".to_string());
+    let func_idx = u32::from(mod_builder.next_func_idx());
+    let mut builder = FuncBuilder::new(format!("f{}", func_idx));
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters and pass the next local as num_params
     let num_params = 0;
