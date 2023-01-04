@@ -26,7 +26,7 @@ impl IrPass for BlocksToFuncPass {
             #[allow(clippy::unwrap_used)]
             let func_in = module.function(i as u32).unwrap().clone();
             // TODO: this cloned Func is a hack to get around the borrow checker
-            dbg!(&func_in);
+            // dbg!(&func_in);
             let func_out = run(func_in, module, 0);
             module.set_function(i.into(), func_out);
         }
@@ -112,7 +112,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                 match capture_opt {
                     Some(mut capture) => {
                         if capture.nested_level == 0 {
-                            dbg!(&extracted_func);
+                            // dbg!(&extracted_func);
                             let extracted_func_idx = module.push_function(extracted_func.clone());
                             // call the extracted func
                             new_func.push(Inst::Call {
@@ -241,6 +241,6 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
             }
         }
     }
-    dbg!(&new_func);
+    // dbg!(&new_func);
     new_func
 }

@@ -4,14 +4,14 @@
 //! to deal with each part of it.
 
 use c2zk_frontend_shared::{FuncBuilder, ModuleBuilder};
-use c2zk_ir::ir;
+use c2zk_ir::ir::{self, FuncIndex};
 
 use crate::code_translator::translate_operator;
 use crate::error::{WasmError, WasmResult};
 use crate::types::IntoIr;
 use wasmparser::{
-    BinaryReader, ExternalKind, FuncValidator, FunctionBody, Parser, Payload, Type, TypeRef,
-    Validator, ValidatorResources, WasmModuleResources,
+    BinaryReader, ExternalKind, FuncValidator, FunctionBody, NameSectionReader, Naming, Parser,
+    Payload, Type, TypeRef, Validator, ValidatorResources, WasmModuleResources,
 };
 
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
@@ -54,10 +54,10 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
 
             Payload::TableSection(tables) => {
                 validator.table_section(&tables)?;
-                // dbg!(
-                //     "Table section: {:?}",
-                //     tables.into_iter().collect::<Vec<_>>()
-                // );
+                dbg!(
+                    "Table section: {:?}",
+                    tables.into_iter().collect::<Vec<_>>()
+                );
             }
 
             Payload::MemorySection(memories) => {
@@ -67,6 +67,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
 
             Payload::TagSection(tags) => {
                 validator.tag_section(&tags)?;
+                dbg!("Tag section: {:?}", tags.into_iter().collect::<Vec<_>>());
                 todo!()
             }
 
@@ -106,6 +107,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
 
             Payload::DataSection(data) => {
                 validator.data_section(&data)?;
+                dbg!("Data section: {:?}", data.into_iter().collect::<Vec<_>>());
                 todo!()
             }
 
@@ -115,12 +117,16 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
             }
 
             Payload::CustomSection(s) if s.name() == "name" => {
-                // dbg!("Custom section: {:?}", s);
-                // todo!()
+                let result = NameSectionReader::new(s.data(), s.data_offset())
+                    .map_err(|e| e.into())
+                    .and_then(|s| parse_name_section(s, &mut mod_builder));
+                if let Err(e) = result {
+                    log::warn!("failed to parse name section {:?}", e);
+                }
             }
 
-            Payload::CustomSection(_custom_section) => {
-                // dbg!("Custom section: {:?}", custom_section);
+            Payload::CustomSection(custom_section) => {
+                dbg!("Custom section: {:?}", custom_section);
             }
             other => {
                 validator.payload(&other)?;
@@ -173,8 +179,13 @@ fn parse_code_section_entry(
 ) -> WasmResult<()> {
     // TODO: get the real function name
     // TODO: demangle the function name
-    let func_idx = u32::from(mod_builder.next_func_idx());
-    let mut builder = FuncBuilder::new(format!("f{}", func_idx));
+    let func_idx = mod_builder.next_func_idx();
+    // TODO: the name section parsed later
+    let func_name = mod_builder
+        .get_func_name(func_idx)
+        .unwrap_or(format!("f{}", u32::from(func_idx)));
+    dbg!(&func_name);
+    let mut builder = FuncBuilder::new(func_name);
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters and pass the next local as num_params
     let num_params = 0;
@@ -231,6 +242,46 @@ fn parse_imports_section(
             TypeRef::Table(ty) => {
                 todo!()
             }
+        }
+    }
+    Ok(())
+}
+
+pub fn parse_name_section<'data>(
+    names: NameSectionReader<'data>,
+    mod_builder: &mut ModuleBuilder,
+) -> WasmResult<()> {
+    for subsection in names {
+        match subsection? {
+            wasmparser::Name::Function(names) => {
+                for name in names {
+                    let Naming { index, name } = name?;
+                    mod_builder.declare_func_name(FuncIndex::from(index), name.to_string());
+                }
+            }
+            wasmparser::Name::Module { name, .. } => {
+                // environ.declare_module_name(name);
+            }
+            wasmparser::Name::Local(reader) => {
+                // for f in reader {
+                //     let f = f?;
+                //     if f.index == u32::max_value() {
+                //         continue;
+                //     }
+                //     for name in f.names {
+                //         let Naming { index, name } = name?;
+                //         environ.declare_local_name(FuncIndex::from_u32(f.index), index, name)
+                //     }
+                // }
+            }
+            wasmparser::Name::Label(_)
+            | wasmparser::Name::Type(_)
+            | wasmparser::Name::Table(_)
+            | wasmparser::Name::Global(_)
+            | wasmparser::Name::Memory(_)
+            | wasmparser::Name::Element(_)
+            | wasmparser::Name::Data(_)
+            | wasmparser::Name::Unknown { .. } => {}
         }
     }
     Ok(())

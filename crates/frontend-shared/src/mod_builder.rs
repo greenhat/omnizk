@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::FuncType;
@@ -19,6 +21,7 @@ pub struct ModuleBuilder {
     start_func_idx: Option<FuncIndex>,
     functions: Vec<Func>,
     import_func_body: ImportFuncBody,
+    func_names: HashMap<FuncIndex, String>,
 }
 
 impl ModuleBuilder {
@@ -28,6 +31,7 @@ impl ModuleBuilder {
             start_func_idx: None,
             functions: Vec::new(),
             import_func_body: ImportFuncBody::new_stdlib(),
+            func_names: HashMap::new(),
         }
     }
 
@@ -84,6 +88,15 @@ impl ModuleBuilder {
 
     pub fn next_func_idx(&self) -> FuncIndex {
         self.functions.len().into()
+    }
+
+    pub fn declare_func_name(&mut self, func_idx: FuncIndex, name: String) {
+        dbg!(&func_idx, &name);
+        self.func_names.insert(func_idx, name);
+    }
+
+    pub fn get_func_name(&self, func_idx: FuncIndex) -> Option<String> {
+        self.func_names.get(&func_idx).cloned()
     }
 }
 
