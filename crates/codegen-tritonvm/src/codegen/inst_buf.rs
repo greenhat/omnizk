@@ -47,7 +47,7 @@ impl InstBuffer {
         self.push(inst);
     }
 
-    pub(crate) fn push_comment(&mut self, comment: String) {
+    pub(crate) fn push_comment_for_next_ins(&mut self, comment: String) {
         self.comments.insert(
             if self.inner.is_empty() {
                 0

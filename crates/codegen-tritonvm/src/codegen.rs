@@ -31,7 +31,6 @@ pub fn compile_module(
     sink.push(AnInstruction::Halt);
     for (idx, func) in module.into_functions().into_iter().enumerate() {
         let idx = FuncIndex::from(idx as u32);
-        // TODO: use the original function name as label?
         sink.push_label(func_index_to_label(idx, &func_names));
         compile_function(func, config, &mut sink, &func_names)?;
     }
@@ -46,7 +45,7 @@ pub fn compile_function(
 ) -> Result<(), TritonError> {
     for (idx, ins) in func.instructions().iter().enumerate() {
         if let Some(comment) = func.comments().get(&idx) {
-            sink.push_comment(comment.clone());
+            sink.push_comment_for_next_ins(comment.clone());
         } else {
         }
         let res = emit_inst(ins, config, sink, func_names);
