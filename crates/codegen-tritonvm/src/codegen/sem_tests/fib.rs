@@ -143,7 +143,7 @@ fn test_fib() {
               (export "__heap_base" (global 2))
             )"#]],
         expect![[r#"
-            call f2
+            call __main
             halt
             c2zk_stdlib_pub_input:
             read_io
@@ -151,11 +151,11 @@ fn test_fib() {
             c2zk_stdlib_pub_output:
             write_io
             return
-            f2:
-            call f3
+            __main:
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE
             return
-            f3:
-            call f3_l0_b0
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE:
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b0
             push -1 // Begin: propagate Br* in block (0)
             add
             skiz
@@ -163,36 +163,36 @@ fn test_fib() {
             push 7
             nop
             nop
-            call f3_l0_b1
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1
             push -1 // Begin: propagate Br* in block (0)
             add
             skiz
             return // End: propagate Br* in block
-            call f3_l0_b2
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2
             push -1 // Begin: propagate Br* in block (0)
             add
             skiz
             return // End: propagate Br* in block
-            call f5
+            call _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
             return
-            f4:
+            _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E:
             call c2zk_stdlib_pub_input
             return
-            f5:
+            _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E:
             call c2zk_stdlib_pub_output
             return
-            f3_l0_b0:
-            call f4
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b0:
+            call _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E
             nop
             nop
             nop
             push 0
-            call f5
+            call _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
             return
             push 1 // Begin: extracted func prologue (0)
             return // End: extracted func prologue
-            f3_l0_b1:
-            call f3_l0_b1_l1_b0
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1:
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b0
             push -1 // Begin: propagate Br* in block (1)
             add
             skiz
@@ -204,7 +204,7 @@ fn test_fib() {
             nop
             push 0
             nop
-            call f3_l0_b1_l1_b1
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b1
             push -1
             add // Begin: propagate Br* in loop (1)
             skiz
@@ -212,7 +212,7 @@ fn test_fib() {
             recurse // End: propagate Br* in loop
             push 1 // Begin: extracted func prologue (0)
             return // End: extracted func prologue
-            f3_l0_b1_l1_b0:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b0:
             push -1
             add
             push 7
@@ -223,7 +223,7 @@ fn test_fib() {
             nop
             push 1 // Begin: extracted func prologue (1)
             return // End: extracted func prologue
-            f3_l0_b1_l1_b1:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b1:
             add
             nop
             add
@@ -247,10 +247,10 @@ fn test_fib() {
             nop
             push 1 // Begin: extracted func prologue (1)
             return // End: extracted func prologue
-            f3_l0_b2:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2:
             nop
             nop
-            call f3_l0_b2_l1_b0
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2_l1_b0
             push -1
             add // Begin: propagate Br* in loop (1)
             skiz
@@ -258,7 +258,7 @@ fn test_fib() {
             recurse // End: propagate Br* in loop
             push 1 // Begin: extracted func prologue (0)
             return // End: extracted func prologue
-            f3_l0_b2_l1_b0:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2_l1_b0:
             push 1
             swap1
             skiz

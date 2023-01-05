@@ -78,7 +78,12 @@ impl ModuleBuilder {
         }])
     }
 
-    pub fn build(self) -> Result<Module, ModuleBuilderError> {
+    pub fn build(mut self) -> Result<Module, ModuleBuilderError> {
+        for (func_idx, func) in self.functions.iter_mut().enumerate() {
+            if let Some(func_name) = self.func_names.get(&(func_idx as u32).into()) {
+                func.set_name(func_name.clone());
+            }
+        }
         if let Some(start_func_idx) = self.start_func_idx {
             Ok(Module::new(self.functions, start_func_idx))
         } else {
@@ -91,7 +96,6 @@ impl ModuleBuilder {
     }
 
     pub fn declare_func_name(&mut self, func_idx: FuncIndex, name: String) {
-        dbg!(&func_idx, &name);
         self.func_names.insert(func_idx, name);
     }
 

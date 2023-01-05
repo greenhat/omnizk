@@ -62,7 +62,7 @@ fn test_add() {
               (export "__heap_base" (global 2))
             )"#]],
         expect![[r#"
-            call f3
+            call __main
             halt
             c2zk_stdlib_pub_input:
             read_io
@@ -73,27 +73,27 @@ fn test_add() {
             c2zk_stdlib_secret_input:
             divine
             return
-            f3:
-            call f5
+            __main:
+            call _ZN28c2zk_rust_wasm_tests_bundle13add4main17hab51675481e443caE
             return
-            f4:
+            _ZN28c2zk_rust_wasm_tests_bundle13add3add17hd10e69d3d128fc14E:
             add
             return
-            f5:
-            call f6
-            call f6
-            call f4
-            call f8
-            call f4
-            call f7
+            _ZN28c2zk_rust_wasm_tests_bundle13add4main17hab51675481e443caE:
+            call _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E
+            call _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E
+            call _ZN28c2zk_rust_wasm_tests_bundle13add3add17hd10e69d3d128fc14E
+            call _ZN11c2zk_stdlib12secret_input17hfc353234bd7a7fadE
+            call _ZN28c2zk_rust_wasm_tests_bundle13add3add17hd10e69d3d128fc14E
+            call _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
             return
-            f6:
+            _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E:
             call c2zk_stdlib_pub_input
             return
-            f7:
+            _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E:
             call c2zk_stdlib_pub_output
             return
-            f8:
+            _ZN11c2zk_stdlib12secret_input17hfc353234bd7a7fadE:
             call c2zk_stdlib_secret_input
             return"#]],
     )

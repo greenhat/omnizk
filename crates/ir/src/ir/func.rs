@@ -42,4 +42,8 @@ impl Func {
     pub fn set_comment(&mut self, idx: usize, comment: String) {
         self.comments.insert(idx, comment);
     }
+
+    pub fn set_name(&mut self, name: String) {
+        self.name = name;
+    }
 }

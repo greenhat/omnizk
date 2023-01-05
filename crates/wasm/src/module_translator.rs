@@ -177,14 +177,10 @@ fn parse_code_section_entry(
     validator: &mut FuncValidator<ValidatorResources>,
     body: FunctionBody,
 ) -> WasmResult<()> {
-    // TODO: get the real function name
-    // TODO: demangle the function name
     let func_idx = mod_builder.next_func_idx();
-    // TODO: the name section parsed later
     let func_name = mod_builder
         .get_func_name(func_idx)
         .unwrap_or(format!("f{}", u32::from(func_idx)));
-    dbg!(&func_name);
     let mut builder = FuncBuilder::new(func_name);
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters and pass the next local as num_params
@@ -247,8 +243,8 @@ fn parse_imports_section(
     Ok(())
 }
 
-pub fn parse_name_section<'data>(
-    names: NameSectionReader<'data>,
+pub fn parse_name_section(
+    names: NameSectionReader,
     mod_builder: &mut ModuleBuilder,
 ) -> WasmResult<()> {
     for subsection in names {
@@ -256,13 +252,14 @@ pub fn parse_name_section<'data>(
             wasmparser::Name::Function(names) => {
                 for name in names {
                     let Naming { index, name } = name?;
+                    // TODO: demangle the function name
                     mod_builder.declare_func_name(FuncIndex::from(index), name.to_string());
                 }
             }
-            wasmparser::Name::Module { name, .. } => {
+            wasmparser::Name::Module { .. } => {
                 // environ.declare_module_name(name);
             }
-            wasmparser::Name::Local(reader) => {
+            wasmparser::Name::Local(_reader) => {
                 // for f in reader {
                 //     let f = f?;
                 //     if f.index == u32::max_value() {

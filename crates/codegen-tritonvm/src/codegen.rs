@@ -94,9 +94,9 @@ mod tests {
         return)
 )"#,
             expect![[r#"
-                call f0
+                call f1
                 halt
-                f0:
+                f1:
                 push 1
                 return
                 return"#]],
@@ -121,16 +121,16 @@ mod tests {
         return)
 )"#,
             expect![[r#"
-                call f1
+                call main
                 halt
-                f0:
+                add:
                 add
                 return
                 return
-                f1:
+                main:
                 push 1
                 push 2
-                call f0
+                call add
                 return
                 return"#]],
         );
