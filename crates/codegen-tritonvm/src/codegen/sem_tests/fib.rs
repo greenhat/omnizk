@@ -184,8 +184,10 @@ fn test_fib() {
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b0:
             call _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E
             nop
-            nop
-            nop
+            push 0
+            eq
+            push 0
+            eq
             push 0
             call _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
             return
@@ -243,12 +245,15 @@ fn test_fib() {
             push -8
             add
             nop
-            nop
-            nop
+            push 0
+            eq
+            push 0
+            eq
             push 1 // Begin: extracted func prologue (1)
             return // End: extracted func prologue
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2:
-            nop
+            push 0
+            eq
             nop
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2_l1_b0
             push -1
@@ -404,9 +409,11 @@ fn test_fib() {
             swap2
             lsb
             swap2
-            nop
+            push 0
+            eq
             assert
-            nop
+            push 0
+            eq
             assert
             push 0
             swap2

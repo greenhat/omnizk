@@ -31,7 +31,7 @@ pub fn emit_inst(
         Inst::I32Const { value } => sink.push(AnInstruction::Push(felt_i32(*value))),
         Inst::LocalGet {
             local_idx: local_index,
-        } => (), // do nothing for now, func param access is done via stack
+        } => (), // TODO: implement
         Inst::I32Add => sink.push(AnInstruction::Add),
         Inst::I32Sub => sink.append(sub_i32()),
         Inst::I64Add => sink.push(AnInstruction::Add),
@@ -46,10 +46,10 @@ pub fn emit_inst(
         Inst::PubOutputWrite => sink.push(AnInstruction::WriteIo),
         Inst::SecretInputRead => sink.push(AnInstruction::Divine(None)),
         Inst::LocalTee { local_idx } => sink.push(AnInstruction::Nop), // TODO: implement
-        Inst::I64Eqz => sink.push(AnInstruction::Nop),                 // TODO: implement
-        Inst::I32Eqz => sink.push(AnInstruction::Nop),                 // TODO: implement
+        Inst::I64Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
+        Inst::I32Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
         Inst::I64Const { value } => sink.push(AnInstruction::Push(felt_i64(*value))),
-        Inst::I64And => sink.append(and_i32()),
+        Inst::I64And => return Err(unexpected_inst(ins)),
         Inst::LocalSet { local_idx } => sink.push(AnInstruction::Nop), // TODO: implement
         Inst::I64GeU => sink.push(AnInstruction::Nop),                 // TODO: implement
         Inst::I64Ne => sink.push(AnInstruction::Nop),                  // TODO: implement
