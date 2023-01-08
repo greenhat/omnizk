@@ -4,7 +4,7 @@ use c2zk_ir::ir::Inst;
 use c2zk_ir::ir::Module;
 use c2zk_ir::pass::IrPass;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Default)]
 pub struct PseudoOpAndPass;
 
 const PSEUDO_OP_AND_FUNC_NAME: &str = "i64_and";

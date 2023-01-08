@@ -1,6 +1,7 @@
 use c2zk_ir::pass::IrPass;
 use c2zk_ir_transform::BlocksToFuncPass;
 use c2zk_ir_transform::PseudoOpAndPass;
+use c2zk_ir_transform::PseudoOpSubPass;
 
 pub struct TritonTargetConfig {
     pub output_format: TritonOutputFormat,
@@ -13,6 +14,7 @@ impl Default for TritonTargetConfig {
             ir_passes: vec![
                 Box::new(BlocksToFuncPass::default()),
                 Box::new(PseudoOpAndPass::default()),
+                Box::new(PseudoOpSubPass::default()),
             ],
         }
     }

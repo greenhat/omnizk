@@ -20,6 +20,8 @@
 
 mod convert_blocks;
 mod pseudo_op_and;
+mod pseudo_op_sub;
 
 pub use convert_blocks::BlocksToFuncPass;
 pub use pseudo_op_and::PseudoOpAndPass;
+pub use pseudo_op_sub::PseudoOpSubPass;

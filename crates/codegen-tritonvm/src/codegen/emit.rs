@@ -4,7 +4,6 @@ use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Inst;
 use triton_vm::ord_n::Ord16;
 
-use crate::codegen::pseudo_inst::*;
 use crate::felt_i32;
 use crate::felt_i64;
 use crate::InstBuffer;
@@ -33,7 +32,8 @@ pub fn emit_inst(
             local_idx: local_index,
         } => (), // TODO: implement
         Inst::I32Add => sink.push(AnInstruction::Add),
-        Inst::I32Sub => sink.append(sub_i32()),
+        Inst::I32Sub => return Err(unexpected_inst(ins)),
+        Inst::I32Mul => sink.push(AnInstruction::Mul),
         Inst::I64Add => sink.push(AnInstruction::Add),
         Inst::I64Mul => sink.push(AnInstruction::Mul),
         Inst::Call {
