@@ -35,6 +35,7 @@ pub fn emit_inst(
         Inst::I32Add => sink.push(AnInstruction::Add),
         Inst::I32Sub => sink.append(sub_i32()),
         Inst::I64Add => sink.push(AnInstruction::Add),
+        Inst::I64Mul => sink.push(AnInstruction::Mul),
         Inst::Call {
             func_idx: func_index,
         } => sink.push(AnInstruction::Call(func_index_to_label(
@@ -57,6 +58,8 @@ pub fn emit_inst(
             TritonExt::Skiz => sink.push(AnInstruction::Skiz),
             TritonExt::Swap { idx } => sink.push(AnInstruction::Swap(ord16_u8(*idx)?)),
             TritonExt::Recurse => sink.push(AnInstruction::Recurse),
+            TritonExt::Lsb => sink.push(AnInstruction::Lsb),
+            TritonExt::Assert => sink.push(AnInstruction::Assert),
         },
     }
     Ok(())

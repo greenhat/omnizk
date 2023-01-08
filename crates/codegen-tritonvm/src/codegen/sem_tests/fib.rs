@@ -161,7 +161,7 @@ fn test_fib() {
             skiz
             return // End: propagate Br* in block
             push 7
-            nop
+            call i64_and
             nop
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1
             push -1 // Begin: propagate Br* in block (0)
@@ -198,7 +198,7 @@ fn test_fib() {
             skiz
             return // End: propagate Br* in block
             push -8
-            nop
+            call i64_and
             nop
             push 1
             nop
@@ -274,6 +274,300 @@ fn test_fib() {
             push 0
             nop
             push 1 // Begin: extracted func prologue (1)
-            return // End: extracted func prologue"#]],
+            return // End: extracted func prologue
+            i64_and:
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            lsb
+            swap2
+            nop
+            assert
+            nop
+            assert
+            push 0
+            swap2
+            mul
+            push 00000000002147483648
+            mul
+            add
+            swap2
+            mul
+            push 00000000001073741824
+            mul
+            add
+            swap2
+            mul
+            push 00000000000536870912
+            mul
+            add
+            swap2
+            mul
+            push 00000000000268435456
+            mul
+            add
+            swap2
+            mul
+            push 00000000000134217728
+            mul
+            add
+            swap2
+            mul
+            push 00000000000067108864
+            mul
+            add
+            swap2
+            mul
+            push 00000000000033554432
+            mul
+            add
+            swap2
+            mul
+            push 00000000000016777216
+            mul
+            add
+            swap2
+            mul
+            push 00000000000008388608
+            mul
+            add
+            swap2
+            mul
+            push 00000000000004194304
+            mul
+            add
+            swap2
+            mul
+            push 00000000000002097152
+            mul
+            add
+            swap2
+            mul
+            push 00000000000001048576
+            mul
+            add
+            swap2
+            mul
+            push 00000000000000524288
+            mul
+            add
+            swap2
+            mul
+            push 00000000000000262144
+            mul
+            add
+            swap2
+            mul
+            push 00000000000000131072
+            mul
+            add
+            swap2
+            mul
+            push 00000000000000065536
+            mul
+            add
+            swap2
+            mul
+            push 00000000000000032768
+            mul
+            add
+            swap2
+            mul
+            push 00000000000000016384
+            mul
+            add
+            swap2
+            mul
+            push 00000000000000008192
+            mul
+            add
+            swap2
+            mul
+            push 00000000000000004096
+            mul
+            add
+            swap2
+            mul
+            push 00000000000000002048
+            mul
+            add
+            swap2
+            mul
+            push 00000000000000001024
+            mul
+            add
+            swap2
+            mul
+            push 00000000000000000512
+            mul
+            add
+            swap2
+            mul
+            push 256
+            mul
+            add
+            swap2
+            mul
+            push 128
+            mul
+            add
+            swap2
+            mul
+            push 64
+            mul
+            add
+            swap2
+            mul
+            push 32
+            mul
+            add
+            swap2
+            mul
+            push 16
+            mul
+            add
+            swap2
+            mul
+            push 8
+            mul
+            add
+            swap2
+            mul
+            push 4
+            mul
+            add
+            swap2
+            mul
+            push 2
+            mul
+            add
+            swap2
+            mul
+            push 1
+            mul
+            add"#]],
     )
 }

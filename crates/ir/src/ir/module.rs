@@ -30,12 +30,26 @@ impl Module {
         self.functions.get(idx as usize)
     }
 
+    pub fn function_by_name(&self, name: &str) -> Option<&Func> {
+        self.functions.iter().find(|f| f.name() == name)
+    }
+
+    pub fn function_idx_by_name(&self, name: &str) -> Option<FuncIndex> {
+        self.functions
+            .iter()
+            .position(|f| f.name() == name)
+            .map(|i| i as u32)
+            .map(Into::into)
+    }
+
     pub fn push_function(&mut self, func: Func) -> FuncIndex {
+        // TODO: check for duplicate func names
         self.functions.push(func);
         FuncIndex::from(self.functions.len() - 1)
     }
 
     pub fn set_function(&mut self, idx: FuncIndex, func: Func) {
+        // TODO: check for duplicate func names
         self.functions[u32::from(idx) as usize] = func;
     }
 
@@ -44,5 +58,9 @@ impl Module {
             .iter()
             .map(|func| func.name().to_string())
             .collect()
+    }
+
+    pub fn next_free_function_idx(&self) -> FuncIndex {
+        FuncIndex::from(self.functions.len() as u32)
     }
 }

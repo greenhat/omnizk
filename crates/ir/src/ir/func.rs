@@ -26,6 +26,10 @@ impl Func {
         &self.ins
     }
 
+    pub fn instructions_mut(&mut self) -> &mut [Inst] {
+        &mut self.ins
+    }
+
     pub fn comments(&self) -> &HashMap<usize, String> {
         &self.comments
     }

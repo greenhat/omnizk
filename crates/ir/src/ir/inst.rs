@@ -25,6 +25,7 @@ pub enum Inst {
     I32Sub,
     I32Eqz,
     I64Add,
+    I64Mul,
     I64Eqz,
     I64And,
     I64GeU,

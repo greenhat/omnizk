@@ -252,7 +252,8 @@ pub fn parse_name_section(
             wasmparser::Name::Function(names) => {
                 for name in names {
                     let Naming { index, name } = name?;
-                    // TODO: demangle the function name
+                    // don't demangle the function name cause it might clash with other func names
+                    // including predefined funcs, pseudo ops funcs, etc.
                     mod_builder.declare_func_name(FuncIndex::from(index), name.to_string());
                 }
             }

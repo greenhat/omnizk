@@ -19,5 +19,7 @@
 #![deny(clippy::panic)]
 
 mod convert_blocks;
+mod pseudo_op_and;
 
 pub use convert_blocks::BlocksToFuncPass;
+pub use pseudo_op_and::PseudoOpAndPass;
