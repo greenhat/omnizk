@@ -3,6 +3,7 @@
 use crate::ir::Func;
 use crate::ir::Module;
 
+// TODO: split into IrModPass and IrFuncPass? run_func_pass is empty so far
 pub trait IrPass {
     fn name(&self) -> &str {
         let name = std::any::type_name::<Self>();
