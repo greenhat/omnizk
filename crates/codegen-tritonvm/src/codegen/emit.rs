@@ -2,7 +2,8 @@ use c2zk_ir::ir::ext::Ext;
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Inst;
-use triton_vm::ord_n::Ord16;
+use triton_opcodes::instruction::AnInstruction;
+use triton_opcodes::ord_n::Ord16;
 
 use crate::felt_i32;
 use crate::felt_i64;
@@ -17,7 +18,6 @@ pub fn emit_inst(
     sink: &mut InstBuffer,
     func_names: &[String],
 ) -> Result<(), TritonError> {
-    use triton_vm::instruction::AnInstruction;
     match ins {
         Inst::Block { blockty } => return Err(unexpected_inst(ins)),
         Inst::Loop { block_type } => return Err(unexpected_inst(ins)),

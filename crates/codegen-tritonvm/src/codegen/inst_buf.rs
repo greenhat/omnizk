@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use triton_vm::instruction::AnInstruction;
-use triton_vm::instruction::LabelledInstruction;
-use triton_vm::vm::Program;
+use triton_opcodes::instruction::AnInstruction;
+use triton_opcodes::instruction::LabelledInstruction;
+use triton_opcodes::program::Program;
 
 use crate::TritonOutputFormat;
 use crate::TritonTargetConfig;

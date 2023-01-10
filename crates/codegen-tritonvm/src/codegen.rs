@@ -6,11 +6,10 @@ mod inst_buf;
 pub use inst_buf::InstBuffer;
 mod emit;
 pub use emit::emit_inst;
+use triton_opcodes::instruction::AnInstruction;
 
 #[cfg(test)]
 mod sem_tests;
-
-use triton_vm::instruction::AnInstruction;
 
 use crate::TritonError;
 use crate::TritonTargetConfig;
@@ -76,7 +75,7 @@ mod tests {
         let out_source = inst_buf.pretty_print();
         expected_tree.assert_eq(&out_source);
         let program = inst_buf.program();
-        let (_trace, _out, err) = program.run(vec![], vec![]);
+        let (_trace, _out, err) = triton_vm::vm::run(&program, vec![], vec![]);
         dbg!(&err);
         assert!(err.is_none());
     }

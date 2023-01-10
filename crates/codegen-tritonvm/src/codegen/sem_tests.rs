@@ -35,7 +35,7 @@ fn check_wasm(
     let program = inst_buf.program();
     let input = input.into_iter().map(Into::into).collect();
     let secret_input = secret_input.into_iter().map(Into::into).collect();
-    let (_trace, out, err) = program.run(input, secret_input);
+    let (_trace, out, err) = triton_vm::vm::run(&program, input, secret_input);
     dbg!(&err);
     assert!(err.is_none());
     assert_eq!(
