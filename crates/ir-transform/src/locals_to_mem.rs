@@ -17,16 +17,23 @@ impl IrPass for LocalsToMemPass {
         for func in module.functions_mut().iter_mut() {
             let mut new_func = Func::new(func.name().to_string(), Vec::new());
 
-            new_func.push(Inst::GlobalGet {
-                global_idx: global_idx_for_base_local_offset,
-            });
+            new_func.push_with_comment(
+                Inst::GlobalGet {
+                    global_idx: global_idx_for_base_local_offset,
+                },
+                "BEGIN prologue for locals access via memory".to_string(),
+            );
             // TODO: get the number of locals from the function signature.
+            // TODO: put func parameters from the stack to the memory for locals
             // TODO: do I need to zero memory where storing the locals?
             new_func.push(Inst::I32Const { value: 2 });
             new_func.push(Inst::I32Sub);
-            new_func.push(Inst::GlobalSet {
-                global_idx: global_idx_for_base_local_offset,
-            });
+            new_func.push_with_comment(
+                Inst::GlobalSet {
+                    global_idx: global_idx_for_base_local_offset,
+                },
+                "END prologue for locals access via memory".to_string(),
+            );
             for inst in func.instructions_mut().iter_mut() {
                 match inst {
                     Inst::LocalGet { local_idx } => {

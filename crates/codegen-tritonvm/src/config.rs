@@ -15,8 +15,8 @@ impl Default for TritonTargetConfig {
             ir_passes: vec![
                 Box::new(BlocksToFuncPass::default()),
                 Box::new(PseudoOpAndPass::default()),
-                Box::new(PseudoOpSubPass::default()),
                 Box::new(LocalsToMemPass::default()),
+                Box::new(PseudoOpSubPass::default()),
             ],
         }
     }

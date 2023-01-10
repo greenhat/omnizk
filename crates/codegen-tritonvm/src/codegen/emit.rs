@@ -11,6 +11,8 @@ use crate::InstBuffer;
 use crate::TritonError;
 use crate::TritonTargetConfig;
 
+const GLOBAL_MEMORY_BASE: u32 = i32::MAX as u32;
+
 #[allow(unused_variables)]
 pub fn emit_inst(
     ins: &Inst,
@@ -24,12 +26,11 @@ pub fn emit_inst(
         Inst::End => sink.push(AnInstruction::Return),
         Inst::Return => sink.push(AnInstruction::Return),
         Inst::I32Const { value } => sink.push(AnInstruction::Push(felt_i32(*value))),
-        Inst::GlobalGet { global_idx } => todo!(),
-        Inst::GlobalSet { global_idx } => todo!(),
-        Inst::I32Load { offset } => todo!(),
-        Inst::I32Store { offset } => todo!(),
+        Inst::GlobalGet { global_idx } => global_get(sink, global_idx),
+        Inst::GlobalSet { global_idx } => global_set(sink, global_idx),
+        Inst::I32Load { offset } => write_mem(sink, offset),
+        Inst::I32Store { offset } => read_mem(sink, offset),
         Inst::I32Add => sink.push(AnInstruction::Add),
-        Inst::I32Sub => return Err(unexpected_inst(ins)),
         Inst::I32Mul => sink.push(AnInstruction::Mul),
         Inst::I64Add => sink.push(AnInstruction::Add),
         Inst::I64Mul => sink.push(AnInstruction::Mul),
@@ -63,8 +64,43 @@ pub fn emit_inst(
         Inst::LocalSet { local_idx } => return Err(unexpected_inst(ins)),
         Inst::LocalTee { local_idx } => return Err(unexpected_inst(ins)),
         Inst::I64And => return Err(unexpected_inst(ins)),
+        Inst::I32Sub => return Err(unexpected_inst(ins)),
     }
     Ok(())
+}
+
+fn write_mem(sink: &mut InstBuffer, offset: &u32) {
+    sink.append(vec![
+        AnInstruction::Push(felt_i32(*offset as i32)),
+        AnInstruction::Add,
+        AnInstruction::ReadMem,
+    ])
+}
+
+fn read_mem(sink: &mut InstBuffer, offset: &u32) {
+    sink.append(vec![
+        AnInstruction::Push(felt_i32(*offset as i32)),
+        AnInstruction::Add,
+        AnInstruction::WriteMem,
+    ])
+}
+
+fn global_get(sink: &mut InstBuffer, global_idx: &u32) {
+    sink.append(vec![
+        AnInstruction::Push(felt_i32(GLOBAL_MEMORY_BASE as i32)),
+        AnInstruction::Push(felt_i32(*global_idx as i32)),
+        AnInstruction::Add,
+        AnInstruction::ReadMem,
+    ])
+}
+
+fn global_set(sink: &mut InstBuffer, global_idx: &u32) {
+    sink.append(vec![
+        AnInstruction::Push(felt_i32(GLOBAL_MEMORY_BASE as i32)),
+        AnInstruction::Push(felt_i32(*global_idx as i32)),
+        AnInstruction::Add,
+        AnInstruction::WriteMem,
+    ])
 }
 
 pub(crate) fn func_index_to_label(func_index: FuncIndex, func_names: &[String]) -> String {

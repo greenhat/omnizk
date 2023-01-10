@@ -146,44 +146,150 @@ fn test_fib() {
             call __main
             halt
             c2zk_stdlib_pub_input:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
             read_io
             return
             c2zk_stdlib_pub_output:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
             write_io
             return
             __main:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE
             return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b0
-            push -1 // Begin: propagate Br* in block (0)
+            push -1
             add
             skiz
-            return // End: propagate Br* in block
+            return
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            read_mem
             push 7
             call i64_and
-            nop
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 1
+            add
+            write_mem
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1
-            push -1 // Begin: propagate Br* in block (0)
+            push -1
             add
             skiz
-            return // End: propagate Br* in block
+            return
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2
-            push -1 // Begin: propagate Br* in block (0)
+            push -1
             add
             skiz
-            return // End: propagate Br* in block
+            return
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            read_mem
             call _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
             return
             _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
             call c2zk_stdlib_pub_input
             return
             _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            read_mem
             call c2zk_stdlib_pub_output
             return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b0:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
             call _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E
-            nop
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            write_mem
+            push 0
+            add
+            read_mem
             push 0
             eq
             push 0
@@ -191,96 +297,426 @@ fn test_fib() {
             push 0
             call _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
             return
-            push 1 // Begin: extracted func prologue (0)
-            return // End: extracted func prologue
+            push 1
+            return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b0
-            push -1 // Begin: propagate Br* in block (1)
+            push -1
             add
             skiz
-            return // End: propagate Br* in block
+            return
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            read_mem
             push -8
             call i64_and
-            nop
-            push 1
-            nop
+            push 00000000002147483647
             push 0
-            nop
+            add
+            read_mem
+            push 3
+            add
+            write_mem
+            push 1
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            write_mem
+            push 0
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            write_mem
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b1
             push -1
-            add // Begin: propagate Br* in loop (1)
+            add
             skiz
             return
-            recurse // End: propagate Br* in loop
-            push 1 // Begin: extracted func prologue (0)
-            return // End: extracted func prologue
+            recurse
+            push 1
+            return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b0:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            read_mem
             push -1
             add
             push 7
             nop
             push 1
-            nop
+            push 00000000002147483647
             push 0
-            nop
-            push 1 // Begin: extracted func prologue (1)
-            return // End: extracted func prologue
+            add
+            read_mem
+            push 0
+            add
+            write_mem
+            push 0
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            write_mem
+            push 1
+            return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b1:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
             add
-            nop
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
             add
-            nop
+            write_mem
+            push 00000000002147483647
+            push 0
             add
-            nop
+            read_mem
+            push 0
             add
-            nop
+            read_mem
+            push 00000000002147483647
+            push 0
             add
-            nop
+            read_mem
+            push 2
             add
-            nop
+            read_mem
             add
-            nop
+            push 00000000002147483647
+            push 0
             add
-            nop
+            read_mem
+            push 2
+            add
+            write_mem
+            push 2
+            add
+            read_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            read_mem
+            add
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            write_mem
+            push 0
+            add
+            read_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            read_mem
+            add
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            write_mem
+            push 2
+            add
+            read_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            read_mem
+            add
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            write_mem
+            push 0
+            add
+            read_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            read_mem
+            add
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            write_mem
+            push 2
+            add
+            read_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            read_mem
+            add
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            write_mem
+            push 0
+            add
+            read_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            read_mem
+            add
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            write_mem
+            push 2
+            add
+            read_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            read_mem
+            add
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 3
+            add
+            read_mem
             push -8
             add
-            nop
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 3
+            add
+            write_mem
+            push 3
+            add
+            read_mem
             push 0
             eq
             push 0
             eq
-            push 1 // Begin: extracted func prologue (1)
-            return // End: extracted func prologue
+            push 1
+            return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 1
+            add
+            read_mem
             push 0
             eq
-            nop
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            read_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 3
+            add
+            write_mem
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2_l1_b0
             push -1
-            add // Begin: propagate Br* in loop (1)
+            add
             skiz
             return
-            recurse // End: propagate Br* in loop
-            push 1 // Begin: extracted func prologue (0)
-            return // End: extracted func prologue
+            recurse
+            push 1
+            return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2_l1_b0:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
             push 1
             swap1
             skiz
             return
             pop
-            nop
+            push 00000000002147483647
+            push 0
             add
-            nop
-            nop
+            read_mem
+            push 0
+            add
+            read_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            write_mem
+            push 2
+            add
+            read_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 3
+            add
+            read_mem
+            add
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 2
+            add
+            read_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 3
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 1
+            add
+            read_mem
             push -1
             add
-            nop
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 1
+            add
+            write_mem
+            push 1
+            add
+            read_mem
             push 0
             nop
-            push 1 // Begin: extracted func prologue (1)
-            return // End: extracted func prologue
+            push 1
+            return
             i64_and:
+            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 0
+            add
+            read_mem
+            push 2
+            call i32_sub
+            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
             lsb
             swap2
             lsb
@@ -574,6 +1010,11 @@ fn test_fib() {
             swap2
             mul
             push 1
+            mul
+            add
+            i32_sub:
+            swap2
+            push -1
             mul
             add"#]],
     )
