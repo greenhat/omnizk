@@ -63,4 +63,9 @@ impl Module {
     pub fn next_free_function_idx(&self) -> FuncIndex {
         FuncIndex::from(self.functions.len() as u32)
     }
+
+    pub fn global_index_storing_base_local_offset(&self) -> u32 {
+        // TODO: last existing global index + 1
+        0
+    }
 }

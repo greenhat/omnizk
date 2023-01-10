@@ -19,18 +19,15 @@ pub fn emit_inst(
     func_names: &[String],
 ) -> Result<(), TritonError> {
     match ins {
-        Inst::Block { blockty } => return Err(unexpected_inst(ins)),
-        Inst::Loop { block_type } => return Err(unexpected_inst(ins)),
-        Inst::BrIf { relative_depth } => return Err(unexpected_inst(ins)),
-        Inst::Br { relative_depth } => return Err(unexpected_inst(ins)),
         Inst::Unreachable => (),
         Inst::Nop => (),
         Inst::End => sink.push(AnInstruction::Return),
         Inst::Return => sink.push(AnInstruction::Return),
         Inst::I32Const { value } => sink.push(AnInstruction::Push(felt_i32(*value))),
-        Inst::LocalGet {
-            local_idx: local_index,
-        } => (), // TODO: implement
+        Inst::GlobalGet { global_idx } => todo!(),
+        Inst::GlobalSet { global_idx } => todo!(),
+        Inst::I32Load { offset } => todo!(),
+        Inst::I32Store { offset } => todo!(),
         Inst::I32Add => sink.push(AnInstruction::Add),
         Inst::I32Sub => return Err(unexpected_inst(ins)),
         Inst::I32Mul => sink.push(AnInstruction::Mul),
@@ -45,14 +42,11 @@ pub fn emit_inst(
         Inst::PubInputRead => sink.push(AnInstruction::ReadIo),
         Inst::PubOutputWrite => sink.push(AnInstruction::WriteIo),
         Inst::SecretInputRead => sink.push(AnInstruction::Divine(None)),
-        Inst::LocalTee { local_idx } => sink.push(AnInstruction::Nop), // TODO: implement
         Inst::I64Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
         Inst::I32Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
         Inst::I64Const { value } => sink.push(AnInstruction::Push(felt_i64(*value))),
-        Inst::I64And => return Err(unexpected_inst(ins)),
-        Inst::LocalSet { local_idx } => sink.push(AnInstruction::Nop), // TODO: implement
-        Inst::I64GeU => sink.push(AnInstruction::Nop),                 // TODO: implement
-        Inst::I64Ne => sink.push(AnInstruction::Nop),                  // TODO: implement
+        Inst::I64GeU => sink.push(AnInstruction::Nop), // TODO: implement
+        Inst::I64Ne => sink.push(AnInstruction::Nop),  // TODO: implement
         Inst::Ext(Ext::Triton(eop)) => match eop {
             TritonExt::Pop => sink.push(AnInstruction::Pop),
             TritonExt::Skiz => sink.push(AnInstruction::Skiz),
@@ -61,6 +55,14 @@ pub fn emit_inst(
             TritonExt::Lsb => sink.push(AnInstruction::Lsb),
             TritonExt::Assert => sink.push(AnInstruction::Assert),
         },
+        Inst::Block { blockty } => return Err(unexpected_inst(ins)),
+        Inst::Loop { block_type } => return Err(unexpected_inst(ins)),
+        Inst::BrIf { relative_depth } => return Err(unexpected_inst(ins)),
+        Inst::Br { relative_depth } => return Err(unexpected_inst(ins)),
+        Inst::LocalGet { local_idx } => return Err(unexpected_inst(ins)),
+        Inst::LocalSet { local_idx } => return Err(unexpected_inst(ins)),
+        Inst::LocalTee { local_idx } => return Err(unexpected_inst(ins)),
+        Inst::I64And => return Err(unexpected_inst(ins)),
     }
     Ok(())
 }
