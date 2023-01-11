@@ -12,12 +12,17 @@ pub struct Func {
 }
 
 impl Func {
-    pub fn new(name: String, sig: FuncType, ins: Vec<Inst>) -> Self {
+    pub fn new(
+        name: String,
+        sig: FuncType,
+        ins: Vec<Inst>,
+        comments: HashMap<usize, String>,
+    ) -> Self {
         Self {
             name,
             sig,
             ins,
-            comments: HashMap::new(),
+            comments,
         }
     }
 

@@ -1,7 +1,11 @@
+use std::collections::HashMap;
+
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::Func;
+use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::Inst;
 use c2zk_ir::ir::Module;
+use c2zk_ir::ir::Ty;
 use c2zk_ir::pass::IrPass;
 
 #[derive(Default)]
@@ -42,5 +46,13 @@ fn triton_i32_sub_func() -> Func {
         Inst::I32Mul,
         Inst::I32Add,
     ];
-    Func::new(PSEUDO_OP_SUB_FUNC_NAME.to_string(), ins)
+    Func::new(
+        PSEUDO_OP_SUB_FUNC_NAME.to_string(),
+        FuncType {
+            params: vec![Ty::I32, Ty::I32],
+            results: vec![Ty::I32],
+        },
+        ins,
+        HashMap::new(),
+    )
 }

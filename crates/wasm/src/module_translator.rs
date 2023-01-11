@@ -194,7 +194,7 @@ fn parse_code_section_entry(
         validator.op(pos, &op)?;
         translate_operator(validator, &op, &mut builder, mod_builder)?;
     }
-    builder.set_sig(mod_builder.get_func_type(func_idx).unwrap().clone());
+    builder.set_signature(mod_builder.get_func_type(func_idx).unwrap().clone());
     mod_builder.push_func(
         builder
             .build()

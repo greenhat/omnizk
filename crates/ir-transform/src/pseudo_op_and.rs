@@ -1,7 +1,11 @@
+use std::collections::HashMap;
+
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::Func;
+use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::Inst;
 use c2zk_ir::ir::Module;
+use c2zk_ir::ir::Ty;
 use c2zk_ir::pass::IrPass;
 
 #[derive(Default)]
@@ -55,5 +59,13 @@ fn triton_i64_and_func() -> Func {
         ins.push(Inst::I64Mul);
         ins.push(Inst::I64Add);
     }
-    Func::new(PSEUDO_OP_AND_FUNC_NAME.to_string(), ins)
+    Func::new(
+        PSEUDO_OP_AND_FUNC_NAME.to_string(),
+        FuncType {
+            params: vec![Ty::I64, Ty::I64],
+            results: vec![Ty::I64],
+        },
+        ins,
+        HashMap::new(),
+    )
 }

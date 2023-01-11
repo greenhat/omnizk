@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::Inst;
 use c2zk_ir::pass::IrPass;
@@ -15,7 +17,12 @@ impl IrPass for LocalsToMemPass {
         // local index is used in load/store as offset from base_local_offset.
 
         for func in module.functions_mut().iter_mut() {
-            let mut new_func = Func::new(func.name().to_string(), Vec::new());
+            let mut new_func = Func::new(
+                func.name().to_string(),
+                func.sig().clone(),
+                Vec::new(),
+                HashMap::new(),
+            );
 
             new_func.push_with_comment(
                 Inst::GlobalGet {
