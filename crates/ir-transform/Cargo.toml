@@ -12,6 +12,7 @@ categories.workspace = true
 
 [dependencies]
 c2zk-ir = { workspace = true }
+c2zk-frontend-shared = { workspace = true }
 derive_more = { workspace = true }
 
 [dev-dependencies]

@@ -1,7 +1,7 @@
 use c2zk_frontend_shared::{FuncBuilder, ModuleBuilder};
 use wasmparser::{FuncValidator, Operator, WasmModuleResources};
 
-use crate::{error::WasmResult, types::IntoIr};
+use crate::{types::IntoIr, WasmError};
 
 /// Translates wasm operators into c2zk IR instructions.
 #[allow(unused_variables)]
@@ -10,7 +10,7 @@ pub fn translate_operator(
     op: &Operator,
     func_builder: &mut FuncBuilder,
     mod_builder: &mut ModuleBuilder,
-) -> WasmResult<()> {
+) -> Result<(), WasmError> {
     match op {
         Operator::Unreachable => {
             func_builder.ins().unreachable();

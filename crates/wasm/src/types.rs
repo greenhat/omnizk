@@ -10,7 +10,7 @@ use wasmparser::{BlockType, ValType};
 
 use std::convert::TryFrom;
 
-use crate::error::{WasmError, WasmResult};
+use crate::error::WasmError;
 
 /// Index type of a function (imported or defined) inside the WebAssembly module.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From)]
@@ -159,7 +159,7 @@ pub enum GlobalInit {
 impl Global {
     /// Creates a new `Global` type from wasmparser's representation.
     #[allow(dead_code)]
-    pub fn new(ty: wasmparser::GlobalType, initializer: GlobalInit) -> WasmResult<Global> {
+    pub fn new(ty: wasmparser::GlobalType, initializer: GlobalInit) -> Result<Global, WasmError> {
         Ok(Global {
             wasm_ty: ty.content_type,
             mutability: ty.mutable,
@@ -182,7 +182,7 @@ pub struct Table {
 impl TryFrom<wasmparser::TableType> for Table {
     type Error = WasmError;
 
-    fn try_from(ty: wasmparser::TableType) -> WasmResult<Table> {
+    fn try_from(ty: wasmparser::TableType) -> Result<Table, WasmError> {
         Ok(Table {
             wasm_ty: ty.element_type,
             minimum: ty.initial,

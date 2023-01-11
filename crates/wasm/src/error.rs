@@ -59,6 +59,3 @@ impl From<wasmparser::BinaryReaderError> for WasmError {
         }
     }
 }
-
-/// A convenient alias for a `Result` that uses `WasmError` as the error type.
-pub type WasmResult<T> = Result<T, WasmError>;

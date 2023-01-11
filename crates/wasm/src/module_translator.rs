@@ -3,11 +3,11 @@
 //! Translation skeleton that traverses the whole WebAssembly module and call helper functions
 //! to deal with each part of it.
 
-use c2zk_frontend_shared::{FuncBuilder, ModuleBuilder};
+use c2zk_frontend_shared::{FuncBuilder, ModuleBuilder, ModuleBuilderError};
 use c2zk_ir::ir::{self, FuncIndex};
 
 use crate::code_translator::translate_operator;
-use crate::error::{WasmError, WasmResult};
+use crate::error::WasmError;
 use crate::types::IntoIr;
 use wasmparser::{
     BinaryReader, ExternalKind, FuncValidator, FunctionBody, NameSectionReader, Naming, Parser,
@@ -140,7 +140,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
 fn parse_export_section(
     exports: wasmparser::ExportSectionReader,
     mod_builder: &mut ModuleBuilder,
-) -> WasmResult<()> {
+) -> Result<(), WasmError> {
     for export in exports {
         let export = export?;
         match export.kind {
@@ -161,7 +161,7 @@ fn parse_export_section(
 fn parse_type_section(
     types: wasmparser::TypeSectionReader,
     mod_builder: &mut ModuleBuilder,
-) -> WasmResult<()> {
+) -> Result<(), WasmError> {
     for entry in types {
         match entry? {
             Type::Func(wasm_func_ty) => {
@@ -176,7 +176,7 @@ fn parse_code_section_entry(
     mod_builder: &mut ModuleBuilder,
     validator: &mut FuncValidator<ValidatorResources>,
     body: FunctionBody,
-) -> WasmResult<()> {
+) -> Result<(), WasmError> {
     let func_idx = mod_builder.next_func_idx();
     let func_name = mod_builder
         .get_func_name(func_idx)
@@ -194,7 +194,12 @@ fn parse_code_section_entry(
         validator.op(pos, &op)?;
         translate_operator(validator, &op, &mut builder, mod_builder)?;
     }
-    mod_builder.push_func(builder.build());
+    builder.set_sig(mod_builder.get_func_type(func_idx).unwrap().clone());
+    mod_builder.push_func(
+        builder
+            .build()
+            .map_err(ModuleBuilderError::FuncBuilderError)?,
+    );
     Ok(())
 }
 
@@ -204,7 +209,7 @@ fn parse_local_decls(
     builder: &mut FuncBuilder,
     num_params: usize,
     validator: &mut FuncValidator<impl WasmModuleResources>,
-) -> WasmResult<()> {
+) -> Result<(), WasmError> {
     let local_count = reader.read_var_u32()?;
     for _ in 0..local_count {
         let pos = reader.original_position();
@@ -219,7 +224,7 @@ fn parse_local_decls(
 fn parse_imports_section(
     imports: wasmparser::ImportSectionReader,
     mod_builder: &mut ModuleBuilder,
-) -> WasmResult<()> {
+) -> Result<(), WasmError> {
     for entry in imports {
         let import = entry?;
         match import.ty {
@@ -246,7 +251,7 @@ fn parse_imports_section(
 pub fn parse_name_section(
     names: NameSectionReader,
     mod_builder: &mut ModuleBuilder,
-) -> WasmResult<()> {
+) -> Result<(), WasmError> {
     for subsection in names {
         match subsection? {
             wasmparser::Name::Function(names) => {

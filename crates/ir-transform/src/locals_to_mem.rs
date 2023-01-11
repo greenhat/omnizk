@@ -23,9 +23,9 @@ impl IrPass for LocalsToMemPass {
                 },
                 "BEGIN prologue for locals access via memory".to_string(),
             );
+            todo!("func params and declared locals count");
             // TODO: get the number of locals from the function signature.
             // TODO: put func parameters from the stack to the memory for locals
-            // TODO: do I need to zero memory where storing the locals?
             new_func.push(Inst::I32Const { value: 2 });
             new_func.push(Inst::I32Sub);
             new_func.push_with_comment(

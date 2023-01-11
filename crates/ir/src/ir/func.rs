@@ -1,18 +1,21 @@
 use std::collections::HashMap;
 
+use super::FuncType;
 use super::Inst;
 
 #[derive(Debug, Clone)]
 pub struct Func {
     name: String,
+    sig: FuncType,
     ins: Vec<Inst>,
     comments: HashMap<usize, String>,
 }
 
 impl Func {
-    pub fn new(name: String, ins: Vec<Inst>) -> Self {
+    pub fn new(name: String, sig: FuncType, ins: Vec<Inst>) -> Self {
         Self {
             name,
+            sig,
             ins,
             comments: HashMap::new(),
         }
@@ -49,5 +52,9 @@ impl Func {
 
     pub fn set_name(&mut self, name: String) {
         self.name = name;
+    }
+
+    pub fn sig(&self) -> &FuncType {
+        &self.sig
     }
 }

@@ -12,6 +12,7 @@ mod import_func_body;
 pub use import_func_body::ImportFuncBody;
 
 use crate::FuncBuilder;
+use crate::FuncBuilderError;
 
 use self::import_func_body::ImportFunc;
 
@@ -60,7 +61,7 @@ impl ModuleBuilder {
             .ok_or(ModuleBuilderError::ImportFuncBodyNotFound(import_func))?;
         let mut func_builder = FuncBuilder::new(name.to_string());
         func_builder.push_insts(func_body.clone());
-        self.functions.push(func_builder.build());
+        self.functions.push(func_builder.build()?);
         Ok(())
     }
 
@@ -102,6 +103,10 @@ impl ModuleBuilder {
     pub fn get_func_name(&self, func_idx: FuncIndex) -> Option<String> {
         self.func_names.get(&func_idx).cloned()
     }
+
+    pub fn get_func_type(&self, func_idx: FuncIndex) -> Option<&FuncType> {
+        self.types.get(usize::from(func_idx))
+    }
 }
 
 #[derive(Error, Debug)]
@@ -112,4 +117,6 @@ pub enum ModuleBuilderError {
     ImportFuncBodyNotFound(ImportFunc),
     #[error("type index `{0}` not found")]
     TypeIndexNotFound(u32),
+    #[error("func builder error: {0:?}")]
+    FuncBuilderError(#[from] FuncBuilderError),
 }
