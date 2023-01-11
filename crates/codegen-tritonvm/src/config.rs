@@ -13,9 +13,9 @@ impl Default for TritonTargetConfig {
         Self {
             output_format: TritonOutputFormat::Source,
             ir_passes: vec![
+                Box::new(LocalsToMemPass::default()),
                 Box::new(BlocksToFuncPass::default()),
                 Box::new(PseudoOpAndPass::default()),
-                Box::new(LocalsToMemPass::default()),
                 Box::new(PseudoOpSubPass::default()),
             ],
         }

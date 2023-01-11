@@ -75,7 +75,6 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
     let mut capture_opt: Option<Capture> = None;
     let mut extracted_func_count = 0;
     // TODO: extract into a closure (use in "reset" below)
-    todo!("copy all the locals(incl func parameters) from the parent function to the extracted function");
     let mut extracted_func_builder = FuncBuilder::new(format!(
         "{}_l{block_nested_level}_b{extracted_func_count}",
         func.name()
@@ -84,6 +83,11 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
         // dbg!(&capture_opt);
         #[allow(clippy::wildcard_enum_match_arm)]
         match inst {
+            Inst::LocalGet { local_idx }
+            | Inst::LocalSet { local_idx }
+            | Inst::LocalTee { local_idx } => {
+                panic!("locals should be converted prior to this pass")
+            }
             Inst::Block { blockty: _ } => match capture_opt {
                 None => {
                     capture_opt = Some(Capture::start_block());
