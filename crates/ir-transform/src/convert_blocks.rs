@@ -125,6 +125,8 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                     Some(mut capture) => {
                         if capture.nested_level == 0 {
                             // dbg!(&extracted_func);
+                            // the signature should be set in Block/Loop above
+                            #[allow(clippy::unwrap_used)]
                             let extracted_func = extracted_func_builder.build().unwrap();
                             let extracted_func_idx = module.push_function(extracted_func.clone());
                             // call the extracted func

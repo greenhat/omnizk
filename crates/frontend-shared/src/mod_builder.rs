@@ -51,11 +51,12 @@ impl ModuleBuilder {
             name: name.to_string(),
             ty: self.get_func_type(type_idx.into())?.clone(),
         };
+        let mut func_builder = FuncBuilder::new(name.to_string());
+        func_builder.set_signature(import_func.ty.clone());
         let func_body = self
             .import_func_body
             .body(&import_func)
             .ok_or(ModuleBuilderError::ImportFuncBodyNotFound(import_func))?;
-        let mut func_builder = FuncBuilder::new(name.to_string());
         func_builder.push_insts(func_body.clone());
         self.functions.push(func_builder.build()?);
         Ok(())

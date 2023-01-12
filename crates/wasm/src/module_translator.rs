@@ -194,6 +194,7 @@ fn parse_code_section_entry(
         validator.op(pos, &op)?;
         translate_operator(validator, &op, &mut builder, mod_builder)?;
     }
+    todo!("don't get type by func id, there should be a type id stored for each function");
     builder.set_signature(mod_builder.get_func_type(func_idx)?.clone());
     mod_builder.push_func(
         builder

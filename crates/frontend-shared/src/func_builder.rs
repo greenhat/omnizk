@@ -26,7 +26,9 @@ impl FuncBuilder {
     }
 
     pub fn build(self) -> Result<Func, FuncBuilderError> {
-        let sig = self.sig.ok_or(FuncBuilderError::MissingSignature)?;
+        let sig = self.sig.clone().ok_or_else(|| {
+            FuncBuilderError::MissingSignature(format!("FuncBuilder: {:?}", &self))
+        })?;
         Ok(Func::new(self.name, sig, self.ins, self.comments))
     }
 
@@ -54,5 +56,5 @@ impl FuncBuilder {
 #[derive(Debug, Error)]
 pub enum FuncBuilderError {
     #[error("missing function signature")]
-    MissingSignature,
+    MissingSignature(String),
 }
