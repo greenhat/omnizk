@@ -49,11 +49,7 @@ impl ModuleBuilder {
         let import_func = ImportFunc {
             module: module.to_string(),
             name: name.to_string(),
-            ty: self
-                .types
-                .get(type_idx as usize)
-                .ok_or(ModuleBuilderError::TypeIndexNotFound(type_idx))?
-                .clone(),
+            ty: self.get_func_type(type_idx.into())?.clone(),
         };
         let func_body = self
             .import_func_body
@@ -104,8 +100,10 @@ impl ModuleBuilder {
         self.func_names.get(&func_idx).cloned()
     }
 
-    pub fn get_func_type(&self, func_idx: FuncIndex) -> Option<&FuncType> {
-        self.types.get(usize::from(func_idx))
+    pub fn get_func_type(&self, func_idx: FuncIndex) -> Result<&FuncType, ModuleBuilderError> {
+        self.types
+            .get(usize::from(func_idx))
+            .ok_or_else(|| ModuleBuilderError::TypeIndexNotFound(usize::from(func_idx) as u32))
     }
 }
 
