@@ -62,6 +62,10 @@ impl ModuleBuilder {
         Ok(())
     }
 
+    pub fn push_func_type(&mut self, func_idx: u32, type_idx: u32) {
+        todo!()
+    }
+
     pub fn set_start_func(&mut self, func_idx: u32) {
         self.start_func_idx = Some(func_idx.into());
     }

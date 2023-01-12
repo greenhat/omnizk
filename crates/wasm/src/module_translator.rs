@@ -49,7 +49,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
                 //     "Function section: {:?}",
                 //     functions.into_iter().collect::<Vec<_>>()
                 // );
-                // todo!()
+                parse_function_section(functions, &mut mod_builder)?;
             }
 
             Payload::TableSection(tables) => {
@@ -287,6 +287,16 @@ pub fn parse_name_section(
             | wasmparser::Name::Data(_)
             | wasmparser::Name::Unknown { .. } => {}
         }
+    }
+    Ok(())
+}
+
+fn parse_function_section(
+    functions: wasmparser::FunctionSectionReader,
+    mod_builder: &mut ModuleBuilder,
+) -> Result<(), WasmError> {
+    for (func_idx, type_idx) in functions.into_iter().enumerate() {
+        mod_builder.push_func_type(func_idx as u32, type_idx?);
     }
     Ok(())
 }
