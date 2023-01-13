@@ -51,6 +51,10 @@ impl FuncBuilder {
     pub fn set_signature(&mut self, signature: FuncType) {
         self.sig = Some(signature);
     }
+
+    pub fn set_name(&mut self, clone: String) {
+        self.name = clone;
+    }
 }
 
 #[derive(Debug, Error)]

@@ -3,7 +3,7 @@
 //! Translation skeleton that traverses the whole WebAssembly module and call helper functions
 //! to deal with each part of it.
 
-use c2zk_frontend_shared::{FuncBuilder, ModuleBuilder, ModuleBuilderError};
+use c2zk_frontend_shared::{FuncBuilder, ModuleBuilder};
 use c2zk_ir::ir::{self, FuncIndex};
 
 use crate::code_translator::translate_operator;
@@ -47,7 +47,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
                 validator.function_section(&functions)?;
                 // dbg!(
                 //     "Function section: {:?}",
-                //     functions.into_iter().collect::<Vec<_>>()
+                //     functions.clone().into_iter().collect::<Vec<_>>()
                 // );
                 parse_function_section(functions, &mut mod_builder)?;
             }
@@ -194,13 +194,7 @@ fn parse_code_section_entry(
         validator.op(pos, &op)?;
         translate_operator(validator, &op, &mut builder, mod_builder)?;
     }
-    todo!("don't get type by func id, there should be a type id stored for each function");
-    builder.set_signature(mod_builder.get_func_type(func_idx)?.clone());
-    mod_builder.push_func(
-        builder
-            .build()
-            .map_err(ModuleBuilderError::FuncBuilderError)?,
-    );
+    mod_builder.push_func_builder(builder);
     Ok(())
 }
 
