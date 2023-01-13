@@ -181,6 +181,7 @@ fn parse_code_section_entry(
     let func_name = mod_builder
         .get_func_name(func_idx)
         .unwrap_or(format!("f{}", u32::from(func_idx)));
+    dbg!(&func_name);
     let mut builder = FuncBuilder::new(func_name);
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters and pass the next local as num_params

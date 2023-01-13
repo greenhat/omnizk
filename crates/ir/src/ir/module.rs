@@ -1,6 +1,7 @@
 use super::Func;
 use super::FuncIndex;
 
+#[derive(Debug)]
 pub struct Module {
     functions: Vec<Func>,
     pub start_func_idx: FuncIndex,

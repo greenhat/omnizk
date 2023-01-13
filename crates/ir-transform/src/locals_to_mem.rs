@@ -16,6 +16,7 @@ impl IrPass for LocalsToMemPass {
         // base_local_offset should be put on the stack before every local access.
         // local index is used in load/store as offset from base_local_offset.
 
+        // dbg!(&module);
         for func in module.functions_mut().iter_mut() {
             let mut new_func = Func::new(
                 func.name().to_string(),
@@ -30,7 +31,8 @@ impl IrPass for LocalsToMemPass {
                 },
                 "BEGIN prologue for locals access via memory".to_string(),
             );
-            todo!("func params and declared locals count");
+            dbg!(&func);
+            // todo!("func params and declared locals count");
             // TODO: get the number of locals from the function signature.
             // TODO: put func parameters from the stack to the memory for locals
             new_func.push(Inst::I32Const { value: 2 });

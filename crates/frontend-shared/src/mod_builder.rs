@@ -50,6 +50,7 @@ impl ModuleBuilder {
         module: &str,
         name: &str,
     ) -> Result<(), ModuleBuilderError> {
+        // dbg!(&self.types);
         let ty = self
             .types
             .get(type_idx as usize)
@@ -60,6 +61,8 @@ impl ModuleBuilder {
                 ))
             })?
             .clone();
+        // dbg!(name);
+        // dbg!(&ty);
         let import_func = ImportFunc {
             module: module.to_string(),
             name: name.to_string(),
@@ -102,22 +105,29 @@ impl ModuleBuilder {
             let func_type = self.get_func_type(func_idx.into())?;
             func_sigs.push(func_type.clone());
         }
+        let imported_funcs_count = self.import_functions.len() as u32;
 
         let mut funcs = Vec::new();
+        // first, imported functions
+        for import_func in self.import_functions {
+            funcs.push(import_func.build()?);
+        }
+
+        // TODO: since func indices should be shifted by imported funcs count change the storage and make it obvious
         for (func_idx, func_builder) in self.functions.iter_mut().enumerate() {
-            if let Some(func_name) = self.func_names.get(&(func_idx as u32).into()) {
+            if let Some(func_name) = self
+                .func_names
+                .get(&(func_idx as u32 + imported_funcs_count).into())
+            {
                 func_builder.set_name(func_name.clone());
             }
             func_builder.set_signature(func_sigs[func_idx].clone());
         }
-
         for func_builder in self.functions {
             funcs.push(func_builder.build()?);
         }
 
-        for import_func in self.import_functions {
-            funcs.push(import_func.build()?);
-        }
+        dbg!(&funcs);
         if let Some(start_func_idx) = self.start_func_idx {
             Ok(Module::new(funcs, start_func_idx))
         } else {
@@ -130,6 +140,8 @@ impl ModuleBuilder {
     }
 
     pub fn declare_func_name(&mut self, func_idx: FuncIndex, name: String) {
+        dbg!(&func_idx);
+        dbg!(&name);
         self.func_names.insert(func_idx, name);
     }
 
