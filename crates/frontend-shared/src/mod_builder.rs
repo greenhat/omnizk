@@ -102,6 +102,7 @@ impl ModuleBuilder {
     pub fn build(mut self) -> Result<Module, ModuleBuilderError> {
         let mut func_sigs: Vec<FuncType> = Vec::new();
         for func_idx in 0..self.functions.len() {
+            // TODO: and here we use "raw" func index without imported functions
             let func_type = self.get_func_type(func_idx.into())?;
             func_sigs.push(func_type.clone());
         }

@@ -17,6 +17,13 @@ impl IrPass for LocalsToMemPass {
         // local index is used in load/store as offset from base_local_offset.
 
         // dbg!(&module);
+
+        // TODO: set initial mem address for locals
+        // TODO: in start function?, make a separate function and call it from start?
+        new_func.push(Inst::I32Const { value: i32::MAX });
+        new_func.push(Inst::GlobalSet {
+            global_idx: global_idx_for_base_local_offset,
+        });
         for func in module.functions_mut().iter_mut() {
             let mut new_func = Func::new(
                 func.name().to_string(),
@@ -25,16 +32,32 @@ impl IrPass for LocalsToMemPass {
                 HashMap::new(),
             );
 
-            new_func.push_with_comment(
-                Inst::GlobalGet {
+            // dbg!(&func);
+            // todo!("store func params and additionally shift by declared locals count");
+
+            // store the function parameters to memory
+            for (i, param) in func.sig().params.iter().enumerate() {
+                new_func.push(Inst::GlobalGet {
                     global_idx: global_idx_for_base_local_offset,
-                },
-                "BEGIN prologue for locals access via memory".to_string(),
-            );
-            dbg!(&func);
-            // todo!("func params and declared locals count");
-            // TODO: get the number of locals from the function signature.
-            // TODO: put func parameters from the stack to the memory for locals
+                });
+                // TODO: store op according to the param type
+                new_func.push_with_comment(
+                    Inst::I32Store { offset: 0 },
+                    format!("store param {} to memory", i),
+                );
+                new_func.push(Inst::GlobalGet {
+                    global_idx: global_idx_for_base_local_offset,
+                });
+                new_func.push(Inst::I32Const { value: -1 });
+                new_func.push(Inst::I32Add);
+                new_func.push(Inst::GlobalSet {
+                    global_idx: global_idx_for_base_local_offset,
+                });
+            }
+            new_func.push(Inst::GlobalGet {
+                global_idx: global_idx_for_base_local_offset,
+            });
+            // TODO: get the number of locals besides function parameters from the function signature.
             new_func.push(Inst::I32Const { value: 2 });
             new_func.push(Inst::I32Sub);
             new_func.push_with_comment(
