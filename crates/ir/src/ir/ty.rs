@@ -21,6 +21,13 @@ pub struct FuncType {
 }
 
 impl FuncType {
+    pub fn void_void() -> Self {
+        Self {
+            params: vec![],
+            results: vec![],
+        }
+    }
+
     pub fn new(params: Vec<Ty>, results: Vec<Ty>) -> Self {
         Self { params, results }
     }

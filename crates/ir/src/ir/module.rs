@@ -1,5 +1,6 @@
 use super::Func;
 use super::FuncIndex;
+use super::Inst;
 
 #[derive(Debug)]
 pub struct Module {
@@ -68,5 +69,15 @@ impl Module {
     pub fn global_index_storing_base_local_offset(&self) -> u32 {
         // TODO: last existing global index + 1
         0
+    }
+
+    /// Adds the function and prepends it's call in the beginning of the start function.
+    pub fn add_prologue_function(&mut self, func: Func) -> FuncIndex {
+        let prologue_idx = self.push_function(func);
+        let start_func = &mut self.functions[u32::from(self.start_func_idx) as usize];
+        start_func.prepend(Inst::Call {
+            func_idx: prologue_idx,
+        });
+        prologue_idx
     }
 }

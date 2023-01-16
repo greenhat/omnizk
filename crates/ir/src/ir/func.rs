@@ -46,6 +46,11 @@ impl Func {
         self.ins.push(inst);
     }
 
+    // Prepends an instruction to the beginning of the function.
+    pub fn prepend(&mut self, inst: Inst) {
+        self.ins.insert(0, inst);
+    }
+
     pub fn push_with_comment(&mut self, inst: Inst, comment: String) {
         self.ins.push(inst);
         self.comments.insert(self.ins.len() - 1, comment);

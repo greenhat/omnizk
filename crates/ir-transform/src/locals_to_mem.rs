@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use c2zk_ir::ir::Func;
+use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::Inst;
 use c2zk_ir::pass::IrPass;
 
@@ -18,12 +19,7 @@ impl IrPass for LocalsToMemPass {
 
         // dbg!(&module);
 
-        // TODO: set initial mem address for locals
-        // TODO: in start function?, make a separate function and call it from start?
-        new_func.push(Inst::I32Const { value: i32::MAX });
-        new_func.push(Inst::GlobalSet {
-            global_idx: global_idx_for_base_local_offset,
-        });
+        let prologue_func = mod_prologue_func(global_idx_for_base_local_offset);
         for func in module.functions_mut().iter_mut() {
             let mut new_func = Func::new(
                 func.name().to_string(),
@@ -58,8 +54,8 @@ impl IrPass for LocalsToMemPass {
                 global_idx: global_idx_for_base_local_offset,
             });
             // TODO: get the number of locals besides function parameters from the function signature.
-            new_func.push(Inst::I32Const { value: 2 });
-            new_func.push(Inst::I32Sub);
+            new_func.push(Inst::I32Const { value: -2 });
+            new_func.push(Inst::I32Add);
             new_func.push_with_comment(
                 Inst::GlobalSet {
                     global_idx: global_idx_for_base_local_offset,
@@ -96,9 +92,24 @@ impl IrPass for LocalsToMemPass {
             }
             *func = new_func;
         }
+        module.add_prologue_function(prologue_func);
     }
 
     fn run_func_pass(&self, _func: &mut c2zk_ir::ir::Func) {
         unreachable!();
     }
+}
+
+fn mod_prologue_func(global_idx_for_base_local_offset: u32) -> Func {
+    Func::new(
+        "init_mem_for_locals".to_string(),
+        FuncType::void_void(),
+        vec![
+            Inst::I32Const { value: i32::MAX },
+            Inst::GlobalSet {
+                global_idx: global_idx_for_base_local_offset,
+            },
+        ],
+        HashMap::new(),
+    )
 }
