@@ -19,7 +19,10 @@ impl IrPass for LocalsToMemPass {
 
         // dbg!(&module);
 
-        let prologue_func = mod_prologue_func(global_idx_for_base_local_offset);
+        let prologue_func = mod_prologue_func(
+            global_idx_for_base_local_offset,
+            module.globals_alloc_size(),
+        );
         for func in module.functions_mut().iter_mut() {
             let mut new_func = Func::new(
                 func.name().to_string(),
@@ -100,12 +103,14 @@ impl IrPass for LocalsToMemPass {
     }
 }
 
-fn mod_prologue_func(global_idx_for_base_local_offset: u32) -> Func {
+fn mod_prologue_func(global_idx_for_base_local_offset: u32, globals_alloc_size: u32) -> Func {
     Func::new(
         "init_mem_for_locals".to_string(),
         FuncType::void_void(),
         vec![
-            Inst::I32Const { value: i32::MAX },
+            Inst::I32Const {
+                value: i32::MAX - globals_alloc_size as i32,
+            },
             Inst::GlobalSet {
                 global_idx: global_idx_for_base_local_offset,
             },

@@ -20,6 +20,12 @@ impl Module {
         &self.functions
     }
 
+    /// The memory size for for storing all globals
+    pub fn globals_alloc_size(&self) -> u32 {
+        // TODO: implement
+        4
+    }
+
     pub fn into_functions(self) -> Vec<Func> {
         self.functions
     }
