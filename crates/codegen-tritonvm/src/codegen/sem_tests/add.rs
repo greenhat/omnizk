@@ -65,65 +65,117 @@ fn test_add() {
             call __main
             halt
             c2zk_stdlib_pub_input:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 00000000002147483647
             push 0
             add
             read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
+            push -2
+            add
+            push 00000000002147483647
             push 0
             add
             write_mem
             read_io
             return
             c2zk_stdlib_pub_output:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 00000000002147483647
             push 0
             add
             read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push -1
+            add
+            push 00000000002147483647
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push -2
+            add
+            push 00000000002147483647
             push 0
             add
             write_mem
             write_io
             return
             c2zk_stdlib_secret_input:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 00000000002147483647
             push 0
             add
             read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
+            push -2
+            add
+            push 00000000002147483647
             push 0
             add
             write_mem
             divine
             return
             __main:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            call init_mem_for_locals
+            push 00000000002147483647
             push 0
             add
             read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
+            push -2
+            add
+            push 00000000002147483647
             push 0
             add
             write_mem
             call _ZN28c2zk_rust_wasm_tests_bundle13add4main17hab51675481e443caE
             return
             _ZN28c2zk_rust_wasm_tests_bundle13add3add17hd10e69d3d128fc14E:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 00000000002147483647
             push 0
             add
             read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push -1
+            add
+            push 00000000002147483647
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push -1
+            add
+            push 00000000002147483647
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push -2
+            add
+            push 00000000002147483647
             push 0
             add
             write_mem
@@ -144,13 +196,13 @@ fn test_add() {
             add
             return
             _ZN28c2zk_rust_wasm_tests_bundle13add4main17hab51675481e443caE:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 00000000002147483647
             push 0
             add
             read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
+            push -2
+            add
+            push 00000000002147483647
             push 0
             add
             write_mem
@@ -162,26 +214,43 @@ fn test_add() {
             call _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
             return
             _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 00000000002147483647
             push 0
             add
             read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
+            push -2
+            add
+            push 00000000002147483647
             push 0
             add
             write_mem
             call c2zk_stdlib_pub_input
             return
             _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 00000000002147483647
             push 0
             add
             read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push -1
+            add
+            push 00000000002147483647
+            push 0
+            add
+            write_mem
+            push 00000000002147483647
+            push 0
+            add
+            read_mem
+            push -2
+            add
+            push 00000000002147483647
             push 0
             add
             write_mem
@@ -195,22 +264,23 @@ fn test_add() {
             call c2zk_stdlib_pub_output
             return
             _ZN11c2zk_stdlib12secret_input17hfc353234bd7a7fadE:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
+            push 00000000002147483647
             push 0
             add
             read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
+            push -2
+            add
+            push 00000000002147483647
             push 0
             add
             write_mem
             call c2zk_stdlib_secret_input
             return
-            i32_sub:
-            swap2
-            push -1
-            mul
-            add"#]],
+            init_mem_for_locals:
+            push 00000000002147483643
+            push 00000000002147483647
+            push 0
+            add
+            write_mem"#]],
     )
 }

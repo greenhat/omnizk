@@ -12,13 +12,7 @@ impl IrPass for LocalsToMemPass {
     #[allow(clippy::wildcard_enum_match_arm)]
     fn run_mod_pass(&self, module: &mut c2zk_ir::ir::Module) {
         let global_idx_for_base_local_offset = module.global_index_storing_base_local_offset();
-        // TODO: add func prologue read current base_local_offset from the global and decrement it by the declared locals count.
-        // TODO: substitute all local references with memory references (base_local_offset + index).
-        // base_local_offset should be put on the stack before every local access.
-        // local index is used in load/store as offset from base_local_offset.
-
         // dbg!(&module);
-
         let prologue_func = mod_prologue_func(
             global_idx_for_base_local_offset,
             module.globals_alloc_size(),
@@ -30,10 +24,7 @@ impl IrPass for LocalsToMemPass {
                 Vec::new(),
                 HashMap::new(),
             );
-
             // dbg!(&func);
-            // todo!("store func params and additionally shift by declared locals count");
-
             // store the function parameters to memory
             for (i, param) in func.sig().params.iter().enumerate() {
                 new_func.push(Inst::GlobalGet {
