@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::Inst;
+use c2zk_ir::ir::Ty;
 use thiserror::Error;
 
 use crate::InstBuilder;
@@ -13,6 +14,7 @@ pub struct FuncBuilder {
     sig: Option<FuncType>,
     ins: Vec<Inst>,
     comments: HashMap<usize, String>,
+    locals: Vec<Ty>,
 }
 
 impl FuncBuilder {
@@ -22,14 +24,26 @@ impl FuncBuilder {
             ins: Vec::new(),
             sig: None,
             comments: HashMap::new(),
+            locals: Vec::new(),
         }
+    }
+
+    pub fn declare_local(&mut self, idx: u32, ty: Ty) {
+        dbg!(idx, ty);
+        self.locals.push(ty);
     }
 
     pub fn build(self) -> Result<Func, FuncBuilderError> {
         let sig = self.sig.clone().ok_or_else(|| {
             FuncBuilderError::MissingSignature(format!("FuncBuilder: {:?}", &self))
         })?;
-        Ok(Func::new(self.name, sig, self.ins, self.comments))
+        Ok(Func::new(
+            self.name,
+            sig,
+            self.locals,
+            self.ins,
+            self.comments,
+        ))
     }
 
     pub fn ins(&mut self) -> InstBuilder {

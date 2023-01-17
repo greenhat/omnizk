@@ -77,6 +77,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
     let mut new_func = Func::new(
         func.name().to_string(),
         func.sig().clone(),
+        func.locals().to_vec(),
         Vec::new(),
         HashMap::new(),
     );

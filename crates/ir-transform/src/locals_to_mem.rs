@@ -22,6 +22,7 @@ impl IrPass for LocalsToMemPass {
                 func.name().to_string(),
                 func.sig().clone(),
                 Vec::new(),
+                Vec::new(),
                 HashMap::new(),
             );
             // dbg!(&func);
@@ -44,42 +45,54 @@ impl IrPass for LocalsToMemPass {
                     global_idx: global_idx_for_base_local_offset,
                 });
             }
-            new_func.push(Inst::GlobalGet {
-                global_idx: global_idx_for_base_local_offset,
-            });
-            // TODO: get the number of locals besides function parameters from the function signature.
-            new_func.push(Inst::I32Const { value: -2 });
-            new_func.push(Inst::I32Add);
-            new_func.push_with_comment(
-                Inst::GlobalSet {
+            if !func.locals().is_empty() {
+                new_func.push(Inst::GlobalGet {
                     global_idx: global_idx_for_base_local_offset,
-                },
-                "END prologue for locals access via memory".to_string(),
-            );
+                });
+                new_func.push(Inst::I32Const {
+                    value: -(func.locals().len() as i32),
+                });
+                new_func.push(Inst::I32Add);
+                new_func.push_with_comment(
+                    Inst::GlobalSet {
+                        global_idx: global_idx_for_base_local_offset,
+                    },
+                    "END prologue for locals access via memory".to_string(),
+                );
+            }
+
+            let param_count = func.sig().params.len() as u32;
+            let local_count = func.locals().len() as u32;
             for inst in func.instructions_mut().iter_mut() {
+                // TODO: get type of the local and use the appropriate load instruction.
                 match inst {
                     Inst::LocalGet { local_idx } => {
                         new_func.push(Inst::GlobalGet {
                             global_idx: global_idx_for_base_local_offset,
                         });
-                        // TODO: get type of the local and use the appropriate load instruction.
-                        new_func.push(Inst::I32Load { offset: *local_idx });
+                        new_func.push(Inst::I32Load {
+                            offset: (param_count + local_count) - *local_idx,
+                        });
                     }
                     Inst::LocalSet { local_idx } => {
                         new_func.push(Inst::GlobalGet {
                             global_idx: global_idx_for_base_local_offset,
                         });
-                        // TODO: get type of the local and use the appropriate load instruction.
-                        new_func.push(Inst::I32Store { offset: *local_idx });
+                        new_func.push(Inst::I32Store {
+                            offset: (param_count + local_count) - *local_idx,
+                        });
                     }
                     Inst::LocalTee { local_idx } => {
                         new_func.push(Inst::GlobalGet {
                             global_idx: global_idx_for_base_local_offset,
                         });
-                        // TODO: get type of the local and use the appropriate load instruction.
-                        new_func.push(Inst::I32Store { offset: *local_idx });
+                        new_func.push(Inst::I32Store {
+                            offset: (param_count + local_count) - *local_idx,
+                        });
                         // we need to leave the original value on the stack
-                        new_func.push(Inst::I32Load { offset: *local_idx });
+                        new_func.push(Inst::I32Load {
+                            offset: (param_count + local_count) - *local_idx,
+                        });
                     }
                     _ => new_func.push(inst.clone()),
                 };
@@ -98,6 +111,7 @@ fn mod_prologue_func(global_idx_for_base_local_offset: u32, globals_alloc_size: 
     Func::new(
         "init_mem_for_locals".to_string(),
         FuncType::void_void(),
+        Vec::new(),
         vec![
             Inst::I32Const {
                 value: i32::MAX - globals_alloc_size as i32,

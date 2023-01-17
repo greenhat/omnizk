@@ -181,11 +181,12 @@ fn parse_code_section_entry(
     let func_name = mod_builder
         .get_func_name(func_idx)
         .unwrap_or(format!("f{}", u32::from(func_idx)));
-    dbg!(&func_name);
+    // dbg!(&func_name);
     let mut builder = FuncBuilder::new(func_name);
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters and pass the next local as num_params
-    let num_params = 0;
+    let num_params = mod_builder.get_func_type(func_idx)?.params.len();
+    dbg!(&num_params);
     parse_local_decls(&mut reader, &mut builder, num_params, validator)?;
     while !reader.eof() {
         // dbg!(&builder);
@@ -212,7 +213,7 @@ fn parse_local_decls(
         let count = reader.read_var_u32()?;
         let ty = reader.read_val_type()?;
         validator.define_locals(pos, count, ty)?;
-        // TODO: add locals to builder
+        builder.declare_local(count, ty.into_ir());
     }
     Ok(())
 }

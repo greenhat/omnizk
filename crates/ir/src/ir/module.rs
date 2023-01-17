@@ -74,7 +74,7 @@ impl Module {
 
     pub fn global_index_storing_base_local_offset(&self) -> u32 {
         // TODO: last existing global index + 1
-        0
+        99
     }
 
     /// Adds the function and prepends it's call in the beginning of the start function.

@@ -2,11 +2,13 @@ use std::collections::HashMap;
 
 use super::FuncType;
 use super::Inst;
+use super::Ty;
 
 #[derive(Debug, Clone)]
 pub struct Func {
     name: String,
     sig: FuncType,
+    locals: Vec<Ty>,
     ins: Vec<Inst>,
     comments: HashMap<usize, String>,
 }
@@ -15,6 +17,7 @@ impl Func {
     pub fn new(
         name: String,
         sig: FuncType,
+        locals: Vec<Ty>,
         ins: Vec<Inst>,
         comments: HashMap<usize, String>,
     ) -> Self {
@@ -23,6 +26,7 @@ impl Func {
             sig,
             ins,
             comments,
+            locals,
         }
     }
 
@@ -66,5 +70,9 @@ impl Func {
 
     pub fn sig(&self) -> &FuncType {
         &self.sig
+    }
+
+    pub fn locals(&self) -> &[Ty] {
+        &self.locals
     }
 }

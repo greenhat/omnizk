@@ -70,34 +70,44 @@ pub fn emit_inst(
 }
 
 fn write_mem(sink: &mut InstBuffer, offset: &u32) {
-    sink.append(vec![
-        AnInstruction::Push(felt_i32(*offset as i32)),
-        AnInstruction::Add,
-        AnInstruction::ReadMem,
-    ])
+    if offset == &0 {
+        sink.push(AnInstruction::WriteMem);
+    } else {
+        sink.append(vec![
+            AnInstruction::Push(felt_i32(*offset as i32)),
+            AnInstruction::Add,
+            AnInstruction::WriteMem,
+        ]);
+    }
 }
 
 fn read_mem(sink: &mut InstBuffer, offset: &u32) {
-    sink.append(vec![
-        AnInstruction::Push(felt_i32(*offset as i32)),
-        AnInstruction::Add,
-        AnInstruction::WriteMem,
-    ])
+    if offset == &0 {
+        sink.push(AnInstruction::ReadMem);
+    } else {
+        sink.append(vec![
+            AnInstruction::Push(felt_i32(*offset as i32)),
+            AnInstruction::Add,
+            AnInstruction::ReadMem,
+        ]);
+    }
 }
 
 fn global_get(sink: &mut InstBuffer, global_idx: &u32) {
+    // TODO: extract this into a function and call it instead of "inlining"
     sink.append(vec![
         AnInstruction::Push(felt_i32(GLOBAL_MEMORY_BASE as i32)),
-        AnInstruction::Push(felt_i32(*global_idx as i32)),
+        AnInstruction::Push(felt_i32(-(*global_idx as i32))),
         AnInstruction::Add,
         AnInstruction::ReadMem,
     ])
 }
 
 fn global_set(sink: &mut InstBuffer, global_idx: &u32) {
+    // TODO: extract this into a function and call it instead of "inlining"
     sink.append(vec![
         AnInstruction::Push(felt_i32(GLOBAL_MEMORY_BASE as i32)),
-        AnInstruction::Push(felt_i32(*global_idx as i32)),
+        AnInstruction::Push(felt_i32(-(*global_idx as i32))),
         AnInstruction::Add,
         AnInstruction::WriteMem,
     ])

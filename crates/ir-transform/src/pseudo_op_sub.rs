@@ -52,6 +52,7 @@ fn triton_i32_sub_func() -> Func {
             params: vec![Ty::I32, Ty::I32],
             results: vec![Ty::I32],
         },
+        vec![],
         ins,
         HashMap::new(),
     )

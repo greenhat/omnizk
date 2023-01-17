@@ -65,6 +65,7 @@ fn triton_i64_and_func() -> Func {
             params: vec![Ty::I64, Ty::I64],
             results: vec![Ty::I64],
         },
+        vec![],
         ins,
         HashMap::new(),
     )
