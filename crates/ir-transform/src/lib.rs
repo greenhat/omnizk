@@ -19,11 +19,13 @@
 #![deny(clippy::panic)]
 
 mod convert_blocks;
+mod globals_to_mem;
 mod locals_to_mem;
 mod pseudo_op_and;
 mod pseudo_op_sub;
 
 pub use convert_blocks::BlocksToFuncPass;
+pub use globals_to_mem::GlobalsToMemPass;
 pub use locals_to_mem::LocalsToMemPass;
 pub use pseudo_op_and::PseudoOpAndPass;
 pub use pseudo_op_sub::PseudoOpSubPass;

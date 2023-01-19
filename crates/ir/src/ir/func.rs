@@ -42,6 +42,10 @@ impl Func {
         &mut self.ins
     }
 
+    pub fn instructions_as_vec_mut(&mut self) -> &mut Vec<Inst> {
+        &mut self.ins
+    }
+
     pub fn comments(&self) -> &HashMap<usize, String> {
         &self.comments
     }
