@@ -128,7 +128,7 @@ impl ModuleBuilder {
             funcs.push(func_builder.build()?);
         }
 
-        dbg!(&funcs);
+        // dbg!(&funcs);
         if let Some(start_func_idx) = self.start_func_idx {
             Ok(Module::new(funcs, start_func_idx))
         } else {
@@ -141,8 +141,8 @@ impl ModuleBuilder {
     }
 
     pub fn declare_func_name(&mut self, func_idx: FuncIndex, name: String) {
-        dbg!(&func_idx);
-        dbg!(&name);
+        // dbg!(&func_idx);
+        // dbg!(&name);
         self.func_names.insert(func_idx, name);
     }
 

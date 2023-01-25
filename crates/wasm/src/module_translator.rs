@@ -186,7 +186,7 @@ fn parse_code_section_entry(
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters and pass the next local as num_params
     let num_params = mod_builder.get_func_type(func_idx)?.params.len();
-    dbg!(&num_params);
+    // dbg!(&num_params);
     parse_local_decls(&mut reader, &mut builder, num_params, validator)?;
     while !reader.eof() {
         // dbg!(&builder);

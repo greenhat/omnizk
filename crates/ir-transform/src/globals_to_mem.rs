@@ -16,9 +16,19 @@ const GLOBALS_SET_FUNC_NAME: &str = "globals_set";
 
 const GLOBAL_MEMORY_BASE: u32 = i32::MAX as u32;
 
+#[derive(Debug, Clone)]
 enum GlobalInst {
     GlobalGet { global_idx: GlobalIndex },
     GlobalSet { global_idx: GlobalIndex },
+}
+
+impl GlobalInst {
+    fn global_idx(&self) -> GlobalIndex {
+        match self {
+            GlobalInst::GlobalGet { global_idx } => *global_idx,
+            GlobalInst::GlobalSet { global_idx } => *global_idx,
+        }
+    }
 }
 
 impl IrPass for GlobalsToMemPass {
@@ -30,6 +40,9 @@ impl IrPass for GlobalsToMemPass {
             .function_idx_by_name(GLOBALS_SET_FUNC_NAME)
             .unwrap_or_else(|| module.push_function(global_set_func()));
 
+        // dbg!(global_get_func_idx);
+        // dbg!(global_set_func_idx);
+
         for func in module.functions_mut().iter_mut() {
             let found_globals: Vec<(usize, GlobalInst)> = func
                 .instructions()
@@ -38,26 +51,28 @@ impl IrPass for GlobalsToMemPass {
                 .filter_map(|(idx, inst)| to_global_inst(idx, inst))
                 .collect();
 
-            for (idx, global_inst) in found_globals {
+            for (idx, global_inst) in found_globals.clone() {
                 let inst_mut = &mut func.instructions_as_vec_mut()[idx];
-                let global_idx = match global_inst {
-                    GlobalInst::GlobalGet { global_idx } => {
+                match global_inst {
+                    GlobalInst::GlobalGet { global_idx: _ } => {
                         *inst_mut = Inst::Call {
                             func_idx: global_get_func_idx,
                         };
-                        global_idx
                     }
-                    GlobalInst::GlobalSet { global_idx } => {
+                    GlobalInst::GlobalSet { global_idx: _ } => {
                         *inst_mut = Inst::Call {
                             func_idx: global_set_func_idx,
                         };
-                        global_idx
                     }
                 };
+            }
+
+            // inserting an op shifts the indices of the following instructions
+            for (offset, (idx, global_inst)) in found_globals.into_iter().enumerate() {
                 func.instructions_as_vec_mut().insert(
-                    idx,
+                    idx + offset,
                     Inst::I32Const {
-                        value: -(u32::from(global_idx) as i32),
+                        value: -(u32::from(global_inst.global_idx()) as i32),
                     },
                 );
             }
