@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::Inst;
+use c2zk_ir::ir::Module;
 use c2zk_ir::pass::IrPass;
 
 #[derive(Default)]
@@ -10,7 +11,7 @@ pub struct LocalsToMemPass;
 
 impl IrPass for LocalsToMemPass {
     #[allow(clippy::wildcard_enum_match_arm)]
-    fn run_mod_pass(&self, module: &mut c2zk_ir::ir::Module) {
+    fn run_mod_pass(&self, module: &mut Module) {
         let global_idx_for_base_local_offset = module.global_index_storing_base_local_offset();
         // dbg!(&module);
         let prologue_func = mod_prologue_func(
