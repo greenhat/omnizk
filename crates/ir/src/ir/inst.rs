@@ -2,6 +2,7 @@ use self::ext::Ext;
 
 use super::BlockType;
 use super::FuncIndex;
+use super::GlobalIndex;
 
 pub mod ext;
 
@@ -18,8 +19,8 @@ pub enum Inst {
     Br { relative_depth: u32 },
     I32Const { value: i32 },
     I64Const { value: i64 },
-    GlobalGet { global_idx: u32 },
-    GlobalSet { global_idx: u32 },
+    GlobalGet { global_idx: GlobalIndex },
+    GlobalSet { global_idx: GlobalIndex },
     LocalGet { local_idx: u32 },
     LocalTee { local_idx: u32 },
     LocalSet { local_idx: u32 },

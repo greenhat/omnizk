@@ -29,7 +29,7 @@ impl IrPass for LocalsToMemPass {
             // store the function parameters to memory
             for (i, param) in func.sig().params.iter().enumerate() {
                 new_func.push(Inst::GlobalGet {
-                    global_idx: global_idx_for_base_local_offset,
+                    global_idx: global_idx_for_base_local_offset.into(),
                 });
                 // TODO: store op according to the param type
                 new_func.push_with_comment(
@@ -37,17 +37,17 @@ impl IrPass for LocalsToMemPass {
                     format!("store param {} to memory", i),
                 );
                 new_func.push(Inst::GlobalGet {
-                    global_idx: global_idx_for_base_local_offset,
+                    global_idx: global_idx_for_base_local_offset.into(),
                 });
                 new_func.push(Inst::I32Const { value: -1 });
                 new_func.push(Inst::I32Add);
                 new_func.push(Inst::GlobalSet {
-                    global_idx: global_idx_for_base_local_offset,
+                    global_idx: global_idx_for_base_local_offset.into(),
                 });
             }
             if !func.locals().is_empty() {
                 new_func.push(Inst::GlobalGet {
-                    global_idx: global_idx_for_base_local_offset,
+                    global_idx: global_idx_for_base_local_offset.into(),
                 });
                 new_func.push(Inst::I32Const {
                     value: -(func.locals().len() as i32),
@@ -55,7 +55,7 @@ impl IrPass for LocalsToMemPass {
                 new_func.push(Inst::I32Add);
                 new_func.push_with_comment(
                     Inst::GlobalSet {
-                        global_idx: global_idx_for_base_local_offset,
+                        global_idx: global_idx_for_base_local_offset.into(),
                     },
                     "END prologue for locals access via memory".to_string(),
                 );
@@ -68,7 +68,7 @@ impl IrPass for LocalsToMemPass {
                 match inst {
                     Inst::LocalGet { local_idx } => {
                         new_func.push(Inst::GlobalGet {
-                            global_idx: global_idx_for_base_local_offset,
+                            global_idx: global_idx_for_base_local_offset.into(),
                         });
                         new_func.push(Inst::I32Load {
                             offset: (param_count + local_count) - *local_idx,
@@ -76,7 +76,7 @@ impl IrPass for LocalsToMemPass {
                     }
                     Inst::LocalSet { local_idx } => {
                         new_func.push(Inst::GlobalGet {
-                            global_idx: global_idx_for_base_local_offset,
+                            global_idx: global_idx_for_base_local_offset.into(),
                         });
                         new_func.push(Inst::I32Store {
                             offset: (param_count + local_count) - *local_idx,
@@ -84,7 +84,7 @@ impl IrPass for LocalsToMemPass {
                     }
                     Inst::LocalTee { local_idx } => {
                         new_func.push(Inst::GlobalGet {
-                            global_idx: global_idx_for_base_local_offset,
+                            global_idx: global_idx_for_base_local_offset.into(),
                         });
                         new_func.push(Inst::I32Store {
                             offset: (param_count + local_count) - *local_idx,
@@ -117,7 +117,7 @@ fn mod_prologue_func(global_idx_for_base_local_offset: u32, globals_alloc_size: 
                 value: i32::MAX - globals_alloc_size as i32,
             },
             Inst::GlobalSet {
-                global_idx: global_idx_for_base_local_offset,
+                global_idx: global_idx_for_base_local_offset.into(),
             },
         ],
         HashMap::new(),

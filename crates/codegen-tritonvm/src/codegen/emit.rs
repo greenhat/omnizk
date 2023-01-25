@@ -1,6 +1,7 @@
 use c2zk_ir::ir::ext::Ext;
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::FuncIndex;
+use c2zk_ir::ir::GlobalIndex;
 use c2zk_ir::ir::Inst;
 use triton_opcodes::instruction::AnInstruction;
 use triton_opcodes::ord_n::Ord16;
@@ -93,21 +94,21 @@ fn read_mem(sink: &mut InstBuffer, offset: &u32) {
     }
 }
 
-fn global_get(sink: &mut InstBuffer, global_idx: &u32) {
+fn global_get(sink: &mut InstBuffer, global_idx: &GlobalIndex) {
     // TODO: extract this into a function and call it instead of "inlining"
     sink.append(vec![
         AnInstruction::Push(felt_i32(GLOBAL_MEMORY_BASE as i32)),
-        AnInstruction::Push(felt_i32(-(*global_idx as i32))),
+        AnInstruction::Push(felt_i32(-(u32::from(*global_idx) as i32))),
         AnInstruction::Add,
         AnInstruction::ReadMem,
     ])
 }
 
-fn global_set(sink: &mut InstBuffer, global_idx: &u32) {
+fn global_set(sink: &mut InstBuffer, global_idx: &GlobalIndex) {
     // TODO: extract this into a function and call it instead of "inlining"
     sink.append(vec![
         AnInstruction::Push(felt_i32(GLOBAL_MEMORY_BASE as i32)),
-        AnInstruction::Push(felt_i32(-(*global_idx as i32))),
+        AnInstruction::Push(felt_i32(-(u32::from(*global_idx) as i32))),
         AnInstruction::Add,
         AnInstruction::WriteMem,
     ])

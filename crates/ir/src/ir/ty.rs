@@ -39,6 +39,9 @@ pub struct FuncIndex(u32);
 #[derive(Debug, Clone, Copy, From, Into, PartialEq, Eq, Hash)]
 pub struct TypeIndex(u32);
 
+#[derive(Debug, Clone, Copy, From, Into, PartialEq, Eq, Hash)]
+pub struct GlobalIndex(u32);
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum BlockType {
     /// The block consumes nor produces any values.
