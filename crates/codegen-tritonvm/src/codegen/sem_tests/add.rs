@@ -68,14 +68,14 @@ fn test_add() {
             read_io
             return
             c2zk_stdlib_pub_output:
-            push -99
+            push -1
             call globals_get
-            read_mem
-            push -99
+            write_mem
+            push -1
             call globals_get
             push -1
             add
-            push -99
+            push -1
             call globals_set
             write_io
             return
@@ -87,34 +87,34 @@ fn test_add() {
             call _ZN28c2zk_rust_wasm_tests_bundle13add4main17hab51675481e443caE
             return
             _ZN28c2zk_rust_wasm_tests_bundle13add3add17hd10e69d3d128fc14E:
-            push -99
+            push -1
             call globals_get
-            read_mem
-            push -99
+            write_mem
+            push -1
             call globals_get
             push -1
             add
-            push -99
+            push -1
             call globals_set
-            push -99
+            push -1
             call globals_get
-            read_mem
-            push -99
+            write_mem
+            push -1
             call globals_get
             push -1
             add
-            push -99
+            push -1
             call globals_set
-            push -99
+            push -1
             call globals_get
             push 1
             add
-            write_mem
-            push -99
+            read_mem
+            push -1
             call globals_get
             push 2
             add
-            write_mem
+            read_mem
             add
             return
             _ZN28c2zk_rust_wasm_tests_bundle13add4main17hab51675481e443caE:
@@ -129,20 +129,20 @@ fn test_add() {
             call c2zk_stdlib_pub_input
             return
             _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E:
-            push -99
+            push -1
             call globals_get
-            read_mem
-            push -99
+            write_mem
+            push -1
             call globals_get
             push -1
             add
-            push -99
+            push -1
             call globals_set
-            push -99
+            push -1
             call globals_get
             push 1
             add
-            write_mem
+            read_mem
             call c2zk_stdlib_pub_output
             return
             _ZN11c2zk_stdlib12secret_input17hfc353234bd7a7fadE:
@@ -150,15 +150,15 @@ fn test_add() {
             return
             init_mem_for_locals:
             push 00000000002147483643
-            push -99
+            push -1
             call globals_set
             globals_get:
             push 00000000002147483647
             add
-            write_mem
+            read_mem
             globals_set:
             push 00000000002147483647
             add
-            read_mem"#]],
+            write_mem"#]],
     )
 }
