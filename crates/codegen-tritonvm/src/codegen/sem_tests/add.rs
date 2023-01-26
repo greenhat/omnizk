@@ -107,12 +107,10 @@ fn test_add() {
             call globals_set
             push -1
             call globals_get
-            push 1
-            add
             read_mem
             push -1
             call globals_get
-            push 2
+            push 1
             add
             read_mem
             add
@@ -140,8 +138,6 @@ fn test_add() {
             call globals_set
             push -1
             call globals_get
-            push 1
-            add
             read_mem
             call c2zk_stdlib_pub_output
             return

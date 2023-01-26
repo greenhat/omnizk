@@ -66,13 +66,19 @@ impl IrPass for LocalsToMemPass {
             let local_count = func.locals().len() as u32;
             for inst in func.instructions_mut().iter_mut() {
                 // TODO: get type of the local and use the appropriate load instruction.
+                let total_local_count = param_count + local_count;
+                let reverse_index_base = if total_local_count > 0 {
+                    total_local_count - 1
+                } else {
+                    0
+                };
                 match inst {
                     Inst::LocalGet { local_idx } => {
                         new_func.push(Inst::GlobalGet {
                             global_idx: global_idx_for_base_local_offset.into(),
                         });
                         new_func.push(Inst::I32Load {
-                            offset: (param_count + local_count) - *local_idx,
+                            offset: reverse_index_base - *local_idx,
                         });
                     }
                     Inst::LocalSet { local_idx } => {
@@ -80,7 +86,7 @@ impl IrPass for LocalsToMemPass {
                             global_idx: global_idx_for_base_local_offset.into(),
                         });
                         new_func.push(Inst::I32Store {
-                            offset: (param_count + local_count) - *local_idx,
+                            offset: reverse_index_base - *local_idx,
                         });
                     }
                     Inst::LocalTee { local_idx } => {
@@ -88,11 +94,11 @@ impl IrPass for LocalsToMemPass {
                             global_idx: global_idx_for_base_local_offset.into(),
                         });
                         new_func.push(Inst::I32Store {
-                            offset: (param_count + local_count) - *local_idx,
+                            offset: reverse_index_base - *local_idx,
                         });
                         // we need to leave the original value on the stack
                         new_func.push(Inst::I32Load {
-                            offset: (param_count + local_count) - *local_idx,
+                            offset: reverse_index_base - *local_idx,
                         });
                     }
                     _ => new_func.push(inst.clone()),
