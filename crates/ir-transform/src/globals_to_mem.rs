@@ -111,6 +111,7 @@ fn global_get_func() -> Func {
         },
         Inst::I32Add,
         Inst::I32Load { offset: 0 },
+        Inst::Return,
     ];
     Func::new(
         GLOBALS_GET_FUNC_NAME.to_string(),
@@ -133,6 +134,7 @@ fn global_set_func() -> Func {
         Inst::I32Add,
         Inst::Swap { idx: 1 },
         Inst::I32Store { offset: 0 },
+        Inst::Return,
     ];
     Func::new(
         GLOBALS_SET_FUNC_NAME.to_string(),

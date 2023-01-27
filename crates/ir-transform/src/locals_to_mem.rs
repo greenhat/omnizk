@@ -132,6 +132,7 @@ fn mod_prologue_func(global_idx_for_base_local_offset: u32, globals_alloc_size: 
             Inst::GlobalSet {
                 global_idx: global_idx_for_base_local_offset.into(),
             },
+            Inst::Return,
         ],
         HashMap::new(),
     )

@@ -169,6 +169,7 @@ fn test_add() {
             push 00000000002147483643
             push -1
             call globals_set
+            return
             globals_get:
             push 00000000002147483647
             add
@@ -176,12 +177,14 @@ fn test_add() {
             read_mem
             swap1
             pop
+            return
             globals_set:
             push 00000000002147483647
             add
             swap1
             write_mem
             pop
-            pop"#]],
+            pop
+            return"#]],
     )
 }
