@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::Inst;
@@ -41,7 +40,7 @@ impl IrPass for PseudoOpSubPass {
 
 fn triton_i32_sub_func() -> Func {
     let ins = vec![
-        TritonExt::Swap { idx: 2 }.into(),
+        Inst::Swap { idx: 2 },
         Inst::I32Const { value: -1 },
         Inst::I32Mul,
         Inst::I32Add,

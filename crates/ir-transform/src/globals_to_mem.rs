@@ -67,6 +67,7 @@ impl IrPass for GlobalsToMemPass {
                 };
             }
 
+            // insert the global index as an argument to the call (before the call)
             // inserting an op shifts the indices of the following instructions
             for (offset, (idx, global_inst)) in found_globals.into_iter().enumerate() {
                 func.instructions_as_vec_mut().insert(
@@ -124,6 +125,8 @@ fn global_get_func() -> Func {
 }
 
 fn global_set_func() -> Func {
+    // first value, next pointer
+    todo!("swap the order of the stack values for writemem");
     let ins = vec![
         Inst::I32Const {
             value: GLOBAL_MEMORY_BASE as i32,

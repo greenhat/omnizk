@@ -43,9 +43,9 @@ fn triton_i64_and_func() -> Func {
     let mut ins: Vec<Inst> = Vec::new();
     for _ in 0..32 {
         ins.push(TritonExt::Lsb.into());
-        ins.push(TritonExt::Swap { idx: 2 }.into());
+        ins.push(Inst::Swap { idx: 2 });
         ins.push(TritonExt::Lsb.into());
-        ins.push(TritonExt::Swap { idx: 2 }.into());
+        ins.push(Inst::Swap { idx: 2 });
     }
     for _ in 0..2 {
         ins.push(Inst::I64Eqz);
@@ -53,7 +53,7 @@ fn triton_i64_and_func() -> Func {
     }
     ins.push(Inst::I64Const { value: 0 });
     for i in (0..32).rev() {
-        ins.push(TritonExt::Swap { idx: 2 }.into());
+        ins.push(Inst::Swap { idx: 2 });
         ins.push(Inst::I64Mul);
         ins.push(Inst::I64Const { value: 1 << i });
         ins.push(Inst::I64Mul);

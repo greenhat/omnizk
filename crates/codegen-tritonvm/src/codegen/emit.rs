@@ -44,14 +44,18 @@ pub fn emit_inst(
         Inst::I64Const { value } => sink.push(AnInstruction::Push(felt_i64(*value))),
         Inst::I64GeU => sink.push(AnInstruction::Nop), // TODO: implement
         Inst::I64Ne => sink.push(AnInstruction::Nop),  // TODO: implement
+        // Extra (besides the wasm instructions)
+        // -------------------------------------
+        Inst::Swap { idx } => sink.push(AnInstruction::Swap(ord16_u8(*idx)?)),
+        // Extention instructions for target arch
         Inst::Ext(Ext::Triton(eop)) => match eop {
             TritonExt::Pop => sink.push(AnInstruction::Pop),
             TritonExt::Skiz => sink.push(AnInstruction::Skiz),
-            TritonExt::Swap { idx } => sink.push(AnInstruction::Swap(ord16_u8(*idx)?)),
             TritonExt::Recurse => sink.push(AnInstruction::Recurse),
             TritonExt::Lsb => sink.push(AnInstruction::Lsb),
             TritonExt::Assert => sink.push(AnInstruction::Assert),
         },
+        // Should not be emitted (should be eliminated in the IR transformation passes)
         Inst::Block { blockty } => return Err(unexpected_inst(ins)),
         Inst::Loop { block_type } => return Err(unexpected_inst(ins)),
         Inst::BrIf { relative_depth } => return Err(unexpected_inst(ins)),
