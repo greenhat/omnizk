@@ -32,6 +32,7 @@ impl IrPass for LocalsToMemPass {
                 new_func.push(Inst::GlobalGet {
                     global_idx: global_idx_for_base_local_offset.into(),
                 });
+                new_func.push(Inst::Swap { idx: 1 });
                 // TODO: store op according to the param type
                 new_func.push_with_comment(
                     Inst::I32Store { offset: 0 },
@@ -85,6 +86,7 @@ impl IrPass for LocalsToMemPass {
                         new_func.push(Inst::GlobalGet {
                             global_idx: global_idx_for_base_local_offset.into(),
                         });
+                        new_func.push(Inst::Swap { idx: 1 });
                         new_func.push(Inst::I32Store {
                             offset: reverse_index_base - *local_idx,
                         });
@@ -93,10 +95,14 @@ impl IrPass for LocalsToMemPass {
                         new_func.push(Inst::GlobalGet {
                             global_idx: global_idx_for_base_local_offset.into(),
                         });
+                        new_func.push(Inst::Swap { idx: 1 });
                         new_func.push(Inst::I32Store {
                             offset: reverse_index_base - *local_idx,
                         });
                         // we need to leave the original value on the stack
+                        new_func.push(Inst::GlobalGet {
+                            global_idx: global_idx_for_base_local_offset.into(),
+                        });
                         new_func.push(Inst::I32Load {
                             offset: reverse_index_base - *local_idx,
                         });

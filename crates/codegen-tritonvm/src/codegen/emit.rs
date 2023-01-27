@@ -55,7 +55,7 @@ pub fn emit_inst(
             TritonExt::Lsb => sink.push(AnInstruction::Lsb),
             TritonExt::Assert => sink.push(AnInstruction::Assert),
         },
-        // Should not be emitted (should be eliminated in the IR transformation passes)
+        // Should not be emitted (eliminated in the IR transformation passes)
         Inst::Block { blockty } => return Err(unexpected_inst(ins)),
         Inst::Loop { block_type } => return Err(unexpected_inst(ins)),
         Inst::BrIf { relative_depth } => return Err(unexpected_inst(ins)),

@@ -126,12 +126,12 @@ fn global_get_func() -> Func {
 
 fn global_set_func() -> Func {
     // first value, next pointer
-    todo!("swap the order of the stack values for writemem");
     let ins = vec![
         Inst::I32Const {
             value: GLOBAL_MEMORY_BASE as i32,
         },
         Inst::I32Add,
+        Inst::Swap { idx: 1 },
         Inst::I32Store { offset: 0 },
     ];
     Func::new(
