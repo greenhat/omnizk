@@ -72,27 +72,27 @@ pub fn emit_inst(
 }
 
 fn write_mem(sink: &mut InstBuffer, offset: &u32) {
-    if offset == &0 {
-        sink.push(AnInstruction::WriteMem);
-    } else {
-        sink.append(vec![
-            AnInstruction::Push(felt_i32(*offset as i32)),
-            AnInstruction::Add,
-            AnInstruction::WriteMem,
-        ]);
+    if offset != &0 {
+        sink.push(AnInstruction::Push(felt_i32(*offset as i32)));
+        sink.push(AnInstruction::Add);
     }
+    sink.push(AnInstruction::WriteMem);
+    // remove the top two elements from the stack (the value and the pointer)
+    sink.push(AnInstruction::Pop);
+    sink.push(AnInstruction::Pop);
 }
 
 fn read_mem(sink: &mut InstBuffer, offset: &u32) {
-    if offset == &0 {
-        sink.push(AnInstruction::ReadMem);
-    } else {
-        sink.append(vec![
-            AnInstruction::Push(felt_i32(*offset as i32)),
-            AnInstruction::Add,
-            AnInstruction::ReadMem,
-        ]);
+    if offset != &0 {
+        sink.push(AnInstruction::Push(felt_i32(*offset as i32)));
+        sink.push(AnInstruction::Add);
     }
+    // push 0 on top of the stack since read_mem overrites the top of the stack with the read value
+    sink.push(AnInstruction::Push(felt_i32(0)));
+    sink.push(AnInstruction::ReadMem);
+    // swap the read value with the pointer (it's left after the read)
+    sink.push(AnInstruction::Swap(Ord16::ST1));
+    sink.push(AnInstruction::Pop);
 }
 
 // fn global_get(sink: &mut InstBuffer, global_idx: &GlobalIndex) {

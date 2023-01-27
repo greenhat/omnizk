@@ -72,6 +72,8 @@ fn test_add() {
             call globals_get
             swap1
             write_mem
+            pop
+            pop
             push -1
             call globals_get
             push -1
@@ -92,6 +94,8 @@ fn test_add() {
             call globals_get
             swap1
             write_mem
+            pop
+            pop
             push -1
             call globals_get
             push -1
@@ -102,6 +106,8 @@ fn test_add() {
             call globals_get
             swap1
             write_mem
+            pop
+            pop
             push -1
             call globals_get
             push -1
@@ -110,12 +116,18 @@ fn test_add() {
             call globals_set
             push -1
             call globals_get
+            push 0
             read_mem
+            swap1
+            pop
             push -1
             call globals_get
             push 1
             add
+            push 0
             read_mem
+            swap1
+            pop
             add
             return
             _ZN28c2zk_rust_wasm_tests_bundle13add4main17hab51675481e443caE:
@@ -134,6 +146,8 @@ fn test_add() {
             call globals_get
             swap1
             write_mem
+            pop
+            pop
             push -1
             call globals_get
             push -1
@@ -142,7 +156,10 @@ fn test_add() {
             call globals_set
             push -1
             call globals_get
+            push 0
             read_mem
+            swap1
+            pop
             call c2zk_stdlib_pub_output
             return
             _ZN11c2zk_stdlib12secret_input17hfc353234bd7a7fadE:
@@ -155,11 +172,16 @@ fn test_add() {
             globals_get:
             push 00000000002147483647
             add
+            push 0
             read_mem
+            swap1
+            pop
             globals_set:
             push 00000000002147483647
             add
             swap1
-            write_mem"#]],
+            write_mem
+            pop
+            pop"#]],
     )
 }
