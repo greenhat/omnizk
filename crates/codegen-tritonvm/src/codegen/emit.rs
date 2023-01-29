@@ -52,7 +52,7 @@ pub fn emit_inst(
             TritonExt::Pop => sink.push(AnInstruction::Pop),
             TritonExt::Skiz => sink.push(AnInstruction::Skiz),
             TritonExt::Recurse => sink.push(AnInstruction::Recurse),
-            TritonExt::Lsb => sink.push(AnInstruction::Lsb),
+            TritonExt::Lsb => todo!("it's pseudo op now"),
             TritonExt::Assert => sink.push(AnInstruction::Assert),
         },
         // Should not be emitted (eliminated in the IR transformation passes)

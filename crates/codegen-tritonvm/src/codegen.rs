@@ -71,7 +71,8 @@ mod tests {
         let source = wat::parse_str(input).unwrap();
         let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
         let module = translate(&source, frontend).unwrap();
-        let inst_buf = compile_module(module, &TritonTargetConfig::default()).unwrap();
+        let triton_target_config = TritonTargetConfig::default();
+        let inst_buf = compile_module(module, &triton_target_config).unwrap();
         let out_source = inst_buf.pretty_print();
         expected_tree.assert_eq(&out_source);
         let program = inst_buf.program();
