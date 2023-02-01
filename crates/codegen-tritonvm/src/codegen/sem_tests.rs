@@ -36,13 +36,23 @@ fn check_wasm(
     let input = input.into_iter().map(Into::into).collect();
     let secret_input = secret_input.into_iter().map(Into::into).collect();
     let (_trace, out, err) = triton_vm::vm::run(&program, input, secret_input);
-    dbg!(&err);
     // dbg!(&_trace.last().unwrap().op_stack);
-    dbg!(&_trace.last().unwrap().op_stack.height());
-    dbg!(&_trace.last().unwrap().program[.._trace.last().unwrap().instruction_pointer]);
+    // dbg!(&_trace.last().unwrap().program[.._trace.last().unwrap().instruction_pointer]);
     dbg!(_trace.last().unwrap().instruction_pointer);
-    dbg!(&_trace.last().unwrap().program[_trace.last().unwrap().instruction_pointer]);
-    dbg!(&_trace.last().unwrap().jump_stack);
+    dbg!(&_trace.last().unwrap().current_instruction());
+    dbg!(&_trace.last().unwrap().op_stack.height());
+
+    // dbg!(&_trace
+    //     .iter()
+    //     .map(|s| s.op_stack.height())
+    //     .collect::<Vec<usize>>());
+
+    dbg!(_trace.last().unwrap().cycle_count);
+    dbg!(_trace.last().unwrap().op_stack.is_too_shallow());
+    dbg!(&err);
+    // pretty print state
+    // dbg!(format!("{}", &_trace.last().unwrap()));
+    // dbg!(&_trace.last().unwrap().jump_stack);
     // dbg!(&_trace.len());
     assert!(err.is_none());
     assert_eq!(

@@ -80,6 +80,12 @@ fn test_add() {
             add
             push -1
             call globals_set
+            push -1
+            call globals_get
+            push 0
+            read_mem
+            swap1
+            pop
             write_io
             return
             c2zk_stdlib_secret_input:
