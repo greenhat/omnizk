@@ -37,7 +37,13 @@ fn check_wasm(
     let secret_input = secret_input.into_iter().map(Into::into).collect();
     let (_trace, out, err) = triton_vm::vm::run(&program, input, secret_input);
     dbg!(&err);
-    // dbg!(&_trace);
+    // dbg!(&_trace.last().unwrap().op_stack);
+    dbg!(&_trace.last().unwrap().op_stack.height());
+    dbg!(&_trace.last().unwrap().program[.._trace.last().unwrap().instruction_pointer]);
+    dbg!(_trace.last().unwrap().instruction_pointer);
+    dbg!(&_trace.last().unwrap().program[_trace.last().unwrap().instruction_pointer]);
+    dbg!(&_trace.last().unwrap().jump_stack);
+    // dbg!(&_trace.len());
     assert!(err.is_none());
     assert_eq!(
         out.into_iter().map(|b| b.into()).collect::<Vec<u64>>(),
