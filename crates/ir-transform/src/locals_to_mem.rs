@@ -110,6 +110,7 @@ impl IrPass for LocalsToMemPass {
                     _ => new_func.push(inst.clone()),
                 };
             }
+            // TODO: decrease the base_local_offset by the number of locals upon return
             *func = new_func;
         }
         module.add_prologue_function(prologue_func);

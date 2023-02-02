@@ -5,7 +5,10 @@
 mod add;
 mod fib;
 
+use std::collections::HashMap;
+
 use c2zk_ir::pass::run_ir_passes;
+use twenty_first::shared_math::b_field_element::BFieldElement;
 
 use crate::compile_module;
 use crate::TritonTargetConfig;
@@ -54,9 +57,15 @@ fn check_wasm(
     // dbg!(format!("{}", &_trace.last().unwrap()));
     // dbg!(&_trace.last().unwrap().jump_stack);
     // dbg!(&_trace.len());
+    dbg!(pretty_print_ram(&_trace.last().unwrap().ram));
     assert!(err.is_none());
     assert_eq!(
         out.into_iter().map(|b| b.into()).collect::<Vec<u64>>(),
         expected_output
     );
+}
+
+fn pretty_print_ram(ram: &HashMap<BFieldElement, BFieldElement>) -> HashMap<u64, u64> {
+    // TODO: sort by key (pointer)
+    ram.iter().map(|(k, v)| (k.into(), v.into())).collect()
 }
