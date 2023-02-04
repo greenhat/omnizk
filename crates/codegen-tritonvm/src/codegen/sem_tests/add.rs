@@ -87,6 +87,12 @@ fn test_add() {
             swap1
             pop
             write_io
+            push -1
+            call globals_get
+            push 1
+            add
+            push -1
+            call globals_set
             return
             c2zk_stdlib_secret_input:
             divine
@@ -135,6 +141,12 @@ fn test_add() {
             swap1
             pop
             add
+            push -1
+            call globals_get
+            push 2
+            add
+            push -1
+            call globals_set
             return
             _ZN28c2zk_rust_wasm_tests_bundle13add4main17hab51675481e443caE:
             call _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E
@@ -167,6 +179,12 @@ fn test_add() {
             swap1
             pop
             call c2zk_stdlib_pub_output
+            push -1
+            call globals_get
+            push 1
+            add
+            push -1
+            call globals_set
             return
             _ZN11c2zk_stdlib12secret_input17hfc353234bd7a7fadE:
             call c2zk_stdlib_secret_input
