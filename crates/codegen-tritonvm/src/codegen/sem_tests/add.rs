@@ -82,6 +82,8 @@ fn test_add() {
             call globals_set
             push -1
             call globals_get
+            push 1
+            add
             push 0
             read_mem
             swap1
@@ -128,13 +130,15 @@ fn test_add() {
             call globals_set
             push -1
             call globals_get
+            push 1
+            add
             push 0
             read_mem
             swap1
             pop
             push -1
             call globals_get
-            push 1
+            push 2
             add
             push 0
             read_mem
@@ -174,6 +178,8 @@ fn test_add() {
             call globals_set
             push -1
             call globals_get
+            push 1
+            add
             push 0
             read_mem
             swap1

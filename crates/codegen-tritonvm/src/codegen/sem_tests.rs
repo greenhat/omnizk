@@ -49,6 +49,8 @@ fn check_wasm(
             pretty_print_vec_horiz(&pretty_stack(&state.op_stack))
         );
         dbg!(s);
+        let r = pretty_print_ram_horiz(&state.ram);
+        dbg!(r);
     }
 
     // dbg!(&_trace.last().unwrap().op_stack);
@@ -77,9 +79,14 @@ fn check_wasm(
     );
 }
 
-fn pretty_print_ram(ram: &HashMap<BFieldElement, BFieldElement>) -> HashMap<u64, u64> {
+fn pretty_print_ram_horiz(ram: &HashMap<BFieldElement, BFieldElement>) -> String {
     // TODO: sort by key (pointer)
-    ram.iter().map(|(k, v)| (k.into(), v.into())).collect()
+    // ram.iter().map(|(k, v)| (k.into(), v.into())).collect()
+    let mut s = String::new();
+    for (k, v) in ram.iter() {
+        s.push_str(&format!("{}:{} ", k.value(), v.value()));
+    }
+    s
 }
 
 fn pretty_stack(stack: &OpStack) -> Vec<u64> {
