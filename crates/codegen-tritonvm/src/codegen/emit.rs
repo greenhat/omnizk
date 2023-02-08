@@ -47,6 +47,7 @@ pub fn emit_inst(
         // Extra (besides the wasm instructions)
         // -------------------------------------
         Inst::Swap { idx } => sink.push(AnInstruction::Swap(ord16_u8(*idx)?)),
+        Inst::Dup { idx } => sink.push(AnInstruction::Dup(ord16_u8(*idx)?)),
         // Extention instructions for target arch
         Inst::Ext(Ext::Triton(eop)) => match eop {
             TritonExt::Pop => sink.push(AnInstruction::Pop),

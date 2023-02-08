@@ -27,22 +27,26 @@ impl IrPass for LocalsToMemPass {
                 HashMap::new(),
             );
             // dbg!(&func);
-            // store the function parameters to memory
-            for (i, param) in func.sig().params.iter().enumerate() {
+            if !func.sig().params.is_empty() {
                 new_func.push(Inst::GlobalGet {
                     global_idx: global_idx_for_base_local_offset.into(),
                 });
-                new_func.push(Inst::Swap { idx: 1 });
+            }
+            // store the function parameters to memory
+            for (i, param) in func.sig().params.iter().enumerate() {
+                new_func.push(Inst::Dup { idx: 0 });
+                // put func param on top
+                new_func.push(Inst::Swap { idx: 2 });
                 // TODO: store op according to the param type
                 new_func.push_with_comment(
                     Inst::I32Store { offset: 0 },
                     format!("store param {} to memory", i),
                 );
-                new_func.push(Inst::GlobalGet {
-                    global_idx: global_idx_for_base_local_offset.into(),
-                });
+                // decrease the pointer
                 new_func.push(Inst::I32Const { value: -1 });
                 new_func.push(Inst::I32Add);
+            }
+            if !func.sig().params.is_empty() {
                 new_func.push(Inst::GlobalSet {
                     global_idx: global_idx_for_base_local_offset.into(),
                 });

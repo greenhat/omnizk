@@ -70,12 +70,11 @@ fn test_add() {
             c2zk_stdlib_pub_output:
             push -1
             call globals_get
-            swap1
+            dup0
+            swap2
             write_mem
             pop
             pop
-            push -1
-            call globals_get
             push -1
             add
             push -1
@@ -106,24 +105,18 @@ fn test_add() {
             _ZN28c2zk_rust_wasm_tests_bundle13add3add17hd10e69d3d128fc14E:
             push -1
             call globals_get
-            swap1
+            dup0
+            swap2
             write_mem
             pop
             pop
-            push -1
-            call globals_get
             push -1
             add
-            push -1
-            call globals_set
-            push -1
-            call globals_get
-            swap1
+            dup0
+            swap2
             write_mem
             pop
             pop
-            push -1
-            call globals_get
             push -1
             add
             push -1
@@ -166,12 +159,11 @@ fn test_add() {
             _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E:
             push -1
             call globals_get
-            swap1
+            dup0
+            swap2
             write_mem
             pop
             pop
-            push -1
-            call globals_get
             push -1
             add
             push -1

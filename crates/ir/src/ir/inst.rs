@@ -73,6 +73,10 @@ pub enum Inst {
     Swap {
         idx: u8,
     },
+    /// 0..=15, copy the idx-th element to the top of the stack
+    Dup {
+        idx: u8,
+    },
     // Extention instructions for target arch
     Ext(Ext),
 }
