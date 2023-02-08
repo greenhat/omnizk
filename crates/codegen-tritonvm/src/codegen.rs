@@ -1,4 +1,3 @@
-use c2zk_codegen_shared::CodegenError;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Module;
@@ -7,41 +6,51 @@ mod inst_buf;
 pub use inst_buf::InstBuffer;
 mod emit;
 pub use emit::emit_inst;
+use triton_opcodes::instruction::AnInstruction;
 
 #[cfg(test)]
 mod sem_tests;
 
-use triton_vm::instruction::AnInstruction;
-
+use crate::TritonError;
 use crate::TritonTargetConfig;
 
 use self::emit::func_index_to_label;
 
 pub fn compile_module(
-    module: &Module,
+    module: Module,
     config: &TritonTargetConfig,
-) -> Result<InstBuffer, CodegenError> {
+) -> Result<InstBuffer, TritonError> {
     let mut sink = InstBuffer::new(config);
+    let func_names = module.func_names();
     sink.push(AnInstruction::Call(func_index_to_label(
         module.start_func_idx,
+        &func_names,
     )));
     sink.push(AnInstruction::Halt);
-    for (idx, func) in module.functions().iter().enumerate() {
+    for (idx, func) in module.into_functions().into_iter().enumerate() {
         let idx = FuncIndex::from(idx as u32);
-        // TODO: use the original function name as label?
-        sink.push_label(func_index_to_label(idx));
-        compile_function(func, config, &mut sink)?;
+        sink.push_label(func_index_to_label(idx, &func_names));
+        compile_function(func, config, &mut sink, &func_names)?;
     }
     Ok(sink)
 }
 
 pub fn compile_function(
-    func: &Func,
+    func: Func,
     config: &TritonTargetConfig,
     sink: &mut InstBuffer,
-) -> Result<(), CodegenError> {
-    for ins in func.instructions() {
-        emit_inst(ins, config, sink)?;
+    func_names: &[String],
+) -> Result<(), TritonError> {
+    for (idx, ins) in func.instructions().iter().enumerate() {
+        if let Some(comment) = func.comments().get(&idx) {
+            sink.push_comment_for_next_ins(comment.clone());
+        } else {
+        }
+        let res = emit_inst(ins, config, sink, func_names);
+        if let Err(e) = res {
+            dbg!(&func);
+            return Err(e);
+        }
     }
     Ok(())
 }
@@ -62,11 +71,12 @@ mod tests {
         let source = wat::parse_str(input).unwrap();
         let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
         let module = translate(&source, frontend).unwrap();
-        let inst_buf = compile_module(&module, &TritonTargetConfig::default()).unwrap();
+        let triton_target_config = TritonTargetConfig::default();
+        let inst_buf = compile_module(module, &triton_target_config).unwrap();
         let out_source = inst_buf.pretty_print();
         expected_tree.assert_eq(&out_source);
         let program = inst_buf.program();
-        let (_trace, _out, err) = program.run(vec![], vec![]);
+        let (_trace, _out, err) = triton_vm::vm::run(&program, vec![], vec![]);
         dbg!(&err);
         assert!(err.is_none());
     }
@@ -82,9 +92,9 @@ mod tests {
         return)
 )"#,
             expect![[r#"
-                call f0
+                call f1
                 halt
-                f0:
+                f1:
                 push 1
                 return
                 return"#]],
@@ -109,16 +119,16 @@ mod tests {
         return)
 )"#,
             expect![[r#"
-                call f1
+                call main
                 halt
-                f0:
+                add:
                 add
                 return
                 return
-                f1:
+                main:
                 push 1
                 push 2
-                call f0
+                call add
                 return
                 return"#]],
         );

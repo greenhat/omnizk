@@ -11,6 +11,7 @@ pub struct ImportFunc {
     pub ty: FuncType,
 }
 
+#[derive(Debug)]
 pub struct ImportFuncBody {
     mapping: HashMap<ImportFunc, Vec<Inst>>,
 }
@@ -22,7 +23,6 @@ impl ImportFuncBody {
 
     pub const PUB_OUTPUT_FUNC_MODULE: &str = "env";
     pub const PUB_OUTPUT_FUNC_NAME: &str = "c2zk_stdlib_pub_output";
-    pub const PUB_OUTPUT_OP: Inst = Inst::PubOutputWrite;
 
     pub const SECRET_INPUT_FUNC_MODULE: &str = "env";
     pub const SECRET_INPUT_FUNC_NAME: &str = "c2zk_stdlib_secret_input";
@@ -45,7 +45,11 @@ impl ImportFuncBody {
                         name: Self::PUB_OUTPUT_FUNC_NAME.to_string(),
                         ty: FuncType::new(vec![Ty::I64], vec![]),
                     },
-                    vec![Self::PUB_OUTPUT_OP, Inst::Return],
+                    vec![
+                        Inst::LocalGet { local_idx: 0 },
+                        Inst::PubOutputWrite,
+                        Inst::Return,
+                    ],
                 ),
                 (
                     ImportFunc {

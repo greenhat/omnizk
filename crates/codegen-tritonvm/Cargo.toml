@@ -12,9 +12,13 @@ categories.workspace = true
 
 [dependencies]
 c2zk-ir = { workspace = true }
+c2zk-ir-transform = { workspace = true }
 c2zk-codegen-shared = { workspace = true }
-triton-vm = { path = "../../../triton-vm/triton-vm" }
-twenty-first = { version = "0.5.0" }
+# triton-vm = { path = "../../../triton-vm/triton-vm" }
+# triton-opcodes = { path = "../../../triton-vm/triton-opcodes" }
+triton-vm = { version = "0.14" }
+triton-opcodes = { version = "0.14" }
+twenty-first = { version = "0.14" }
 
 [dev-dependencies]
 c2zk-frontend = { workspace = true }

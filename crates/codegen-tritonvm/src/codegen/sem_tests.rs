@@ -3,6 +3,13 @@
 #![allow(clippy::unwrap_used)]
 
 mod add;
+mod fib;
+
+use std::collections::HashMap;
+
+use c2zk_ir::pass::run_ir_passes;
+use triton_vm::op_stack::OpStack;
+use twenty_first::shared_math::b_field_element::BFieldElement;
 
 use crate::compile_module;
 use crate::TritonTargetConfig;
@@ -22,18 +29,79 @@ fn check_wasm(
     let wat = wasmprinter::print_bytes(source).unwrap();
     expected_wat.assert_eq(&wat);
     let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
-    let module = translate(source, frontend).unwrap();
-    let inst_buf = compile_module(&module, &TritonTargetConfig::default()).unwrap();
+    let triton_target_config = TritonTargetConfig::default();
+
+    let mut module = translate(source, frontend).unwrap();
+    run_ir_passes(&mut module, &triton_target_config.ir_passes);
+    let inst_buf = compile_module(module, &triton_target_config).unwrap();
     let out_source = inst_buf.pretty_print();
     expected_triton.assert_eq(&out_source);
     let program = inst_buf.program();
     let input = input.into_iter().map(Into::into).collect();
     let secret_input = secret_input.into_iter().map(Into::into).collect();
-    let (_trace, out, err) = program.run(input, secret_input);
+    let (_trace, out, err) = triton_vm::vm::run(&program, input, secret_input);
+
+    // iterate over last n traces
+    for state in _trace.iter().rev().take(400) {
+        let s = format!(
+            "{}: {}",
+            &state.current_instruction().unwrap(),
+            pretty_print_vec_horiz(&pretty_stack(&state.op_stack))
+        );
+        dbg!(s);
+        let r = pretty_print_ram_horiz(&state.ram);
+        dbg!(r);
+    }
+
+    // dbg!(&_trace.last().unwrap().op_stack);
+    // dbg!(&_trace.last().unwrap().program[.._trace.last().unwrap().instruction_pointer]);
+    // dbg!(_trace.last().unwrap().instruction_pointer);
+    // dbg!(&_trace.last().unwrap().current_instruction());
+
+    // dbg!(&_trace
+    //     .iter()
+    //     .map(|s| s.op_stack.height())
+    //     .collect::<Vec<usize>>());
+
+    // dbg!(_trace.last().unwrap().cycle_count);
+    // dbg!(_trace.last().unwrap().op_stack.is_too_shallow());
+    // pretty print state
+    // dbg!(format!("{}", &_trace.last().unwrap()));
+    // dbg!(&_trace.last().unwrap().jump_stack);
+    // dbg!(&_trace.len());
+    // dbg!(pretty_stack(&_trace.last().unwrap().op_stack));
+    // dbg!(pretty_print_ram(&_trace.last().unwrap().ram));
     dbg!(&err);
     assert!(err.is_none());
     assert_eq!(
         out.into_iter().map(|b| b.into()).collect::<Vec<u64>>(),
         expected_output
     );
+}
+
+fn pretty_print_ram_horiz(ram: &HashMap<BFieldElement, BFieldElement>) -> String {
+    // TODO: sort by key (pointer)
+    // ram.iter().map(|(k, v)| (k.into(), v.into())).collect()
+    let mut s = String::new();
+    for (k, v) in ram.iter() {
+        s.push_str(&format!("{}:{} ", k.value(), v.value()));
+    }
+    s
+}
+
+fn pretty_stack(stack: &OpStack) -> Vec<u64> {
+    stack
+        .stack
+        .iter()
+        .map(|b| b.value())
+        .rev()
+        .collect::<Vec<u64>>()
+}
+
+fn pretty_print_vec_horiz<T: std::fmt::Display>(vec: &[T]) -> String {
+    let mut s = String::new();
+    for v in vec {
+        s.push_str(&format!("{} ", v));
+    }
+    s
 }

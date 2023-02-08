@@ -1,5 +1,8 @@
 //! std lib for c2zk runtime
+
+// no_std for wasm32 target
 #![no_std]
+//
 // Coding conventions
 // #![deny(unsafe_code)]
 #![deny(non_upper_case_globals)]
@@ -18,10 +21,11 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(feature = "std")]
 #[macro_use]
-extern crate alloc;
+extern crate std;
 
+#[cfg(feature = "std")]
 #[cfg(not(target_arch = "wasm32"))]
 pub mod io_native;
 
@@ -50,6 +54,7 @@ macro_rules! entry {
 }
 
 pub fn pub_input() -> u64 {
+    #[cfg(feature = "std")]
     #[cfg(not(target_arch = "wasm32"))]
     return io_native::pub_input();
 
@@ -58,6 +63,7 @@ pub fn pub_input() -> u64 {
 }
 
 pub fn pub_output(x: u64) {
+    #[cfg(feature = "std")]
     #[cfg(not(target_arch = "wasm32"))]
     return io_native::pub_output(x);
 
@@ -66,6 +72,7 @@ pub fn pub_output(x: u64) {
 }
 
 pub fn secret_input() -> u64 {
+    #[cfg(feature = "std")]
     #[cfg(not(target_arch = "wasm32"))]
     return io_native::secret_input();
 

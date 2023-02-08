@@ -21,6 +21,13 @@ pub struct FuncType {
 }
 
 impl FuncType {
+    pub fn void_void() -> Self {
+        Self {
+            params: vec![],
+            results: vec![],
+        }
+    }
+
     pub fn new(params: Vec<Ty>, results: Vec<Ty>) -> Self {
         Self { params, results }
     }
@@ -31,3 +38,35 @@ pub struct FuncIndex(u32);
 
 #[derive(Debug, Clone, Copy, From, Into, PartialEq, Eq, Hash)]
 pub struct TypeIndex(u32);
+
+#[derive(Debug, Clone, Copy, From, Into, PartialEq, Eq, Hash)]
+pub struct GlobalIndex(u32);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum BlockType {
+    /// The block consumes nor produces any values.
+    Empty,
+    /// The block produces a singular value of the given type ([] -> \[t]).
+    Type(Ty),
+    /// The block is described by a function type.
+    /// The index is to a function type in the types section.
+    FuncType(TypeIndex),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum BlockKind {
+    Block,
+    Loop,
+}
+
+impl From<usize> for FuncIndex {
+    fn from(idx: usize) -> Self {
+        Self(idx as u32)
+    }
+}
+
+impl From<FuncIndex> for usize {
+    fn from(fi: FuncIndex) -> Self {
+        fi.0 as usize
+    }
+}

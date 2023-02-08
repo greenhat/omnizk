@@ -25,15 +25,6 @@ pub enum WasmError {
     #[error("Unsupported feature: {0}")]
     Unsupported(String),
 
-    /// An implementation limit was exceeded.
-    ///
-    /// Cranelift can compile very large and complicated functions, but the [implementation has
-    /// limits][limits] that cause compilation to fail when they are exceeded.
-    ///
-    /// [limits]: https://github.com/bytecodealliance/wasmtime/blob/main/cranelift/docs/ir.md#implementation-limits
-    #[error("Implementation limit exceeded")]
-    ImplLimitExceeded,
-
     /// Any user-defined error.
     #[error("User error: {0}")]
     User(String),
@@ -59,6 +50,3 @@ impl From<wasmparser::BinaryReaderError> for WasmError {
         }
     }
 }
-
-/// A convenient alias for a `Result` that uses `WasmError` as the error type.
-pub type WasmResult<T> = Result<T, WasmError>;

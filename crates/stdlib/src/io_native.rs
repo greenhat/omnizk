@@ -1,35 +1,43 @@
-use alloc::vec::Vec;
-use lazy_static::lazy_static;
-use spin::Mutex;
+use std::cell::RefCell;
+use std::thread_local;
+use std::vec::Vec;
 
-lazy_static! {
-    static ref PUB_INPUT: Mutex<Vec<u64>> = Mutex::new(vec![]);
-    static ref PUB_OUTPUT: Mutex<Vec<u64>> = Mutex::new(vec![]);
-    static ref SECRET_INPUT: Mutex<Vec<u64>> = Mutex::new(vec![]);
+thread_local! {
+    static PUB_INPUT: RefCell<Vec<u64>> = RefCell::new(vec![]);
+    static PUB_OUTPUT: RefCell<Vec<u64>> = RefCell::new(vec![]);
+    static SECRET_INPUT: RefCell<Vec<u64>> = RefCell::new(vec![]);
 }
 
-pub fn set_pub_input(input: Vec<u64>) {
-    *PUB_INPUT.lock() = input;
+pub fn init_io(pub_input: Vec<u64>, secret_input: Vec<u64>) {
+    let mut pub_input_reversed = pub_input;
+    pub_input_reversed.reverse();
+    let mut secret_input_reversed = secret_input;
+    secret_input_reversed.reverse();
+    PUB_INPUT.with(|v| {
+        *v.borrow_mut() = pub_input_reversed;
+    });
+    SECRET_INPUT.with(|v| {
+        *v.borrow_mut() = secret_input_reversed;
+    });
+    PUB_OUTPUT.with(|v| {
+        *v.borrow_mut() = vec![];
+    });
 }
 
 pub fn get_pub_output() -> Vec<u64> {
-    PUB_OUTPUT.lock().clone()
+    PUB_OUTPUT.with(|v| v.borrow().clone())
 }
 
-pub fn set_secret_input(input: Vec<u64>) {
-    *SECRET_INPUT.lock() = input;
-}
-
-pub fn pub_input() -> u64 {
+pub(crate) fn pub_input() -> u64 {
     #[allow(clippy::unwrap_used)]
-    PUB_INPUT.lock().pop().unwrap()
+    PUB_INPUT.with(|v| v.borrow_mut().pop().unwrap())
 }
 
-pub fn pub_output(x: u64) {
-    PUB_OUTPUT.lock().push(x);
+pub(crate) fn pub_output(x: u64) {
+    PUB_OUTPUT.with(|v| v.borrow_mut().push(x));
 }
 
-pub fn secret_input() -> u64 {
+pub(crate) fn secret_input() -> u64 {
     #[allow(clippy::unwrap_used)]
-    SECRET_INPUT.lock().pop().unwrap()
+    SECRET_INPUT.with(|v| v.borrow_mut().pop().unwrap())
 }

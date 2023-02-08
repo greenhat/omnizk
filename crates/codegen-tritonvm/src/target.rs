@@ -14,8 +14,9 @@ impl Target for TritonTarget {
         "TritonVM"
     }
 
-    fn compile_module(&self, module: &Module) -> Result<Vec<u8>, CodegenError> {
-        let inst_buf = compile_module(module, &self.config)?;
+    fn compile_module(&self, module: Module) -> Result<Vec<u8>, CodegenError> {
+        let inst_buf = compile_module(module, &self.config)
+            .map_err(|e| CodegenError::Triton(format!("{:?}", e)))?;
         Ok(inst_buf.pretty_print().into_bytes())
     }
 }
