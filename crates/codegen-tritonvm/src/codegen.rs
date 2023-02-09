@@ -67,10 +67,13 @@ mod tests {
         use c2zk_frontend::translate;
         use c2zk_frontend::FrontendConfig;
         use c2zk_frontend::WasmFrontendConfig;
+        use c2zk_ir::pass::run_ir_passes;
 
         let source = wat::parse_str(input).unwrap();
         let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
-        let module = translate(&source, frontend).unwrap();
+        let mut module = translate(&source, frontend).unwrap();
+        let triton_target_config = TritonTargetConfig::default();
+        run_ir_passes(&mut module, &triton_target_config.ir_passes);
         let triton_target_config = TritonTargetConfig::default();
         let inst_buf = compile_module(module, &triton_target_config).unwrap();
         let out_source = inst_buf.pretty_print();
@@ -95,8 +98,30 @@ mod tests {
                 call f1
                 halt
                 f1:
+                call init_mem_for_locals
                 push 1
                 return
+                return
+                init_mem_for_locals:
+                push 00000000002147483643
+                push -1
+                call globals_set
+                return
+                globals_get:
+                push 00000000002147483647
+                add
+                push 0
+                read_mem
+                swap1
+                pop
+                return
+                globals_set:
+                push 00000000002147483647
+                add
+                swap1
+                write_mem
+                pop
+                pop
                 return"#]],
         );
     }
@@ -122,14 +147,82 @@ mod tests {
                 call main
                 halt
                 add:
+                push -1
+                call globals_get
+                dup0
+                swap2
+                write_mem
+                pop
+                pop
+                push -1
                 add
+                dup0
+                swap2
+                write_mem
+                pop
+                pop
+                push -1
+                add
+                push -1
+                call globals_set
+                push -1
+                call globals_get
+                push 2
+                add
+                push 0
+                read_mem
+                swap1
+                pop
+                push -1
+                call globals_get
+                push 1
+                add
+                push 0
+                read_mem
+                swap1
+                pop
+                add
+                push -1
+                call globals_get
+                push 2
+                add
+                push -1
+                call globals_set
                 return
+                push -1
+                call globals_get
+                push 2
+                add
+                push -1
+                call globals_set
                 return
                 main:
+                call init_mem_for_locals
                 push 1
                 push 2
                 call add
                 return
+                return
+                init_mem_for_locals:
+                push 00000000002147483643
+                push -1
+                call globals_set
+                return
+                globals_get:
+                push 00000000002147483647
+                add
+                push 0
+                read_mem
+                swap1
+                pop
+                return
+                globals_set:
+                push 00000000002147483647
+                add
+                swap1
+                write_mem
+                pop
+                pop
                 return"#]],
         );
     }
