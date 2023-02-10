@@ -96,26 +96,6 @@ fn read_mem(sink: &mut InstBuffer, offset: &u32) {
     sink.push(AnInstruction::Pop);
 }
 
-// fn global_get(sink: &mut InstBuffer, global_idx: &GlobalIndex) {
-//     // TODO: extract this into a function and call it instead of "inlining"
-//     sink.append(vec![
-//         AnInstruction::Push(felt_i32(GLOBAL_MEMORY_BASE as i32)),
-//         AnInstruction::Push(felt_i32(-(u32::from(*global_idx) as i32))),
-//         AnInstruction::Add,
-//         AnInstruction::ReadMem,
-//     ])
-// }
-
-// fn global_set(sink: &mut InstBuffer, global_idx: &GlobalIndex) {
-//     // TODO: extract this into a function and call it instead of "inlining"
-//     sink.append(vec![
-//         AnInstruction::Push(felt_i32(GLOBAL_MEMORY_BASE as i32)),
-//         AnInstruction::Push(felt_i32(-(u32::from(*global_idx) as i32))),
-//         AnInstruction::Add,
-//         AnInstruction::WriteMem,
-//     ])
-// }
-
 pub(crate) fn func_index_to_label(func_index: FuncIndex, func_names: &[String]) -> String {
     func_names
         .get(usize::from(func_index))
