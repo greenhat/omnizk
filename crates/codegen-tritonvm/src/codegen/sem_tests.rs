@@ -4,6 +4,7 @@
 
 mod add;
 mod fib;
+mod func_call;
 
 use std::collections::HashMap;
 
@@ -19,6 +20,7 @@ fn check_wasm(
     input: Vec<u64>,
     secret_input: Vec<u64>,
     expected_output: Vec<u64>,
+    expected_stack: Vec<u64>,
     expected_wat: expect_test::Expect,
     expected_triton: expect_test::Expect,
 ) {
@@ -77,6 +79,29 @@ fn check_wasm(
         out.into_iter().map(|b| b.into()).collect::<Vec<u64>>(),
         expected_output
     );
+    let stack = pretty_stack(&_trace.last().unwrap().op_stack);
+    assert_eq!(stack, expected_stack);
+}
+
+fn check_wat(
+    source: &str,
+    input: Vec<u64>,
+    secret_input: Vec<u64>,
+    expected_output: Vec<u64>,
+    expected_stack: Vec<u64>,
+    expected_wat: expect_test::Expect,
+    expected_triton: expect_test::Expect,
+) {
+    let wasm = wat::parse_str(source).unwrap();
+    check_wasm(
+        &wasm,
+        input,
+        secret_input,
+        expected_output,
+        expected_stack,
+        expected_wat,
+        expected_triton,
+    );
 }
 
 fn pretty_print_ram_horiz(ram: &HashMap<BFieldElement, BFieldElement>) -> String {
@@ -94,6 +119,7 @@ fn pretty_stack(stack: &OpStack) -> Vec<u64> {
         .stack
         .iter()
         .map(|b| b.value())
+        .filter(|v| *v != 0)
         .rev()
         .collect::<Vec<u64>>()
 }
