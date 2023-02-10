@@ -28,9 +28,10 @@ impl FuncBuilder {
         }
     }
 
-    pub fn declare_local(&mut self, idx: u32, ty: Ty) {
-        dbg!(idx, ty);
-        self.locals.push(ty);
+    pub fn declare_local(&mut self, count: u32, ty: Ty) {
+        for _ in 0..count {
+            self.locals.push(ty);
+        }
     }
 
     pub fn build(self) -> Result<Func, FuncBuilderError> {
