@@ -4,6 +4,7 @@ use c2zk_frontend_shared::FuncBuilder;
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::BlockKind;
 use c2zk_ir::ir::Func;
+use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::Inst;
 use c2zk_ir::ir::Module;
 use c2zk_ir::pass::IrPass;
@@ -88,6 +89,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
         "{}_l{block_nested_level}_b{extracted_func_count}",
         func.name()
     ));
+    extracted_func_builder.set_signature(FuncType::new(vec![], vec![]));
     for inst in func.instructions() {
         // dbg!(&capture_opt);
         #[allow(clippy::wildcard_enum_match_arm)]
@@ -181,6 +183,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                                 "{}_l{block_nested_level}_b{extracted_func_count}",
                                 func.name()
                             ));
+                            extracted_func_builder.set_signature(FuncType::new(vec![], vec![]));
 
                             // extracted func prologue
                             processed_func.set_comment(
