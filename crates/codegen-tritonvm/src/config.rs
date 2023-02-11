@@ -2,7 +2,6 @@ use c2zk_ir::pass::IrPass;
 use c2zk_ir_transform::BlocksToFuncPass;
 use c2zk_ir_transform::GlobalsToMemPass;
 use c2zk_ir_transform::LocalsToMemPass;
-use c2zk_ir_transform::PseudoOpAndPass;
 use c2zk_ir_transform::PseudoOpSubPass;
 
 pub struct TritonTargetConfig {
@@ -17,7 +16,6 @@ impl Default for TritonTargetConfig {
                 Box::new(LocalsToMemPass::default()),
                 Box::new(GlobalsToMemPass::default()),
                 Box::new(BlocksToFuncPass::default()),
-                Box::new(PseudoOpAndPass::default()),
                 Box::new(PseudoOpSubPass::default()),
             ],
         }

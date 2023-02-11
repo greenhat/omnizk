@@ -30,6 +30,7 @@ pub fn emit_inst(
         Inst::I32Mul => sink.push(AnInstruction::Mul),
         Inst::I64Add => sink.push(AnInstruction::Add),
         Inst::I64Mul => sink.push(AnInstruction::Mul),
+        Inst::I64And => sink.push(AnInstruction::And),
         Inst::Call {
             func_idx: func_index,
         } => sink.push(AnInstruction::Call(func_index_to_label(
@@ -66,7 +67,6 @@ pub fn emit_inst(
         Inst::LocalTee { local_idx } => return Err(unexpected_inst(ins)),
         Inst::GlobalGet { global_idx } => return Err(unexpected_inst(ins)),
         Inst::GlobalSet { global_idx } => return Err(unexpected_inst(ins)),
-        Inst::I64And => return Err(unexpected_inst(ins)),
         Inst::I32Sub => return Err(unexpected_inst(ins)),
     }
     Ok(())

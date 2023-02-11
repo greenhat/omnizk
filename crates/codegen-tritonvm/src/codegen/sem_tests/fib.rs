@@ -148,876 +148,660 @@ fn test_fib() {
             call __main
             halt
             c2zk_stdlib_pub_input:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
-            add
-            read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
-            write_mem
             read_io
             return
             c2zk_stdlib_pub_output:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
-            add
-            read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
+            push -1
+            call globals_get
+            dup0
+            swap2
             write_mem
+            pop
+            pop
+            push -1
+            add
+            push -1
+            call globals_set
+            push -1
+            call globals_get
+            push 1
+            add
+            push 0
+            read_mem
+            swap1
+            pop
             write_io
+            push -1
+            call globals_get
+            push 1
+            add
+            push -1
+            call globals_set
             return
             __main:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
-            add
-            read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
-            write_mem
+            call init_mem_for_locals
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE
             return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
+            push -1
+            call globals_get
+            push -4
             add
-            read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
-            write_mem
+            push -1
+            call globals_set
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b0
-            push -1
+            push -1 // Begin: propagate Br* in block (0)
             add
             skiz
-            return
-            push 00000000002147483647
-            push 0
+            return // End: propagate Br* in block
+            push -1
+            call globals_get
+            push 4
             add
-            read_mem
             push 0
-            add
             read_mem
+            swap1
+            pop
             push 7
-            call i64_and
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 1
-            add
-            write_mem
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1
+            and
             push -1
-            add
-            skiz
-            return
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2
-            push -1
-            add
-            skiz
-            return
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 2
-            add
-            read_mem
-            call _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
-            return
-            _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
-            add
-            read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
-            write_mem
-            call c2zk_stdlib_pub_input
-            return
-            _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
-            add
-            read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
-            write_mem
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
-            add
-            read_mem
-            call c2zk_stdlib_pub_output
-            return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b0:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
-            add
-            read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
-            write_mem
-            call _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
-            add
-            write_mem
-            push 0
-            add
-            read_mem
-            push 0
-            eq
-            push 0
-            eq
-            push 0
-            call _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
-            return
-            push 1
-            return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
-            add
-            read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
-            write_mem
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b0
-            push -1
-            add
-            skiz
-            return
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
-            add
-            read_mem
-            push -8
-            call i64_and
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
+            call globals_get
+            swap1
             push 3
             add
             write_mem
-            push 1
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
-            add
-            write_mem
-            push 0
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 2
-            add
-            write_mem
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b1
-            push -1
+            pop
+            pop
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1
+            push -1 // Begin: propagate Br* in block (0)
             add
             skiz
-            return
-            recurse
-            push 1
-            return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b0:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
+            return // End: propagate Br* in block
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2
+            push -1 // Begin: propagate Br* in block (0)
             add
-            read_mem
+            skiz
+            return // End: propagate Br* in block
+            push -1
+            call globals_get
             push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
+            add
             push 0
+            read_mem
+            swap1
+            pop
+            call _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
+            push -1
+            call globals_get
+            push 4
+            add
+            push -1
+            call globals_set
+            return
+            _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E:
+            call c2zk_stdlib_pub_input
+            return
+            _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E:
+            push -1
+            call globals_get
+            dup0
+            swap2
+            write_mem
+            pop
+            pop
+            push -1
+            add
+            push -1
+            call globals_set
+            push -1
+            call globals_get
+            push 1
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            call c2zk_stdlib_pub_output
+            push -1
+            call globals_get
+            push 1
+            add
+            push -1
+            call globals_set
+            return
+            init_mem_for_locals:
+            push 00000000002147483643
+            push -1
+            call globals_set
+            return
+            globals_get:
+            push 00000000002147483647
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            return
+            globals_set:
+            push 00000000002147483647
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            return
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b0:
+            call _ZN11c2zk_stdlib9pub_input17h060bd075f37c6b24E
+            push -1
+            call globals_get
+            swap1
+            push 4
             add
             write_mem
-            push 00000000002147483647
-            push 0
+            pop
+            pop
+            push -1
+            call globals_get
+            push 4
             add
-            read_mem
             push 0
-            add
             read_mem
+            swap1
+            pop
+            push 0
+            eq
+            push 0
+            eq
+            push 0
+            call _ZN11c2zk_stdlib10pub_output17hc744a302b8a83f64E
+            push -1
+            call globals_get
+            push 4
+            add
+            push -1
+            call globals_set
+            return
+            push -1
+            call globals_get
+            push 4
+            add
+            push -1
+            call globals_set
+            push 1 // Begin: extracted func prologue (0)
+            return // End: extracted func prologue
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1:
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b0
+            push -1 // Begin: propagate Br* in block (1)
+            add
+            skiz
+            return // End: propagate Br* in block
+            push -1
+            call globals_get
+            push 4
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push -8
+            and
+            push -1
+            call globals_get
+            swap1
+            push 1
+            add
+            write_mem
+            pop
+            pop
+            push 1
+            push -1
+            call globals_get
+            swap1
+            push 4
+            add
+            write_mem
+            pop
+            pop
+            push 0
+            push -1
+            call globals_get
+            swap1
+            push 2
+            add
+            write_mem
+            pop
+            pop
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b1
+            push -1
+            add // Begin: propagate Br* in loop (1)
+            skiz
+            return
+            recurse // End: propagate Br* in loop
+            push -1
+            call globals_get
+            push 4
+            add
+            push -1
+            call globals_set
+            push 1 // Begin: extracted func prologue (0)
+            return // End: extracted func prologue
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b0:
+            push -1
+            call globals_get
+            push 4
+            add
+            push 0
+            read_mem
+            swap1
+            pop
             push -1
             add
             push 7
             nop
             push 1
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
+            push -1
+            call globals_get
+            swap1
+            push 4
             add
             write_mem
+            pop
+            pop
             push 0
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
+            push -1
+            call globals_get
+            swap1
             push 2
             add
             write_mem
-            push 1
-            return
+            pop
+            pop
+            push -1
+            call globals_get
+            push 4
+            add
+            push -1
+            call globals_set
+            push 1 // Begin: extracted func prologue (1)
+            return // End: extracted func prologue
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b1_l1_b1:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
+            push -1
+            call globals_get
+            push 4
             add
+            push 0
             read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
-            write_mem
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
-            add
-            read_mem
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
+            swap1
+            pop
+            push -1
+            call globals_get
             push 2
             add
-            read_mem
-            add
-            push 00000000002147483647
             push 0
-            add
             read_mem
+            swap1
+            pop
+            add
+            push -1
+            call globals_get
+            swap1
             push 2
             add
             write_mem
+            pop
+            pop
+            push -1
+            call globals_get
             push 2
             add
-            read_mem
-            push 00000000002147483647
             push 0
-            add
             read_mem
-            push 0
+            swap1
+            pop
+            push -1
+            call globals_get
+            push 4
             add
+            push 0
             read_mem
+            swap1
+            pop
             add
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
+            push -1
+            call globals_get
+            swap1
+            push 4
             add
             write_mem
-            push 0
+            pop
+            pop
+            push -1
+            call globals_get
+            push 4
             add
-            read_mem
-            push 00000000002147483647
             push 0
-            add
             read_mem
+            swap1
+            pop
+            push -1
+            call globals_get
             push 2
             add
-            read_mem
-            add
-            push 00000000002147483647
             push 0
-            add
             read_mem
-            push 2
+            swap1
+            pop
             add
-            write_mem
-            push 2
-            add
-            read_mem
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
-            add
-            read_mem
-            add
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
-            add
-            write_mem
-            push 0
-            add
-            read_mem
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 2
-            add
-            read_mem
-            add
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
+            push -1
+            call globals_get
+            swap1
             push 2
             add
             write_mem
+            pop
+            pop
+            push -1
+            call globals_get
             push 2
             add
-            read_mem
-            push 00000000002147483647
             push 0
-            add
             read_mem
-            push 0
+            swap1
+            pop
+            push -1
+            call globals_get
+            push 4
             add
+            push 0
             read_mem
+            swap1
+            pop
             add
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
+            push -1
+            call globals_get
+            swap1
+            push 4
             add
             write_mem
-            push 0
+            pop
+            pop
+            push -1
+            call globals_get
+            push 4
             add
-            read_mem
-            push 00000000002147483647
             push 0
-            add
             read_mem
+            swap1
+            pop
+            push -1
+            call globals_get
             push 2
             add
-            read_mem
-            add
-            push 00000000002147483647
             push 0
-            add
             read_mem
+            swap1
+            pop
+            add
+            push -1
+            call globals_get
+            swap1
             push 2
             add
             write_mem
+            pop
+            pop
+            push -1
+            call globals_get
             push 2
             add
-            read_mem
-            push 00000000002147483647
             push 0
-            add
             read_mem
-            push 0
+            swap1
+            pop
+            push -1
+            call globals_get
+            push 4
             add
+            push 0
             read_mem
+            swap1
+            pop
             add
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
+            push -1
+            call globals_get
+            swap1
+            push 4
             add
             write_mem
-            push 00000000002147483647
+            pop
+            pop
+            push -1
+            call globals_get
+            push 4
+            add
             push 0
-            add
             read_mem
-            push 3
+            swap1
+            pop
+            push -1
+            call globals_get
+            push 2
             add
+            push 0
             read_mem
+            swap1
+            pop
+            add
+            push -1
+            call globals_get
+            swap1
+            push 2
+            add
+            write_mem
+            pop
+            pop
+            push -1
+            call globals_get
+            push 2
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push -1
+            call globals_get
+            push 4
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            add
+            push -1
+            call globals_get
+            swap1
+            push 4
+            add
+            write_mem
+            pop
+            pop
+            push -1
+            call globals_get
+            push 1
+            add
+            push 0
+            read_mem
+            swap1
+            pop
             push -8
             add
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 3
+            push -1
+            call globals_get
+            swap1
+            push 1
             add
             write_mem
-            push 3
-            add
-            read_mem
-            push 0
-            eq
-            push 0
-            eq
+            pop
+            pop
+            push -1
+            call globals_get
             push 1
-            return
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push 0
+            eq
+            push 0
+            eq
+            push -1
+            call globals_get
+            push 4
+            add
+            push -1
+            call globals_set
+            push 1 // Begin: extracted func prologue (1)
+            return // End: extracted func prologue
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
-            add
-            read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
-            write_mem
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 1
-            add
-            read_mem
-            push 0
-            eq
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 2
-            add
-            read_mem
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
+            push -1
+            call globals_get
             push 3
             add
+            push 0
+            read_mem
+            swap1
+            pop
+            push 0
+            eq
+            push -1
+            call globals_get
+            push 2
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push -1
+            call globals_get
+            swap1
+            push 1
+            add
             write_mem
+            pop
+            pop
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2_l1_b0
             push -1
-            add
+            add // Begin: propagate Br* in loop (1)
             skiz
             return
-            recurse
-            push 1
-            return
+            recurse // End: propagate Br* in loop
+            push -1
+            call globals_get
+            push 4
+            add
+            push -1
+            call globals_set
+            push 1 // Begin: extracted func prologue (0)
+            return // End: extracted func prologue
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h65c3299d95c55f5bE_l0_b2_l1_b0:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
-            add
-            read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
-            write_mem
             push 1
             swap1
             skiz
             return
             pop
-            push 00000000002147483647
-            push 0
+            push -1
+            call globals_get
+            push 4
             add
-            read_mem
             push 0
-            add
             read_mem
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
+            swap1
+            pop
+            push -1
+            call globals_get
+            swap1
             push 2
             add
             write_mem
+            pop
+            pop
+            push -1
+            call globals_get
             push 2
             add
-            read_mem
-            push 00000000002147483647
             push 0
-            add
             read_mem
-            push 3
-            add
-            read_mem
-            add
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 0
-            add
-            write_mem
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 2
-            add
-            read_mem
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 3
-            add
-            write_mem
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
+            swap1
+            pop
+            push -1
+            call globals_get
             push 1
             add
+            push 0
             read_mem
+            swap1
+            pop
+            add
+            push -1
+            call globals_get
+            swap1
+            push 4
+            add
+            write_mem
+            pop
+            pop
+            push -1
+            call globals_get
+            push 2
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push -1
+            call globals_get
+            swap1
+            push 1
+            add
+            write_mem
+            pop
+            pop
+            push -1
+            call globals_get
+            push 3
+            add
+            push 0
+            read_mem
+            swap1
+            pop
             push -1
             add
-            push 00000000002147483647
-            push 0
-            add
-            read_mem
-            push 1
+            push -1
+            call globals_get
+            swap1
+            push 3
             add
             write_mem
-            push 1
+            pop
+            pop
+            push -1
+            call globals_get
+            push 3
             add
+            push 0
             read_mem
+            swap1
+            pop
             push 0
             nop
-            push 1
-            return
-            i64_and:
-            push 00000000002147483647 // BEGIN prologue for locals access via memory
-            push 0
-            add
-            read_mem
-            push 2
-            call i32_sub
-            push 00000000002147483647 // END prologue for locals access via memory
-            push 0
-            add
-            write_mem
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            lsb
-            swap2
-            push 0
-            eq
-            assert
-            push 0
-            eq
-            assert
-            push 0
-            swap2
-            mul
-            push 00000000002147483648
-            mul
-            add
-            swap2
-            mul
-            push 00000000001073741824
-            mul
-            add
-            swap2
-            mul
-            push 00000000000536870912
-            mul
-            add
-            swap2
-            mul
-            push 00000000000268435456
-            mul
-            add
-            swap2
-            mul
-            push 00000000000134217728
-            mul
-            add
-            swap2
-            mul
-            push 00000000000067108864
-            mul
-            add
-            swap2
-            mul
-            push 00000000000033554432
-            mul
-            add
-            swap2
-            mul
-            push 00000000000016777216
-            mul
-            add
-            swap2
-            mul
-            push 00000000000008388608
-            mul
-            add
-            swap2
-            mul
-            push 00000000000004194304
-            mul
-            add
-            swap2
-            mul
-            push 00000000000002097152
-            mul
-            add
-            swap2
-            mul
-            push 00000000000001048576
-            mul
-            add
-            swap2
-            mul
-            push 00000000000000524288
-            mul
-            add
-            swap2
-            mul
-            push 00000000000000262144
-            mul
-            add
-            swap2
-            mul
-            push 00000000000000131072
-            mul
-            add
-            swap2
-            mul
-            push 00000000000000065536
-            mul
-            add
-            swap2
-            mul
-            push 00000000000000032768
-            mul
-            add
-            swap2
-            mul
-            push 00000000000000016384
-            mul
-            add
-            swap2
-            mul
-            push 00000000000000008192
-            mul
-            add
-            swap2
-            mul
-            push 00000000000000004096
-            mul
-            add
-            swap2
-            mul
-            push 00000000000000002048
-            mul
-            add
-            swap2
-            mul
-            push 00000000000000001024
-            mul
-            add
-            swap2
-            mul
-            push 00000000000000000512
-            mul
-            add
-            swap2
-            mul
-            push 256
-            mul
-            add
-            swap2
-            mul
-            push 128
-            mul
-            add
-            swap2
-            mul
-            push 64
-            mul
-            add
-            swap2
-            mul
-            push 32
-            mul
-            add
-            swap2
-            mul
-            push 16
-            mul
-            add
-            swap2
-            mul
-            push 8
-            mul
-            add
-            swap2
-            mul
-            push 4
-            mul
-            add
-            swap2
-            mul
-            push 2
-            mul
-            add
-            swap2
-            mul
-            push 1
-            mul
-            add
-            i32_sub:
-            swap2
             push -1
-            mul
-            add"#]],
+            call globals_get
+            push 4
+            add
+            push -1
+            call globals_set
+            push 1 // Begin: extracted func prologue (1)
+            return // End: extracted func prologue"#]],
     )
 }
