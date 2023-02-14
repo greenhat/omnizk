@@ -43,7 +43,26 @@ pub fn emit_inst(
         Inst::I64Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
         Inst::I32Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
         Inst::I64Const { value } => sink.push(AnInstruction::Push(felt_i64(*value))),
-        Inst::I64GeU => sink.push(AnInstruction::Nop), // TODO: implement
+        // TODO: extract to IR pass
+        Inst::I64GeU => sink.append(vec![
+            // Duplicate the pair
+            AnInstruction::Dup(Ord16::ST1),
+            AnInstruction::Dup(Ord16::ST1),
+            AnInstruction::Lt,
+            // invert Lt to Gt
+            AnInstruction::Push(0u32.into()),
+            AnInstruction::Eq,
+            // ----------------
+            // swap Gt with second element
+            AnInstruction::Swap(Ord16::ST1),
+            AnInstruction::Eq,
+            // Gt + Eq
+            AnInstruction::Add,
+            // Gt + Eq == 1
+            AnInstruction::Push(1u32.into()),
+            AnInstruction::Eq,
+        ]),
+        // TODO: extract to IR pass
         Inst::I64Ne => sink.append(vec![
             AnInstruction::Eq,
             AnInstruction::Push(0u32.into()),

@@ -397,7 +397,16 @@ fn test_fib() {
             push -1
             add
             push 7
-            nop
+            dup1
+            dup1
+            lt
+            push 0
+            eq
+            swap1
+            eq
+            add
+            push 1
+            eq
             push 1
             push -1
             call globals_get
