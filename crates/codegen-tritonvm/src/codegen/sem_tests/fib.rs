@@ -794,7 +794,9 @@ fn test_fib() {
             swap1
             pop
             push 0
-            nop
+            eq
+            push 0
+            eq
             push -1
             call globals_get
             push 4

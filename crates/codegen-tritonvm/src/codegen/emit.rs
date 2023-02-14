@@ -44,7 +44,11 @@ pub fn emit_inst(
         Inst::I32Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
         Inst::I64Const { value } => sink.push(AnInstruction::Push(felt_i64(*value))),
         Inst::I64GeU => sink.push(AnInstruction::Nop), // TODO: implement
-        Inst::I64Ne => sink.push(AnInstruction::Nop),  // TODO: implement
+        Inst::I64Ne => sink.append(vec![
+            AnInstruction::Eq,
+            AnInstruction::Push(0u32.into()),
+            AnInstruction::Eq,
+        ]),
         // Extra (besides the wasm instructions)
         // -------------------------------------
         Inst::Swap { idx } => sink.push(AnInstruction::Swap(ord16_u8(*idx)?)),
