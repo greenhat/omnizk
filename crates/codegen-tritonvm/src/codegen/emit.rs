@@ -20,7 +20,7 @@ pub fn emit_inst(
 ) -> Result<(), TritonError> {
     match ins {
         Inst::Unreachable => (),
-        Inst::Nop => (),
+        Inst::Nop => sink.push(AnInstruction::Nop),
         Inst::End => sink.push(AnInstruction::Return),
         Inst::Return => sink.push(AnInstruction::Return),
         Inst::I32Const { value } => sink.push(AnInstruction::Push(felt_i32(*value))),
