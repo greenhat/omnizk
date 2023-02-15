@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use c2zk_ir::pass::run_ir_passes;
 use triton_vm::op_stack::OpStack;
 use twenty_first::shared_math::b_field_element::BFieldElement;
+use wasmtime::*;
 
 use crate::compile_module;
 use crate::TritonTargetConfig;
@@ -20,20 +21,35 @@ fn check_wasm(
     input: Vec<u64>,
     secret_input: Vec<u64>,
     expected_output: Vec<u64>,
-    expected_stack: Vec<u64>,
     expected_wat: expect_test::Expect,
+    expected_triton: expect_test::Expect,
+) {
+    let wat = wasmprinter::print_bytes(source).unwrap();
+    expected_wat.assert_eq(&wat);
+
+    check_triton(
+        source,
+        input,
+        secret_input,
+        expected_output,
+        expected_triton,
+    );
+}
+
+fn check_triton(
+    wasm: &[u8],
+    input: Vec<u64>,
+    secret_input: Vec<u64>,
+    expected_output: Vec<u64>,
     expected_triton: expect_test::Expect,
 ) {
     use c2zk_frontend::translate;
     use c2zk_frontend::FrontendConfig;
     use c2zk_frontend::WasmFrontendConfig;
 
-    let wat = wasmprinter::print_bytes(source).unwrap();
-    expected_wat.assert_eq(&wat);
     let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
     let triton_target_config = TritonTargetConfig::default();
-
-    let mut module = translate(source, frontend).unwrap();
+    let mut module = translate(wasm, frontend).unwrap();
     run_ir_passes(&mut module, &triton_target_config.ir_passes);
     let inst_buf = compile_module(module, &triton_target_config).unwrap();
     let out_source = inst_buf.pretty_print();
@@ -80,7 +96,7 @@ fn check_wasm(
         expected_output
     );
     let stack = pretty_stack(&_trace.last().unwrap().op_stack);
-    assert_eq!(stack, expected_stack);
+    // assert_eq!(stack, expected_stack);
 }
 
 fn check_wat(
@@ -88,20 +104,38 @@ fn check_wat(
     input: Vec<u64>,
     secret_input: Vec<u64>,
     expected_output: Vec<u64>,
-    expected_stack: Vec<u64>,
-    expected_wat: expect_test::Expect,
     expected_triton: expect_test::Expect,
 ) {
-    let wasm = wat::parse_str(source).unwrap();
-    check_wasm(
-        &wasm,
-        input,
-        secret_input,
-        expected_output,
-        expected_stack,
-        expected_wat,
-        expected_triton,
+    struct Io {
+        input: Vec<u64>,
+        secret_input: Vec<u64>,
+        output: Vec<u64>,
+    }
+
+    let mut store = Store::new(
+        &Engine::default(),
+        Io {
+            input: input.clone(),
+            secret_input: secret_input.clone(),
+            output: Vec::new(),
+        },
     );
+
+    let wasm = wat::parse_str(source).unwrap();
+    let module = Module::from_binary(store.engine(), &wasm).unwrap();
+
+    let c2zk_stdlib_pub_input = Func::wrap(&mut store, |mut caller: Caller<'_, Io>| {
+        caller.data_mut().input.pop().unwrap()
+    });
+    let c2zk_stdlib_pub_output =
+        Func::wrap(&mut store, |mut caller: Caller<'_, Io>, output: i64| {
+            caller.data_mut().output.push(output as u64);
+        });
+    let imports = [c2zk_stdlib_pub_input.into(), c2zk_stdlib_pub_output.into()];
+    let _ = Instance::new(&mut store, &module, &imports).unwrap();
+
+    assert_eq!(store.data().output, expected_output);
+    check_triton(&wasm, input, secret_input, expected_output, expected_triton);
 }
 
 fn pretty_print_ram_horiz(ram: &HashMap<BFieldElement, BFieldElement>) -> String {

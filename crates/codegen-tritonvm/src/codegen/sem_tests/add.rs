@@ -7,7 +7,6 @@ fn test_add() {
     let input = vec![11, 7];
     let secret_input = vec![3];
     let expected_output = vec![21];
-    let expected_stack = vec![];
     let native_output = c2zk_rust_wasm_tests_helper::wrap_main_with_io(
         &c2zk_rust_wasm_tests_bundle1::add::main,
     )(input.clone(), secret_input.clone());
@@ -18,7 +17,6 @@ fn test_add() {
         input,
         secret_input,
         expected_output,
-        expected_stack,
         expect![[r#"
             (module
               (type (;0;) (func (result i64)))

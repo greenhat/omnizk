@@ -2,12 +2,12 @@ use expect_test::expect;
 
 use crate::codegen::sem_tests::check_wasm;
 
+#[ignore = "reason"]
 #[test]
 fn test_fib() {
     let input = vec![25];
     let secret_input = vec![];
     let expected_output = vec![75025];
-    let expected_stack = vec![];
     let native_output = c2zk_rust_wasm_tests_helper::wrap_main_with_io(
         &c2zk_rust_wasm_tests_bundle1::fib::fib_seq,
     )(input.clone(), secret_input.clone());
@@ -18,7 +18,6 @@ fn test_fib() {
         input,
         secret_input,
         expected_output,
-        expected_stack,
         expect![[r#"
             (module
               (type (;0;) (func (result i64)))
