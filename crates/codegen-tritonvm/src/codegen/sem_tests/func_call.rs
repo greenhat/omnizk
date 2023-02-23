@@ -15,6 +15,7 @@ fn test_func_call() {
     (type (;2;) (func))
     (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
     (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
+    (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
     (export "main" (func $main))
     (start $main)
     (func $add (param i64 i64) (result i64)
@@ -22,7 +23,7 @@ fn test_func_call() {
         get_local 1
         i64.add
         return)
-    (func $main (type 2)
+    (func $main 
         i64.const 1
         i64.const 2
         call $add
@@ -65,6 +66,9 @@ fn test_func_call() {
             add
             push -1
             call globals_set
+            return
+            c2zk_stdlib_secret_input:
+            divine
             return
             add:
             push -1

@@ -95,7 +95,7 @@ fn check_triton(
         out.into_iter().map(|b| b.into()).collect::<Vec<u64>>(),
         expected_output
     );
-    let stack = pretty_stack(&_trace.last().unwrap().op_stack);
+    // let stack = pretty_stack(&_trace.last().unwrap().op_stack);
     // assert_eq!(stack, expected_stack);
 }
 
@@ -131,7 +131,14 @@ fn check_wat(
         Func::wrap(&mut store, |mut caller: Caller<'_, Io>, output: i64| {
             caller.data_mut().output.push(output as u64);
         });
-    let imports = [c2zk_stdlib_pub_input.into(), c2zk_stdlib_pub_output.into()];
+    let c2zk_stdlib_secret_input = Func::wrap(&mut store, |mut caller: Caller<'_, Io>| {
+        caller.data_mut().secret_input.pop().unwrap()
+    });
+    let imports = [
+        c2zk_stdlib_pub_input.into(),
+        c2zk_stdlib_pub_output.into(),
+        c2zk_stdlib_secret_input.into(),
+    ];
     let _ = Instance::new(&mut store, &module, &imports).unwrap();
 
     assert_eq!(store.data().output, expected_output);
