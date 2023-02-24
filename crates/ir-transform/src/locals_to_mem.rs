@@ -69,17 +69,18 @@ impl IrPass for LocalsToMemPass {
 
             let param_count = func.sig().params.len() as u32;
             let local_count = func.locals().len() as u32;
+            // TODO: get type of the local and use the appropriate load instruction.
+            let total_local_count = param_count + local_count;
+            dbg!(&total_local_count);
+            let reverse_index_base = if total_local_count > 0 {
+                // although it looks like here should be total_local_count - 1
+                // but the last pointer stored in global base_local_offset is NEXT address
+                // after the last stored local, so it's total_local_count - 1 + 1
+                total_local_count
+            } else {
+                0
+            };
             for inst in func.instructions_mut().iter_mut() {
-                // TODO: get type of the local and use the appropriate load instruction.
-                let total_local_count = param_count + local_count;
-                let reverse_index_base = if total_local_count > 0 {
-                    // although it looks like here should be total_local_count - 1
-                    // but the last pointer stored in global base_local_offset is NEXT address
-                    // after the last stored local, so it's total_local_count - 1 + 1
-                    total_local_count
-                } else {
-                    0
-                };
                 match inst {
                     Inst::LocalGet { local_idx } => {
                         new_func.push(Inst::GlobalGet {

@@ -2,7 +2,7 @@ use expect_test::expect;
 
 use crate::codegen::sem_tests::check_wasm;
 
-#[ignore = "reason"]
+// #[ignore = "reason"]
 #[test]
 fn test_fib() {
     let input = vec![25];
@@ -206,8 +206,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 3
             add
+            swap1
             write_mem
             pop
             pop
@@ -294,8 +296,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 4
             add
+            swap1
             write_mem
             pop
             pop
@@ -347,8 +351,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 1
             add
+            swap1
             write_mem
             pop
             pop
@@ -356,8 +362,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 4
             add
+            swap1
             write_mem
             pop
             pop
@@ -365,8 +373,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 2
             add
+            swap1
             write_mem
             pop
             pop
@@ -410,8 +420,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 4
             add
+            swap1
             write_mem
             pop
             pop
@@ -419,8 +431,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 2
             add
+            swap1
             write_mem
             pop
             pop
@@ -453,8 +467,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 2
             add
+            swap1
             write_mem
             pop
             pop
@@ -478,8 +494,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 4
             add
+            swap1
             write_mem
             pop
             pop
@@ -503,8 +521,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 2
             add
+            swap1
             write_mem
             pop
             pop
@@ -528,8 +548,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 4
             add
+            swap1
             write_mem
             pop
             pop
@@ -553,8 +575,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 2
             add
+            swap1
             write_mem
             pop
             pop
@@ -578,8 +602,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 4
             add
+            swap1
             write_mem
             pop
             pop
@@ -603,8 +629,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 2
             add
+            swap1
             write_mem
             pop
             pop
@@ -628,8 +656,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 4
             add
+            swap1
             write_mem
             pop
             pop
@@ -646,8 +676,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 1
             add
+            swap1
             write_mem
             pop
             pop
@@ -693,8 +725,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 1
             add
+            swap1
             write_mem
             pop
             pop
@@ -729,8 +763,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 2
             add
+            swap1
             write_mem
             pop
             pop
@@ -753,9 +789,11 @@ fn test_fib() {
             add
             push -1
             call globals_get
+            swap1
             swap1
             push 4
             add
+            swap1
             write_mem
             pop
             pop
@@ -770,8 +808,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 1
             add
+            swap1
             write_mem
             pop
             pop
@@ -788,8 +828,10 @@ fn test_fib() {
             push -1
             call globals_get
             swap1
+            swap1
             push 3
             add
+            swap1
             write_mem
             pop
             pop

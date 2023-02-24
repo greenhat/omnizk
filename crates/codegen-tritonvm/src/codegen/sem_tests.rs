@@ -5,6 +5,7 @@
 mod add;
 mod fib;
 mod func_call;
+mod locals;
 
 use std::collections::HashMap;
 

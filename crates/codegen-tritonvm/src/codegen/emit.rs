@@ -97,8 +97,12 @@ pub fn emit_inst(
 
 fn write_mem(sink: &mut InstBuffer, offset: &u32) {
     if offset != &0 {
+        // swap the value and the pointer to add the offset
+        sink.push(AnInstruction::Swap(Ord16::ST1));
         sink.push(AnInstruction::Push(felt_i32(*offset as i32)));
         sink.push(AnInstruction::Add);
+        // swap the value and the pointer so the value is on top of the stack
+        sink.push(AnInstruction::Swap(Ord16::ST1));
     }
     sink.push(AnInstruction::WriteMem);
     // remove the top two elements from the stack (the value and the pointer)
