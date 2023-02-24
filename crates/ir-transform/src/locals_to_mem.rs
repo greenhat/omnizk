@@ -100,18 +100,13 @@ impl IrPass for LocalsToMemPass {
                         });
                     }
                     Inst::LocalTee { local_idx } => {
+                        // we need to leave the original value on the stack
+                        new_func.push(Inst::Dup { idx: 0 });
                         new_func.push(Inst::GlobalGet {
                             global_idx: global_idx_for_base_local_offset.into(),
                         });
                         new_func.push(Inst::Swap { idx: 1 });
                         new_func.push(Inst::I32Store {
-                            offset: reverse_index_base - *local_idx,
-                        });
-                        // we need to leave the original value on the stack
-                        new_func.push(Inst::GlobalGet {
-                            global_idx: global_idx_for_base_local_offset.into(),
-                        });
-                        new_func.push(Inst::I32Load {
                             offset: reverse_index_base - *local_idx,
                         });
                     }
