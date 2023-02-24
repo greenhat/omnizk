@@ -61,7 +61,7 @@ fn check_triton(
     let (_trace, out, err) = triton_vm::vm::run(&program, input, secret_input);
 
     // iterate over last n traces
-    for state in _trace.iter().rev().take(400) {
+    for state in _trace.iter().rev().take(400).rev() {
         let s = format!(
             "{}: {}",
             &state.current_instruction().unwrap(),
