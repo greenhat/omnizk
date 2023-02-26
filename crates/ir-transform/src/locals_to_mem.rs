@@ -111,13 +111,14 @@ impl IrPass for LocalsToMemPass {
                         });
                     }
                     Inst::Return | Inst::End => {
-                        if local_count > 0 || param_count > 0 {
-                            // increase (rollback) the pointer stored in global base_local_offset by the number of locals upon return
+                        if total_local_count > 0 {
+                            // increase (rollback) the pointer stored in global base_local_offset
+                            // by the number of locals upon return
                             new_func.push(Inst::GlobalGet {
                                 global_idx: global_idx_for_base_local_offset.into(),
                             });
                             new_func.push(Inst::I32Const {
-                                value: (local_count + param_count) as i32,
+                                value: total_local_count as i32,
                             });
                             new_func.push(Inst::I32Add);
                             new_func.push(Inst::GlobalSet {
