@@ -41,33 +41,28 @@ impl IrPass for BlocksToFuncPass {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-struct Capture {
-    nested_level: u32,
-    block_kind: BlockKind,
+#[derive(Debug, Clone)]
+struct CaptureState {
+    levels: Vec<BlockKind>,
 }
 
-impl Capture {
-    fn start_block() -> Self {
-        Self {
-            nested_level: 0,
-            block_kind: BlockKind::Block,
-        }
+impl Default for CaptureState {
+    fn default() -> Self {
+        Self { levels: Vec::new() }
+    }
+}
+
+impl CaptureState {
+    fn inc_nested_level(&mut self, block_kind: BlockKind) {
+        self.levels.push(block_kind);
     }
 
-    fn start_loop() -> Self {
-        Self {
-            nested_level: 0,
-            block_kind: BlockKind::Loop,
-        }
+    fn dec_nested_level(&mut self) -> Option<BlockKind> {
+        self.levels.pop()
     }
 
-    fn inc_nested_level(&mut self) {
-        self.nested_level += 1;
-    }
-
-    fn dec_nested_level(&mut self) {
-        self.nested_level -= 1;
+    fn nested_level(&self) -> usize {
+        self.levels.len()
     }
 }
 
@@ -82,7 +77,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
         Vec::new(),
         HashMap::new(),
     );
-    let mut capture_opt: Option<Capture> = None;
+    let mut capture_state = CaptureState::default();
     let mut extracted_func_count = 0;
     // TODO: extract into a closure (use in "reset" below)
     let mut extracted_func_builder = FuncBuilder::new(format!(
@@ -100,33 +95,26 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
             | Inst::LocalTee { local_idx: _ } => {
                 panic!("locals should be converted prior to this pass");
             }
-            Inst::Block { blockty: _ } => match capture_opt {
-                None => {
-                    capture_opt = Some(Capture::start_block());
-                }
-                Some(mut capture) => {
-                    capture.inc_nested_level();
-                    capture_opt = Some(capture);
+            Inst::Block { blockty: _ } => {
+                if capture_state.nested_level() > 0 {
                     // nested block, keep extracting
                     extracted_func_builder.push(inst.clone());
                 }
-            },
-            Inst::Loop { block_type: _ } => match capture_opt {
-                None => {
-                    capture_opt = Some(Capture::start_loop());
-                }
-                Some(mut capture) => {
-                    capture.inc_nested_level();
-                    // TODO: rewrite to avoid this
-                    capture_opt = Some(capture);
+                capture_state.inc_nested_level(BlockKind::Block);
+            }
+            Inst::Loop { block_type: _ } => {
+                if capture_state.nested_level() > 0 {
                     // nested block, keep extracting
                     extracted_func_builder.push(inst.clone());
                 }
-            },
+                capture_state.inc_nested_level(BlockKind::Block);
+            }
             Inst::End => {
-                match capture_opt {
-                    Some(mut capture) => {
-                        if capture.nested_level == 0 {
+                match capture_state.levels.pop() {
+                    Some(block_kind) => {
+                        if capture_state.nested_level() == 0 {
+                            // end of the root block, stop extracting
+
                             // dbg!(&extracted_func);
                             // the signature should be set in Block/Loop above
                             #[allow(clippy::unwrap_used)]
@@ -138,7 +126,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                             });
 
                             // handle Br* op
-                            match capture.block_kind {
+                            match block_kind {
                                 BlockKind::Block => {
                                     new_func.push_with_comment(
                                         Inst::I32Const { value: -1 },
@@ -199,10 +187,9 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                             processed_func.push(Inst::Return);
 
                             module.set_function(extracted_func_idx, processed_func);
-                            capture_opt = None;
+                            capture_state.dec_nested_level();
                         } else {
-                            capture.dec_nested_level();
-                            capture_opt = Some(capture);
+                            capture_state.dec_nested_level();
                             // nested block, keep extracting
                             extracted_func_builder.push(inst.clone());
                         }
@@ -210,10 +197,10 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                     None => {
                         new_func.push(inst.clone());
                     }
-                }
+                };
             }
             Inst::Br { relative_depth } => {
-                if capture_opt.is_none() {
+                if capture_state.nested_level() == 0 {
                     extracted_func_builder.push_with_comment(
                         Inst::I32Const {
                             value: (relative_depth + 1) as i32,
@@ -229,7 +216,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                 }
             }
             Inst::BrIf { relative_depth } => {
-                if capture_opt.is_none() {
+                if capture_state.nested_level() == 0 {
                     extracted_func_builder.push_with_comment(
                         Inst::I32Const {
                             value: (relative_depth + 1) as i32,
@@ -249,7 +236,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                 }
             }
             _ => {
-                if capture_opt.is_some() {
+                if capture_state.nested_level() > 0 {
                     extracted_func_builder.push(inst.clone());
                 } else {
                     new_func.push(inst.clone())
