@@ -70,10 +70,6 @@ fn test_one_block() {
             main:
             call init_mem_for_locals
             call main_l0_b0
-            push -1 // Begin: propagate Br* in block (0)
-            add
-            skiz
-            return // End: propagate Br* in block
             return
             return
             init_mem_for_locals:
@@ -102,7 +98,6 @@ fn test_one_block() {
             push 2
             add
             call c2zk_stdlib_pub_output
-            push 1 // Begin: extracted func prologue (0)
-            return // End: extracted func prologue"#]],
+            return"#]],
     );
 }

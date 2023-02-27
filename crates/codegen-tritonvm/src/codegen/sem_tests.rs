@@ -68,9 +68,9 @@ fn check_triton(
             &state.current_instruction().unwrap(),
             pretty_print_vec_horiz(&pretty_stack(&state.op_stack))
         );
-        dbg!(s);
+        // dbg!(s);
         let r = pretty_print_ram_horiz(&state.ram);
-        dbg!(r);
+        // dbg!(r);
     }
 
     // dbg!(&_trace.last().unwrap().op_stack);

@@ -3,10 +3,10 @@ use expect_test::expect;
 use crate::codegen::sem_tests::check_wat;
 
 #[test]
-fn test_nested_block() {
+fn test_one_block_br() {
     let input = vec![];
     let secret_input = vec![];
-    let expected_output = vec![3, 8];
+    let expected_output = vec![3];
     check_wat(
         r#"
 (module 
@@ -20,16 +20,15 @@ fn test_nested_block() {
     (start $main)
     (func $main 
         block 
-            i64.const 1
-            i64.const 2
-            i64.add
-            call $c2zk_stdlib_pub_output
-            block 
-                i64.const 3
-                i64.const 5
-                i64.add
-                call $c2zk_stdlib_pub_output
-            end
+          i64.const 1
+          i64.const 2
+          i64.add
+          call $c2zk_stdlib_pub_output
+          br 0
+          i64.const 4
+          i64.const 5
+          i64.add
+          call $c2zk_stdlib_pub_output
         end
         return)
 )"#,
@@ -104,18 +103,12 @@ fn test_nested_block() {
             push 2
             add
             call c2zk_stdlib_pub_output
-            call main_l0_b0_l1_b0
-            push -1 // Begin: propagate Br* in block (1)
-            add
-            skiz
-            return // End: propagate Br* in block
+            push 1
             return
-            main_l0_b0_l1_b0:
-            push 3
+            push 4
             push 5
             add
             call c2zk_stdlib_pub_output
-            push 1 // Begin: extracted func prologue (1)
-            return // End: extracted func prologue"#]],
+            return"#]],
     );
 }

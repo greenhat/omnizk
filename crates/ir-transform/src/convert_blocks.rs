@@ -110,7 +110,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                 capture_state.inc_nested_level(BlockKind::Block);
             }
             Inst::End => {
-                dbg!(&capture_state);
+                // dbg!(&capture_state);
                 match capture_state.levels.pop() {
                     Some(block_kind) => {
                         if capture_state.nested_level() == 0 {
@@ -129,39 +129,58 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                             // handle Br* op
                             match block_kind {
                                 BlockKind::Block => {
-                                    new_func.push_with_comment(
-                                        Inst::I32Const { value: -1 },
-                                        format!(
+                                    if block_nested_level > 0 {
+                                        new_func.push_with_comment(
+                                            Inst::I32Const { value: -1 },
+                                            format!(
                                             "Begin: propagate Br* in block ({block_nested_level})"
                                         ),
-                                    );
-                                    new_func.push(Inst::I32Add);
-                                    // if not zero then return to the parent func(block), keep bailing out
-                                    // zero is expected when we exited the targeted by Br op block
-                                    // TODO: does it mean we have to put on stack increased relative_depth for Block
-                                    // and untouched for Loop?
-                                    new_func.push(TritonExt::Skiz.into());
-                                    new_func.push_with_comment(
-                                        Inst::Return,
-                                        "End: propagate Br* in block".to_string(),
-                                    );
+                                        );
+                                        new_func.push(Inst::I32Add);
+                                        // if not zero then return to the parent func(block), keep bailing out
+                                        // zero is expected when we exited the targeted by Br op block
+                                        // TODO: does it mean we have to put on stack increased relative_depth for Block
+                                        // and untouched for Loop?
+                                        new_func.push(TritonExt::Skiz.into());
+                                        new_func.push_with_comment(
+                                            Inst::Return,
+                                            "End: propagate Br* in block".to_string(),
+                                        );
+                                    }
                                 }
                                 BlockKind::Loop => {
-                                    new_func.push(Inst::I32Const { value: -1 });
-                                    new_func.push_with_comment(
-                                        Inst::I32Add,
-                                        format!(
+                                    if block_nested_level > 0 {
+                                        new_func.push(Inst::I32Const { value: -1 });
+                                        new_func.push(Inst::I32Const { value: -1 });
+                                        new_func.push_with_comment(
+                                            Inst::I32Add,
+                                            format!(
                                             "Begin: propagate Br* in loop ({block_nested_level})"
                                         ),
-                                    );
-                                    // if not zero then return to the parent func(block), keep bailing out
-                                    // zero is expected when we exited into the targeted by Br op loop
-                                    new_func.push(TritonExt::Skiz.into());
-                                    new_func.push(Inst::Return);
-                                    new_func.push_with_comment(
-                                        TritonExt::Recurse.into(),
-                                        "End: propagate Br* in loop".to_string(),
-                                    );
+                                        );
+                                        // if not zero then return to the parent func(block), keep bailing out
+                                        // zero is expected when we exited into the targeted by Br op loop
+                                        new_func.push(TritonExt::Skiz.into());
+                                        new_func.push(Inst::Return);
+                                        new_func.push_with_comment(
+                                            TritonExt::Recurse.into(),
+                                            "End: propagate Br* in loop".to_string(),
+                                        );
+                                        new_func.push_with_comment(
+                                            Inst::I32Add,
+                                            format!(
+                                            "Begin: propagate Br* in loop ({block_nested_level})"
+                                        ),
+                                        );
+                                        // if not zero then return to the parent func(block), keep bailing out
+                                        // zero is expected when we exited into the targeted by Br op loop
+                                        new_func.push(TritonExt::Skiz.into());
+                                        new_func.push(Inst::Return);
+                                        new_func.push_with_comment(
+                                            TritonExt::Recurse.into(),
+                                            "End: propagate Br* in loop".to_string(),
+                                        );
+                                    }
                                 }
                             }
                             // recursevely extract nested blocks into functions
@@ -174,18 +193,25 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                             ));
                             extracted_func_builder.set_signature(FuncType::new(vec![], vec![]));
 
-                            // extracted func prologue
-                            processed_func.set_comment(
-                                processed_func.instructions().len(),
-                                format!("Begin: extracted func prologue ({block_nested_level})"),
-                            );
-                            // exiting the function not with a Br* op and stop exit propagation
-                            processed_func.push(Inst::I32Const { value: 1 });
-                            processed_func.set_comment(
-                                processed_func.instructions().len(),
-                                "End: extracted func prologue".to_string(),
-                            );
-                            processed_func.push(Inst::Return);
+                            if block_nested_level > 0 {
+                                // we are in the nested block so put 1 on the stack to counteract Br propagation
+                                processed_func.set_comment(
+                                    processed_func.instructions().len(),
+                                    format!(
+                                        "Begin: extracted func prologue ({block_nested_level})"
+                                    ),
+                                );
+                                // exiting the function not with a Br* op and stop exit propagation
+                                processed_func.push(Inst::I32Const { value: 1 });
+                                processed_func.set_comment(
+                                    processed_func.instructions().len(),
+                                    "End: extracted func prologue".to_string(),
+                                );
+                                processed_func.push(Inst::Return);
+                            } else {
+                                // we are in the top block, no need to counteract Br propagation
+                                processed_func.push(Inst::Return);
+                            }
 
                             module.set_function(extracted_func_idx, processed_func);
                         } else {
@@ -199,7 +225,9 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                 };
             }
             Inst::Br { relative_depth } => {
-                if capture_state.nested_level() == 0 {
+                // dbg!(&capture_state);
+                if capture_state.nested_level() == 1 {
+                    dbg!(&extracted_func_builder);
                     extracted_func_builder.push_with_comment(
                         Inst::I32Const {
                             value: (relative_depth + 1) as i32,
@@ -215,7 +243,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                 }
             }
             Inst::BrIf { relative_depth } => {
-                if capture_state.nested_level() == 0 {
+                if capture_state.nested_level() == 1 {
                     extracted_func_builder.push_with_comment(
                         Inst::I32Const {
                             value: (relative_depth + 1) as i32,
