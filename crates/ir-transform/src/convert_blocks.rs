@@ -251,7 +251,6 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                         format!("Begin: BrIf call on nested ({block_nested_level})"),
                     );
                     extracted_func_builder.push(Inst::Swap { idx: 1 });
-                    // TODO: "invert stack value since BrIf jumps on true (non zero)"
                     extracted_func_builder.push(TritonExt::Skiz.into());
                     extracted_func_builder.push(Inst::Return);
                     extracted_func_builder.push_with_comment(
