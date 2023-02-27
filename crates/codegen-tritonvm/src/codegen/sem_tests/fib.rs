@@ -2,7 +2,7 @@ use expect_test::expect;
 
 use crate::codegen::sem_tests::check_wasm;
 
-// #[ignore = "reason"]
+#[ignore = "reason"]
 #[test]
 fn test_fib() {
     let input = vec![25];

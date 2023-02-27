@@ -110,15 +110,16 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                 capture_state.inc_nested_level(BlockKind::Block);
             }
             Inst::End => {
+                dbg!(&capture_state);
                 match capture_state.levels.pop() {
                     Some(block_kind) => {
                         if capture_state.nested_level() == 0 {
                             // end of the root block, stop extracting
 
-                            // dbg!(&extracted_func);
                             // the signature should be set in Block/Loop above
                             #[allow(clippy::unwrap_used)]
                             let extracted_func = extracted_func_builder.build().unwrap();
+                            // dbg!(&extracted_func);
                             let extracted_func_idx = module.push_function(extracted_func.clone());
                             // call the extracted func
                             new_func.push(Inst::Call {
@@ -187,9 +188,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                             processed_func.push(Inst::Return);
 
                             module.set_function(extracted_func_idx, processed_func);
-                            capture_state.dec_nested_level();
                         } else {
-                            capture_state.dec_nested_level();
                             // nested block, keep extracting
                             extracted_func_builder.push(inst.clone());
                         }
