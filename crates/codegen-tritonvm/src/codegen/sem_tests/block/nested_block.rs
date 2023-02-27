@@ -20,14 +20,10 @@ fn test_nested_block() {
     (start $main)
     (func $main 
         block 
-            i64.const 1
-            i64.const 2
-            i64.add
+            i64.const 3
             call $c2zk_stdlib_pub_output
             block 
-                i64.const 3
-                i64.const 5
-                i64.add
+                i64.const 8
                 call $c2zk_stdlib_pub_output
             end
         end
@@ -100,9 +96,7 @@ fn test_nested_block() {
             pop
             return
             main_l0_b0:
-            push 1
-            push 2
-            add
+            push 3
             call c2zk_stdlib_pub_output
             call main_l0_b0_l1_b0
             push -1 // Begin: propagate Br* in block (1)
@@ -111,9 +105,7 @@ fn test_nested_block() {
             return // End: propagate Br* in block
             return
             main_l0_b0_l1_b0:
-            push 3
-            push 5
-            add
+            push 8
             call c2zk_stdlib_pub_output
             push 1 // Begin: extracted func prologue (1)
             return // End: extracted func prologue"#]],

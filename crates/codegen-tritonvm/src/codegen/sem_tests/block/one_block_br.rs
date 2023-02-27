@@ -20,14 +20,10 @@ fn test_one_block_br() {
     (start $main)
     (func $main 
         block 
-          i64.const 1
-          i64.const 2
-          i64.add
+          i64.const 3
           call $c2zk_stdlib_pub_output
           br 0
           i64.const 4
-          i64.const 5
-          i64.add
           call $c2zk_stdlib_pub_output
         end
         return)
@@ -99,15 +95,11 @@ fn test_one_block_br() {
             pop
             return
             main_l0_b0:
-            push 1
-            push 2
-            add
+            push 3
             call c2zk_stdlib_pub_output
             push 1
             return
             push 4
-            push 5
-            add
             call c2zk_stdlib_pub_output
             return"#]],
     );
