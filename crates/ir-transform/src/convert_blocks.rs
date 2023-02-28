@@ -31,7 +31,7 @@ impl IrPass for BlocksToFuncPass {
             let func_in = module.function(i as u32).unwrap().clone();
             // TODO: this cloned Func is a hack to get around the borrow checker
             // dbg!(&func_in);
-            let func_out = run(func_in, module, 0);
+            let func_out = run(func_in, module, Vec::new());
             module.set_function(i.into(), func_out);
         }
     }
@@ -66,7 +66,7 @@ impl CaptureState {
     }
 }
 
-fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
+fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Func {
     // dbg!(&block_nested_level);
     // TODO: exit early if there are no blocks
     // TODO: use FuncBuilder?
@@ -77,6 +77,7 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
         Vec::new(),
         HashMap::new(),
     );
+    let block_nested_level = traversed_blocks.len();
     let mut capture_state = CaptureState::default();
     let mut extracted_func_count = 0;
     // TODO: extract into a closure (use in "reset" below)
@@ -127,8 +128,9 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                             });
 
                             // handle Br* op
-                            match block_kind {
-                                BlockKind::Block => {
+                            match traversed_blocks.last() {
+                                Some(BlockKind::Block) => {
+                                    // TODO: why here but not in Loop?
                                     if block_nested_level > 0 {
                                         new_func.push_with_comment(
                                             Inst::I32Const { value: -1 },
@@ -148,24 +150,12 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                                         );
                                     }
                                 }
-                                BlockKind::Loop => {
+                                Some(BlockKind::Loop) => {
                                     if block_nested_level > 0 {
-                                        new_func.push(Inst::I32Const { value: -1 });
-                                        new_func.push(Inst::I32Const { value: -1 });
-                                        new_func.push_with_comment(
-                                            Inst::I32Add,
-                                            format!(
-                                            "Begin: propagate Br* in loop ({block_nested_level})"
-                                        ),
-                                        );
-                                        // if not zero then return to the parent func(block), keep bailing out
-                                        // zero is expected when we exited into the targeted by Br op loop
-                                        new_func.push(TritonExt::Skiz.into());
-                                        new_func.push(Inst::Return);
-                                        new_func.push_with_comment(
-                                            TritonExt::Recurse.into(),
-                                            "End: propagate Br* in loop".to_string(),
-                                        );
+                                        // decrease by 2 since we're recursing ("exiting" propagation early)
+                                        // earlier in loop than in block?
+                                        // TODO: maybe handle it in BR/BR_IF? Determine if we're exiting block or loop and put depth accordingly (level for block, level+1 for loop)
+                                        new_func.push(Inst::I32Const { value: -2 });
                                         new_func.push_with_comment(
                                             Inst::I32Add,
                                             format!(
@@ -182,10 +172,14 @@ fn run(func: Func, module: &mut Module, block_nested_level: u32) -> Func {
                                         );
                                     }
                                 }
+                                None => (), // TODO: duplicate check for block_nested_level == 0?
                             }
                             // recursevely extract nested blocks into functions
-                            let mut processed_func =
-                                run(extracted_func, module, block_nested_level + 1);
+                            let mut processed_func = run(
+                                extracted_func,
+                                module,
+                                itertools::concat(vec![traversed_blocks.clone(), vec![block_kind]]),
+                            );
                             extracted_func_count += 1;
                             extracted_func_builder = FuncBuilder::new(format!(
                                 "{}_l{block_nested_level}_b{extracted_func_count}",
