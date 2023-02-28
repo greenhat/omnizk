@@ -68,9 +68,9 @@ fn check_triton(
             &state.current_instruction().unwrap(),
             pretty_print_vec_horiz(&pretty_stack(&state.op_stack))
         );
-        dbg!(s);
+        // dbg!(s);
         let r = pretty_print_ram_horiz(&state.ram);
-        dbg!(r);
+        // dbg!(r);
     }
 
     // dbg!(&_trace.last().unwrap().op_stack);
@@ -97,8 +97,9 @@ fn check_triton(
         out.into_iter().map(|b| b.into()).collect::<Vec<u64>>(),
         expected_output
     );
-    // let stack = pretty_stack(&_trace.last().unwrap().op_stack);
-    // assert_eq!(stack, expected_stack);
+    let stack = pretty_stack(&_trace.last().unwrap().op_stack);
+    let expected_stack: Vec<u64> = Vec::new();
+    assert_eq!(stack, expected_stack);
 }
 
 fn check_wat(

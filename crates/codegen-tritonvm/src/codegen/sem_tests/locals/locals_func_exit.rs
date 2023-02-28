@@ -6,7 +6,7 @@ use crate::codegen::sem_tests::check_wat;
 fn test_locals_func_exit() {
     let input = vec![];
     let secret_input = vec![];
-    let expected_output = vec![5];
+    let expected_output = vec![5, 16];
     check_wat(
         r#"
 (module 
@@ -31,6 +31,7 @@ fn test_locals_func_exit() {
         call $add
         local.get 0
         call $c2zk_stdlib_pub_output ;; should return first(0) local value
+        call $c2zk_stdlib_pub_output ;; should return 9+7=16
         return)
 )"#,
         input,
@@ -153,6 +154,7 @@ fn test_locals_func_exit() {
             read_mem
             swap1
             pop
+            call c2zk_stdlib_pub_output
             call c2zk_stdlib_pub_output
             push -1
             call globals_get
