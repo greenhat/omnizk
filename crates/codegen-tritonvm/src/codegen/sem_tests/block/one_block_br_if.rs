@@ -6,7 +6,7 @@ use crate::codegen::sem_tests::check_wat;
 fn test_one_block_br_if() {
     let input = vec![];
     let secret_input = vec![];
-    let expected_output = vec![3, 7, 9];
+    let expected_output = vec![3, 7, 9, 5];
     check_wat(
         r#"
 (module 
@@ -35,6 +35,8 @@ fn test_one_block_br_if() {
           i64.const 9
           call $c2zk_stdlib_pub_output
         end
+        i64.const 5
+        call $c2zk_stdlib_pub_output
         return)
 )"#,
         input,
@@ -81,6 +83,8 @@ fn test_one_block_br_if() {
             call init_mem_for_locals
             call main_l0_b0
             call main_l0_b1
+            push 5
+            call c2zk_stdlib_pub_output
             return
             return
             init_mem_for_locals:
