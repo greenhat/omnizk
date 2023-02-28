@@ -6,7 +6,7 @@ use crate::codegen::sem_tests::check_wat;
 fn test_one_loop_nested_block() {
     let input = vec![1, 1, 0];
     let secret_input = vec![];
-    let expected_output = vec![9, 9, 9, 7, 6];
+    let expected_output = vec![9, 9, 9, 7, 6, 5];
     check_wat(
         r#"
 (module 
@@ -33,6 +33,8 @@ fn test_one_loop_nested_block() {
             i64.const 6
             call $c2zk_stdlib_pub_output
         end
+        i64.const 5
+        call $c2zk_stdlib_pub_output
         return)
 )"#,
         input,
@@ -78,6 +80,8 @@ fn test_one_loop_nested_block() {
             main:
             call init_mem_for_locals
             call main_l0_b0
+            push 5
+            call c2zk_stdlib_pub_output
             return
             return
             init_mem_for_locals:
