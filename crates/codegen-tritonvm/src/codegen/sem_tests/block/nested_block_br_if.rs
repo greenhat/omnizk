@@ -20,17 +20,21 @@ fn test_nested_block_br_if() {
     (start $main)
     (func $main 
         block 
-            i64.const 3
-            call $c2zk_stdlib_pub_output
             block 
-                i64.const 8
+                i64.const 3
                 call $c2zk_stdlib_pub_output
-                i32.const 1
-                br_if 1
-                i64.const 11
+                block 
+                    i64.const 8
+                    call $c2zk_stdlib_pub_output
+                    i32.const 1
+                    br_if 2
+                    i64.const 11
+                    call $c2zk_stdlib_pub_output
+                end
+                i64.const 9
                 call $c2zk_stdlib_pub_output
             end
-            i64.const 9
+            i64.const 7
             call $c2zk_stdlib_pub_output
         end
         return)
@@ -102,28 +106,42 @@ fn test_nested_block_br_if() {
             pop
             return
             main_l0_b0:
-            push 3
-            call c2zk_stdlib_pub_output
             call main_l0_b0_l1_b0
             push -1 // Begin: propagate Br* in block (1)
             add
+            dup0
             skiz
             return // End: propagate Br* in block
-            push 9
+            pop
+            push 7
             call c2zk_stdlib_pub_output
             return
             main_l0_b0_l1_b0:
+            push 3
+            call c2zk_stdlib_pub_output
+            call main_l0_b0_l1_b0_l2_b0
+            push -1 // Begin: propagate Br* in block (2)
+            add
+            dup0
+            skiz
+            return // End: propagate Br* in block
+            pop
+            push 9
+            call c2zk_stdlib_pub_output
+            push 1 // Begin: extracted func prologue (1)
+            return // End: extracted func prologue
+            main_l0_b0_l1_b0_l2_b0:
             push 8
             call c2zk_stdlib_pub_output
             push 1
-            push 2
+            push 3
             swap1
             skiz
             return
             pop
             push 11
             call c2zk_stdlib_pub_output
-            push 1 // Begin: extracted func prologue (1)
+            push 1 // Begin: extracted func prologue (2)
             return // End: extracted func prologue"#]],
     );
 }

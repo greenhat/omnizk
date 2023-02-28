@@ -321,8 +321,10 @@ fn test_fib() {
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1_l1_b0
             push -1 // Begin: propagate Br* in block (1)
             add
+            dup0
             skiz
             return // End: propagate Br* in block
+            pop
             push -1
             call globals_get
             push 4
@@ -368,8 +370,10 @@ fn test_fib() {
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1_l1_b1
             push -1 // Begin: propagate Br* in block (1)
             add
+            dup0
             skiz
             return // End: propagate Br* in block
+            pop
             push -1
             call globals_get
             push 4
@@ -676,8 +680,10 @@ fn test_fib() {
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b2_l1_b0
             push -1 // Begin: propagate Br* in block (1)
             add
+            dup0
             skiz
             return // End: propagate Br* in block
+            pop
             push -1
             call globals_get
             push 4

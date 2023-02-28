@@ -101,8 +101,10 @@ fn test_nested_block() {
             call main_l0_b0_l1_b0
             push -1 // Begin: propagate Br* in block (1)
             add
+            dup0
             skiz
             return // End: propagate Br* in block
+            pop
             return
             main_l0_b0_l1_b0:
             push 8

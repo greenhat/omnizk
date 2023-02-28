@@ -101,8 +101,10 @@ fn test_one_loop_nested_block() {
             call main_l0_b0_l1_b0
             push -2
             add // Begin: propagate Br* in loop (1)
+            dup0
             skiz
             return
+            pop
             recurse // End: propagate Br* in loop
             return
             main_l0_b0_l1_b0:

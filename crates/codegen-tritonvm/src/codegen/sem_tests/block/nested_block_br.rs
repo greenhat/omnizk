@@ -106,8 +106,10 @@ fn test_nested_block_br() {
             call main_l0_b0_l1_b0
             push -1 // Begin: propagate Br* in block (1)
             add
+            dup0
             skiz
             return // End: propagate Br* in block
+            pop
             push 9
             call c2zk_stdlib_pub_output
             return

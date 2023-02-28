@@ -143,11 +143,13 @@ fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Fun
                                         // zero is expected when we exited the targeted by Br op block
                                         // TODO: does it mean we have to put on stack increased relative_depth for Block
                                         // and untouched for Loop?
+                                        new_func.push(Inst::Dup { idx: 0 });
                                         new_func.push(TritonExt::Skiz.into());
                                         new_func.push_with_comment(
                                             Inst::Return,
                                             "End: propagate Br* in block".to_string(),
                                         );
+                                        new_func.push(TritonExt::Pop.into());
                                     }
                                 }
                                 Some(BlockKind::Loop) => {
@@ -164,8 +166,10 @@ fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Fun
                                         );
                                         // if not zero then return to the parent func(block), keep bailing out
                                         // zero is expected when we exited into the targeted by Br op loop
+                                        new_func.push(Inst::Dup { idx: 0 });
                                         new_func.push(TritonExt::Skiz.into());
                                         new_func.push(Inst::Return);
+                                        new_func.push(TritonExt::Pop.into());
                                         new_func.push_with_comment(
                                             TritonExt::Recurse.into(),
                                             "End: propagate Br* in loop".to_string(),
