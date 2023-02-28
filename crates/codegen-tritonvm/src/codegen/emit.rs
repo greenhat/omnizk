@@ -41,6 +41,7 @@ pub fn emit_inst(
         Inst::PubOutputWrite => sink.push(AnInstruction::WriteIo),
         Inst::SecretInputRead => sink.push(AnInstruction::Divine(None)),
         Inst::I64Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
+        Inst::I64Eq => sink.push(AnInstruction::Eq),
         Inst::I32Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
         Inst::I64Const { value } => sink.push(AnInstruction::Push(felt_i64(*value))),
         // TODO: extract to IR pass

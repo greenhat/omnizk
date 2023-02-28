@@ -62,6 +62,10 @@ impl<'a> InstBuilder<'a> {
         self.fbuilder.push(Inst::I64Eqz);
     }
 
+    pub fn i64eq(&mut self) {
+        self.fbuilder.push(Inst::I64Eq);
+    }
+
     pub fn i64and(&mut self) {
         self.fbuilder.push(Inst::I64And);
     }

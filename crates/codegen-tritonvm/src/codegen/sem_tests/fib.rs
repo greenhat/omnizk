@@ -189,10 +189,6 @@ fn test_fib() {
             push -1
             call globals_set
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0
-            push -1 // Begin: propagate Br* in block (0)
-            add
-            skiz
-            return // End: propagate Br* in block
             push -1
             call globals_get
             push 4
@@ -213,67 +209,8 @@ fn test_fib() {
             write_mem
             pop
             pop
-            push -1
-            call globals_get
-            push 4
-            add
-            push 0
-            read_mem
-            swap1
-            pop
-            push -8
-            and
-            push -1
-            call globals_get
-            swap1
-            swap1
-            push 1
-            add
-            swap1
-            write_mem
-            pop
-            pop
-            push 1
-            push -1
-            call globals_get
-            swap1
-            swap1
-            push 4
-            add
-            swap1
-            write_mem
-            pop
-            pop
-            push 0
-            push -1
-            call globals_get
-            swap1
-            swap1
-            push 2
-            add
-            swap1
-            write_mem
-            pop
-            pop
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1
-            push -1 // Begin: propagate Br* in block (0)
-            add
-            skiz
-            return // End: propagate Br* in block
-            push -1
-            call globals_get
-            push 4
-            add
-            push -1
-            call globals_set
-            return
-            push -1
-            call globals_get
-            push 4
-            add
-            push -1
-            call globals_set
-            return
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b2
             push -1
             call globals_get
             push 2
@@ -359,6 +296,11 @@ fn test_fib() {
             eq
             push 0
             eq
+            push 1
+            swap1
+            skiz
+            return
+            pop
             push 0
             call _ZN11c2zk_stdlib10pub_output17h88275f26ad69ad8bE
             push -1
@@ -374,14 +316,133 @@ fn test_fib() {
             add
             push -1
             call globals_set
-            push 1 // Begin: extracted func prologue (0)
-            return // End: extracted func prologue
+            return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1:
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1_l1_b0
             push -1 // Begin: propagate Br* in block (1)
             add
             skiz
             return // End: propagate Br* in block
+            push -1
+            call globals_get
+            push 4
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push -8
+            and
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 1
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            push 1
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 4
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            push 0
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 2
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1_l1_b1
+            push -1
+            push -1
+            add // Begin: propagate Br* in loop (1)
+            skiz
+            return
+            recurse // End: propagate Br* in loop
+            add // Begin: propagate Br* in loop (1)
+            skiz
+            return
+            recurse // End: propagate Br* in loop
+            push -1
+            call globals_get
+            push 4
+            add
+            push -1
+            call globals_set
+            return
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1_l1_b0:
+            push -1
+            call globals_get
+            push 4
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push -1
+            add
+            push 7
+            dup1
+            dup1
+            lt
+            push 0
+            eq
+            swap1
+            eq
+            add
+            push 1
+            eq
+            push 1
+            swap1
+            skiz
+            return
+            pop
+            push 1
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 4
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            push 0
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 2
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            push 2
+            return
+            push -1
+            call globals_get
+            push 4
+            add
+            push -1
+            call globals_set
+            push 1 // Begin: extracted func prologue (1)
+            return // End: extracted func prologue
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1_l1_b1:
             push -1
             call globals_get
             push 4
@@ -574,15 +635,69 @@ fn test_fib() {
             eq
             push 0
             eq
+            skiz
+            recurse
             push -1
             call globals_get
             push 4
             add
             push -1
             call globals_set
-            push 1 // Begin: extracted func prologue (0)
+            push 1 // Begin: extracted func prologue (1)
             return // End: extracted func prologue
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1_l1_b0:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b2:
+            push -1
+            call globals_get
+            push 3
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push 0
+            eq
+            push 1
+            swap1
+            skiz
+            return
+            pop
+            push -1
+            call globals_get
+            push 2
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 1
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b2_l1_b0
+            push -1
+            push -1
+            add // Begin: propagate Br* in loop (1)
+            skiz
+            return
+            recurse // End: propagate Br* in loop
+            add // Begin: propagate Br* in loop (1)
+            skiz
+            return
+            recurse // End: propagate Br* in loop
+            push -1
+            call globals_get
+            push 4
+            add
+            push -1
+            call globals_set
+            return
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b2_l1_b0:
             push -1
             call globals_get
             push 4
@@ -591,31 +706,7 @@ fn test_fib() {
             read_mem
             swap1
             pop
-            push -1
-            add
-            push 7
-            dup1
-            dup1
-            lt
-            push 0
-            eq
-            swap1
-            eq
-            add
-            push 1
-            eq
-            push 1
-            push -1
-            call globals_get
-            swap1
-            swap1
-            push 4
-            add
-            swap1
-            write_mem
-            pop
-            pop
-            push 0
+            dup0
             push -1
             call globals_get
             swap1
@@ -626,6 +717,70 @@ fn test_fib() {
             write_mem
             pop
             pop
+            push -1
+            call globals_get
+            push 1
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            add
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 4
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            push -1
+            call globals_get
+            push 2
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 1
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            push -1
+            call globals_get
+            push 3
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push -1
+            add
+            dup0
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 3
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            push 0
+            eq
+            push 0
+            eq
+            skiz
+            recurse
             push -1
             call globals_get
             push 4

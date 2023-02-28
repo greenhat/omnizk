@@ -64,6 +64,7 @@ pub enum Inst {
     I64And,
     I64GeU,
     I64Ne,
+    I64Eq,
     PubInputRead,
     PubOutputWrite,
     SecretInputRead,

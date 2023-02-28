@@ -47,6 +47,7 @@ pub fn translate_operator(
         Operator::I64And => func_builder.ins().i64and(),
         Operator::I64GeU => func_builder.ins().i64geu(),
         Operator::I64Ne => func_builder.ins().i64ne(),
+        Operator::I64Eq => func_builder.ins().i64eq(),
         _ => todo!("Wasm op not implemented: {:?}", op),
     };
     Ok(())
