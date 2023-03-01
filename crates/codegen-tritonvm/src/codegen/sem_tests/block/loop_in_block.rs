@@ -118,7 +118,6 @@ fn test_loop_in_block() {
             pop
             push 6
             call c2zk_stdlib_pub_output
-            push 1
             return
             push 5
             call c2zk_stdlib_pub_output
@@ -129,8 +128,11 @@ fn test_loop_in_block() {
             call c2zk_stdlib_pub_input
             push 1
             eq
+            push 1
+            swap1
             skiz
-            recurse
+            return
+            pop
             push 7
             call c2zk_stdlib_pub_output
             push 1 // Begin: extracted func prologue (1)

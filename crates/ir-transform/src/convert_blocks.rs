@@ -64,6 +64,10 @@ impl CaptureState {
     fn nested_level(&self) -> usize {
         self.levels.len()
     }
+
+    fn peek_last_block(&self) -> Option<&BlockKind> {
+        self.levels.last()
+    }
 }
 
 fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Func {
@@ -223,19 +227,20 @@ fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Fun
                 };
             }
             Inst::Br { relative_depth } => {
-                // dbg!(&capture_state);
+                dbg!(&capture_state);
+                dbg!(&traversed_blocks);
                 if capture_state.nested_level() == 1 {
                     // dbg!(&extracted_func_builder);
-                    extracted_func_builder.push_with_comment(
-                        Inst::I32Const {
+                    if traversed_blocks.is_empty() {
+                        // we are in the top block, no need for Br propagation
+                        extracted_func_builder.push(Inst::Return);
+                    } else {
+                        // we are in the nested block so put relative_depth on the stack for Br propagation
+                        extracted_func_builder.push(Inst::I32Const {
                             value: (relative_depth + 1) as i32,
-                        },
-                        format!("Begin: Br call on nested ({block_nested_level})"),
-                    );
-                    extracted_func_builder.push_with_comment(
-                        Inst::Return,
-                        format!("End: Br call on nested ({block_nested_level})"),
-                    );
+                        });
+                        extracted_func_builder.push(Inst::Return);
+                    }
                 } else {
                     extracted_func_builder.push(inst.clone());
                 }
@@ -243,27 +248,51 @@ fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Fun
             Inst::BrIf { relative_depth } => {
                 #[allow(clippy::unwrap_used)]
                 if capture_state.nested_level() == 1 {
-                    if *relative_depth == 0
-                        && capture_state.levels.last().unwrap() == &BlockKind::Loop
-                    {
-                        // jump to the next loop iteration (recurse into the current function)
-                        extracted_func_builder.push(TritonExt::Skiz.into());
-                        extracted_func_builder.push(TritonExt::Recurse.into());
+                    if traversed_blocks.is_empty() {
+                        // we are in the top block, no need for Br propagation
+                        match capture_state.levels.last().unwrap() {
+                            &BlockKind::Loop => {
+                                // jump to the next loop iteration (recurse into the current function)
+                                extracted_func_builder.push(TritonExt::Skiz.into());
+                                extracted_func_builder.push(TritonExt::Recurse.into());
+                            }
+                            BlockKind::Block => {
+                                extracted_func_builder.push(TritonExt::Skiz.into());
+                                extracted_func_builder.push(Inst::Return);
+                            }
+                        }
                     } else {
-                        extracted_func_builder.push_with_comment(
-                            Inst::I32Const {
-                                value: (relative_depth + 1) as i32,
-                            },
-                            format!("Begin: BrIf call on nested ({block_nested_level})"),
-                        );
+                        // we are in the nested block so put relative_depth on the stack for Br propagation
+                        extracted_func_builder.push(Inst::I32Const {
+                            value: (relative_depth + 1) as i32,
+                        });
                         extracted_func_builder.push(Inst::Swap { idx: 1 });
                         extracted_func_builder.push(TritonExt::Skiz.into());
                         extracted_func_builder.push(Inst::Return);
-                        extracted_func_builder.push_with_comment(
-                            TritonExt::Pop.into(),
-                            format!("End: BrIf call on nested ({block_nested_level})"),
-                        );
+                        extracted_func_builder.push(TritonExt::Pop.into());
                     }
+
+                    // if *relative_depth == 0
+                    //     && capture_state.levels.last().unwrap() == &BlockKind::Loop
+                    // {
+                    //     // jump to the next loop iteration (recurse into the current function)
+                    //     extracted_func_builder.push(TritonExt::Skiz.into());
+                    //     extracted_func_builder.push(TritonExt::Recurse.into());
+                    // } else {
+                    //     extracted_func_builder.push_with_comment(
+                    //         Inst::I32Const {
+                    //             value: (relative_depth + 1) as i32,
+                    //         },
+                    //         format!("Begin: BrIf call on nested ({block_nested_level})"),
+                    //     );
+                    //     extracted_func_builder.push(Inst::Swap { idx: 1 });
+                    //     extracted_func_builder.push(TritonExt::Skiz.into());
+                    //     extracted_func_builder.push(Inst::Return);
+                    //     extracted_func_builder.push_with_comment(
+                    //         TritonExt::Pop.into(),
+                    //         format!("End: BrIf call on nested ({block_nested_level})"),
+                    //     );
+                    // }
                 } else {
                     extracted_func_builder.push(inst.clone());
                 }
