@@ -168,28 +168,7 @@ fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Fun
                                 func.name()
                             ));
                             extracted_func_builder.set_signature(FuncType::new(vec![], vec![]));
-
-                            // if block_nested_level > 0 {
-                            //     // we are in the nested block so put 1 on the stack to counteract Br propagation
-                            //     processed_func.set_comment(
-                            //         processed_func.instructions().len(),
-                            //         format!(
-                            //             "Begin: extracted func prologue ({block_nested_level})"
-                            //         ),
-                            //     );
-                            //     // exiting the function not with a Br* op and stop exit propagation
-                            //     processed_func.push(Inst::I32Const { value: 1 });
-                            //     processed_func.set_comment(
-                            //         processed_func.instructions().len(),
-                            //         "End: extracted func prologue".to_string(),
-                            //     );
-                            //     processed_func.push(Inst::Return);
-                            // } else {
-                            //     // we are in the top block, no need to counteract Br propagation
-                            //     processed_func.push(Inst::Return);
-                            // }
                             processed_func.push(Inst::Return);
-
                             module.set_function(extracted_func_idx, processed_func);
                         } else {
                             // nested block, keep extracting
@@ -202,41 +181,67 @@ fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Fun
                 };
             }
             Inst::Br { relative_depth } => {
-                // TODO: just Return/Recurse if relative_depth == 0
                 dbg!(&capture_state);
                 dbg!(&traversed_blocks);
                 if capture_state.nested_level() == 1 {
                     // dbg!(&extracted_func_builder);
-                    extracted_func_builder.push(Inst::I32Const {
-                        value: (relative_depth + 1) as i32,
-                    });
-                    extracted_func_builder.push(Inst::GlobalSet {
-                        global_idx: br_propagation_global_idx,
-                    });
-                    extracted_func_builder.push(Inst::Return);
+                    if *relative_depth > 0 {
+                        extracted_func_builder.push(Inst::I32Const {
+                            value: (relative_depth + 1) as i32,
+                        });
+                        extracted_func_builder.push(Inst::GlobalSet {
+                            global_idx: br_propagation_global_idx,
+                        });
+                        extracted_func_builder.push(Inst::Return);
+                    } else {
+                        match capture_state.levels.first() {
+                            Some(BlockKind::Block) => {
+                                extracted_func_builder.push(Inst::Return);
+                            }
+                            Some(BlockKind::Loop) => {
+                                extracted_func_builder.push(TritonExt::Recurse.into());
+                            }
+                            None => {
+                                panic!("unexpected Br outside the block");
+                            }
+                        }
+                    }
                 } else {
                     extracted_func_builder.push(inst.clone());
                 }
             }
             Inst::BrIf { relative_depth } => {
-                // TODO: just Return/Recurse if relative_depth == 0
                 if capture_state.nested_level() == 1 {
-                    // we are in the nested block so put relative_depth on the stack for Br propagation
-
-                    extracted_func_builder.push(Inst::I32Const {
-                        value: (relative_depth + 1) as i32,
-                    });
-                    extracted_func_builder.push(Inst::GlobalSet {
-                        global_idx: br_propagation_global_idx,
-                    });
-                    // extracted_func_builder.push(Inst::Swap { idx: 1 });
-                    extracted_func_builder.push(TritonExt::Skiz.into());
-                    extracted_func_builder.push(Inst::Return);
-                    // br_if did not exit so clean up the global
-                    extracted_func_builder.push(Inst::I32Const { value: 0 });
-                    extracted_func_builder.push(Inst::GlobalSet {
-                        global_idx: br_propagation_global_idx,
-                    });
+                    if *relative_depth > 0 {
+                        // we are in the nested block so put relative_depth in the global for Br propagation
+                        extracted_func_builder.push(Inst::I32Const {
+                            value: (relative_depth + 1) as i32,
+                        });
+                        extracted_func_builder.push(Inst::GlobalSet {
+                            global_idx: br_propagation_global_idx,
+                        });
+                        extracted_func_builder.push(TritonExt::Skiz.into());
+                        extracted_func_builder.push(Inst::Return);
+                        // br_if did not exit so clean up the global
+                        extracted_func_builder.push(Inst::I32Const { value: 0 });
+                        extracted_func_builder.push(Inst::GlobalSet {
+                            global_idx: br_propagation_global_idx,
+                        });
+                    } else {
+                        match capture_state.levels.first() {
+                            Some(BlockKind::Block) => {
+                                extracted_func_builder.push(TritonExt::Skiz.into());
+                                extracted_func_builder.push(Inst::Return);
+                            }
+                            Some(BlockKind::Loop) => {
+                                extracted_func_builder.push(TritonExt::Skiz.into());
+                                extracted_func_builder.push(TritonExt::Recurse.into());
+                            }
+                            None => {
+                                panic!("unexpected BrIf outside the block");
+                            }
+                        }
+                    }
                 } else {
                     extracted_func_builder.push(inst.clone());
                 }

@@ -118,9 +118,6 @@ fn test_loop_in_block() {
             return
             push 6
             call c2zk_stdlib_pub_output
-            push 1
-            push -2
-            call globals_set
             return
             push 5
             call c2zk_stdlib_pub_output
@@ -131,14 +128,8 @@ fn test_loop_in_block() {
             call c2zk_stdlib_pub_input
             push 1
             eq
-            push 1
-            push -2
-            call globals_set
             skiz
-            return
-            push 0
-            push -2
-            call globals_set
+            recurse
             push 7
             call c2zk_stdlib_pub_output
             return"#]],
