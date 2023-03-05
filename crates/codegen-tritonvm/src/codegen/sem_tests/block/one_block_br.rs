@@ -101,6 +101,9 @@ fn test_one_block_br() {
             main_l0_b0:
             push 3
             call c2zk_stdlib_pub_output
+            push 1
+            push -2
+            call globals_set
             return
             push 4
             call c2zk_stdlib_pub_output

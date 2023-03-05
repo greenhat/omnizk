@@ -1,8 +1,3 @@
 /// Translation(parsing) options for Wasm frontend
+#[derive(Default)]
 pub struct WasmFrontendConfig {}
-
-impl Default for WasmFrontendConfig {
-    fn default() -> Self {
-        Self {}
-    }
-}

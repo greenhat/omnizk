@@ -1,5 +1,6 @@
 use super::Func;
 use super::FuncIndex;
+use super::GlobalIndex;
 use super::Inst;
 
 #[derive(Debug)]
@@ -72,9 +73,14 @@ impl Module {
         FuncIndex::from(self.functions.len() as u32)
     }
 
-    pub fn global_index_storing_base_local_offset(&self) -> u32 {
+    pub fn global_index_storing_base_local_offset(&self) -> GlobalIndex {
         // TODO: last existing global index + 1
-        1
+        1.into()
+    }
+
+    pub fn global_index_storing_br_propagation(&self) -> GlobalIndex {
+        // TODO: last existing global index + 2
+        2.into()
     }
 
     /// Adds the function and prepends it's call in the beginning of the start function.

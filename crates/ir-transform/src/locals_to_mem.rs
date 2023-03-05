@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
+use c2zk_ir::ir::GlobalIndex;
 use c2zk_ir::ir::Inst;
 use c2zk_ir::ir::Module;
 use c2zk_ir::pass::IrPass;
@@ -29,11 +30,11 @@ impl IrPass for LocalsToMemPass {
             // dbg!(&func);
             if !func.sig().params.is_empty() {
                 new_func.push(Inst::GlobalGet {
-                    global_idx: global_idx_for_base_local_offset.into(),
+                    global_idx: global_idx_for_base_local_offset,
                 });
             }
             // store the function parameters to memory
-            for (i, param) in func.sig().params.iter().enumerate() {
+            for (i, _param) in func.sig().params.iter().enumerate() {
                 new_func.push(Inst::Dup { idx: 0 });
                 // put func param on top
                 new_func.push(Inst::Swap { idx: 2 });
@@ -48,12 +49,12 @@ impl IrPass for LocalsToMemPass {
             }
             if !func.sig().params.is_empty() {
                 new_func.push(Inst::GlobalSet {
-                    global_idx: global_idx_for_base_local_offset.into(),
+                    global_idx: global_idx_for_base_local_offset,
                 });
             }
             if !func.locals().is_empty() {
                 new_func.push(Inst::GlobalGet {
-                    global_idx: global_idx_for_base_local_offset.into(),
+                    global_idx: global_idx_for_base_local_offset,
                 });
                 new_func.push(Inst::I32Const {
                     value: -(func.locals().len() as i32),
@@ -61,7 +62,7 @@ impl IrPass for LocalsToMemPass {
                 new_func.push(Inst::I32Add);
                 new_func.push_with_comment(
                     Inst::GlobalSet {
-                        global_idx: global_idx_for_base_local_offset.into(),
+                        global_idx: global_idx_for_base_local_offset,
                     },
                     "END prologue for locals access via memory".to_string(),
                 );
@@ -84,7 +85,7 @@ impl IrPass for LocalsToMemPass {
                 match inst {
                     Inst::LocalGet { local_idx } => {
                         new_func.push(Inst::GlobalGet {
-                            global_idx: global_idx_for_base_local_offset.into(),
+                            global_idx: global_idx_for_base_local_offset,
                         });
                         new_func.push(Inst::I32Load {
                             offset: reverse_index_base - *local_idx,
@@ -92,7 +93,7 @@ impl IrPass for LocalsToMemPass {
                     }
                     Inst::LocalSet { local_idx } => {
                         new_func.push(Inst::GlobalGet {
-                            global_idx: global_idx_for_base_local_offset.into(),
+                            global_idx: global_idx_for_base_local_offset,
                         });
                         new_func.push(Inst::Swap { idx: 1 });
                         new_func.push(Inst::I32Store {
@@ -103,7 +104,7 @@ impl IrPass for LocalsToMemPass {
                         // we need to leave the original value on the stack
                         new_func.push(Inst::Dup { idx: 0 });
                         new_func.push(Inst::GlobalGet {
-                            global_idx: global_idx_for_base_local_offset.into(),
+                            global_idx: global_idx_for_base_local_offset,
                         });
                         new_func.push(Inst::Swap { idx: 1 });
                         new_func.push(Inst::I32Store {
@@ -115,14 +116,14 @@ impl IrPass for LocalsToMemPass {
                             // increase (rollback) the pointer stored in global base_local_offset
                             // by the number of locals upon return
                             new_func.push(Inst::GlobalGet {
-                                global_idx: global_idx_for_base_local_offset.into(),
+                                global_idx: global_idx_for_base_local_offset,
                             });
                             new_func.push(Inst::I32Const {
                                 value: total_local_count as i32,
                             });
                             new_func.push(Inst::I32Add);
                             new_func.push(Inst::GlobalSet {
-                                global_idx: global_idx_for_base_local_offset.into(),
+                                global_idx: global_idx_for_base_local_offset,
                             });
                         }
                         // original (return or end) instruction
@@ -142,7 +143,10 @@ impl IrPass for LocalsToMemPass {
     }
 }
 
-fn mod_prologue_func(global_idx_for_base_local_offset: u32, globals_alloc_size: u32) -> Func {
+fn mod_prologue_func(
+    global_idx_for_base_local_offset: GlobalIndex,
+    globals_alloc_size: u32,
+) -> Func {
     Func::new(
         "init_mem_for_locals".to_string(),
         FuncType::void_void(),
@@ -152,7 +156,7 @@ fn mod_prologue_func(global_idx_for_base_local_offset: u32, globals_alloc_size: 
                 value: i32::MAX - globals_alloc_size as i32,
             },
             Inst::GlobalSet {
-                global_idx: global_idx_for_base_local_offset.into(),
+                global_idx: global_idx_for_base_local_offset,
             },
             Inst::Return,
         ],

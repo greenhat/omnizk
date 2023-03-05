@@ -112,8 +112,14 @@ fn test_one_block_br_if() {
             push 3
             call c2zk_stdlib_pub_output
             push 1
+            push 1
+            push -2
+            call globals_set
             skiz
             return
+            push 0
+            push -2
+            call globals_set
             push 4
             call c2zk_stdlib_pub_output
             return
@@ -121,8 +127,14 @@ fn test_one_block_br_if() {
             push 7
             call c2zk_stdlib_pub_output
             push 0
+            push 1
+            push -2
+            call globals_set
             skiz
             return
+            push 0
+            push -2
+            call globals_set
             push 9
             call c2zk_stdlib_pub_output
             return"#]],

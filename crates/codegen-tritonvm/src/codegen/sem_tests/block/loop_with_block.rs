@@ -108,12 +108,11 @@ fn test_one_loop_nested_block() {
             main_l0_b0:
             call main_l0_b0_l1_b0
             push -2
-            add // Begin: propagate Br* in loop (1)
-            dup0
+            call globals_get
+            push -1
+            add
             skiz
-            return
-            pop
-            recurse // End: propagate Br* in loop
+            recurse
             push 6
             call c2zk_stdlib_pub_output
             return
@@ -124,13 +123,15 @@ fn test_one_loop_nested_block() {
             push 1
             eq
             push 2
-            swap1
+            push -2
+            call globals_set
             skiz
             return
-            pop
+            push 0
+            push -2
+            call globals_set
             push 7
             call c2zk_stdlib_pub_output
-            push 1 // Begin: extracted func prologue (1)
-            return // End: extracted func prologue"#]],
+            return"#]],
     );
 }

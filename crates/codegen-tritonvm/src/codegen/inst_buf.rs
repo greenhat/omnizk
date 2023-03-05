@@ -22,6 +22,7 @@ impl<'a> InstBuffer<'a> {
         }
     }
 
+    #[allow(dead_code)]
     pub(crate) fn program(&self) -> Program {
         Program::new(&self.inner)
     }
@@ -42,10 +43,10 @@ impl<'a> InstBuffer<'a> {
         self.inner.push(LabelledInstruction::Instruction(inst, ""));
     }
 
-    pub(crate) fn push_with_comment(&mut self, inst: AnInstruction<String>, comment: String) {
-        self.comments.insert(self.inner.len(), comment);
-        self.push(inst);
-    }
+    // pub(crate) fn push_with_comment(&mut self, inst: AnInstruction<String>, comment: String) {
+    //     self.comments.insert(self.inner.len(), comment);
+    //     self.push(inst);
+    // }
 
     pub(crate) fn push_comment_for_next_ins(&mut self, comment: String) {
         self.comments.insert(

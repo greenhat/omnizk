@@ -107,12 +107,12 @@ fn test_nested_block_br_if() {
             return
             main_l0_b0:
             call main_l0_b0_l1_b0
-            push -1 // Begin: propagate Br* in block (1)
+            push -2
+            call globals_get
+            push -1
             add
-            dup0
             skiz
-            return // End: propagate Br* in block
-            pop
+            return
             push 7
             call c2zk_stdlib_pub_output
             return
@@ -120,28 +120,29 @@ fn test_nested_block_br_if() {
             push 3
             call c2zk_stdlib_pub_output
             call main_l0_b0_l1_b0_l2_b0
-            push -1 // Begin: propagate Br* in block (2)
+            push -2
+            call globals_get
+            push -1
             add
-            dup0
             skiz
-            return // End: propagate Br* in block
-            pop
+            return
             push 9
             call c2zk_stdlib_pub_output
-            push 1 // Begin: extracted func prologue (1)
-            return // End: extracted func prologue
+            return
             main_l0_b0_l1_b0_l2_b0:
             push 8
             call c2zk_stdlib_pub_output
             push 1
             push 3
-            swap1
+            push -2
+            call globals_set
             skiz
             return
-            pop
+            push 0
+            push -2
+            call globals_set
             push 11
             call c2zk_stdlib_pub_output
-            push 1 // Begin: extracted func prologue (2)
-            return // End: extracted func prologue"#]],
+            return"#]],
     );
 }

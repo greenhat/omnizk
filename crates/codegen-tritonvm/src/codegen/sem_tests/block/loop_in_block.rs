@@ -110,14 +110,17 @@ fn test_loop_in_block() {
             return
             main_l0_b0:
             call main_l0_b0_l1_b0
-            push -1 // Begin: propagate Br* in block (1)
+            push -2
+            call globals_get
+            push -1
             add
-            dup0
             skiz
-            return // End: propagate Br* in block
-            pop
+            return
             push 6
             call c2zk_stdlib_pub_output
+            push 1
+            push -2
+            call globals_set
             return
             push 5
             call c2zk_stdlib_pub_output
@@ -129,13 +132,15 @@ fn test_loop_in_block() {
             push 1
             eq
             push 1
-            swap1
+            push -2
+            call globals_set
             skiz
             return
-            pop
+            push 0
+            push -2
+            call globals_set
             push 7
             call c2zk_stdlib_pub_output
-            push 1 // Begin: extracted func prologue (1)
-            return // End: extracted func prologue"#]],
+            return"#]],
     );
 }

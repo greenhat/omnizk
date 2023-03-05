@@ -158,7 +158,13 @@ impl ModuleBuilder {
 
         self.types
             .get(u32::from(*type_idx) as usize)
-            .ok_or_else(|| ModuleBuilderError::TypeNotFound(u32::from(*type_idx) as u32))
+            .ok_or_else(|| ModuleBuilderError::TypeNotFound(u32::from(*type_idx)))
+    }
+}
+
+impl Default for ModuleBuilder {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

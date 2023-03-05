@@ -101,8 +101,14 @@ fn test_one_loop() {
             call c2zk_stdlib_pub_input
             push 1
             eq
+            push 1
+            push -2
+            call globals_set
             skiz
-            recurse
+            return
+            push 0
+            push -2
+            call globals_set
             return"#]],
     );
 }

@@ -59,19 +59,9 @@ fn check_triton(
     let program = inst_buf.program();
     let input = input.into_iter().map(Into::into).collect();
     let secret_input = secret_input.into_iter().map(Into::into).collect();
-    let (_trace, out, err) = triton_vm::vm::run(&program, input, secret_input);
+    let (trace, out, err) = triton_vm::vm::run(&program, input, secret_input);
 
-    // iterate over last n traces
-    for state in _trace.iter().rev().take(400).rev() {
-        let s = format!(
-            "{}: {}",
-            &state.current_instruction().unwrap(),
-            pretty_print_vec_horiz(&pretty_stack(&state.op_stack))
-        );
-        // dbg!(s);
-        let r = pretty_print_ram_horiz(&state.ram);
-        // dbg!(r);
-    }
+    // pp_trace(&trace);
 
     // dbg!(&_trace.last().unwrap().op_stack);
     // dbg!(&_trace.last().unwrap().program[.._trace.last().unwrap().instruction_pointer]);
@@ -97,9 +87,23 @@ fn check_triton(
         out.into_iter().map(|b| b.into()).collect::<Vec<u64>>(),
         expected_output
     );
-    let stack = pretty_stack(&_trace.last().unwrap().op_stack);
+    let stack = pretty_stack(&trace.last().unwrap().op_stack);
     let expected_stack: Vec<u64> = Vec::new();
     assert_eq!(stack, expected_stack);
+}
+
+fn pp_trace(_trace: &[triton_vm::state::VMState]) {
+    // iterate over last n traces
+    for state in _trace.iter().rev().take(400).rev() {
+        let s = format!(
+            "{}: {}",
+            &state.current_instruction().unwrap(),
+            pretty_print_vec_horiz(&pretty_stack(&state.op_stack))
+        );
+        dbg!(s);
+        let r = pretty_print_ram_horiz(&state.ram);
+        dbg!(r);
+    }
 }
 
 fn check_wat(

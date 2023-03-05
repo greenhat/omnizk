@@ -143,6 +143,8 @@ fn parse_export_section(
 ) -> Result<(), WasmError> {
     for export in exports {
         let export = export?;
+
+        #[allow(clippy::single_match)]
         match export.kind {
             ExternalKind::Func => {
                 // dbg!(&export);
@@ -204,7 +206,7 @@ fn parse_code_section_entry(
 fn parse_local_decls(
     reader: &mut BinaryReader,
     builder: &mut FuncBuilder,
-    num_params: usize,
+    _num_params: usize,
     validator: &mut FuncValidator<impl WasmModuleResources>,
 ) -> Result<(), WasmError> {
     let local_count = reader.read_var_u32()?;
@@ -228,16 +230,16 @@ fn parse_imports_section(
             TypeRef::Func(type_index) => {
                 mod_builder.push_import_func(type_index, import.module, import.name)?;
             }
-            TypeRef::Memory(ty) => {
+            TypeRef::Memory(_ty) => {
                 todo!()
             }
-            TypeRef::Tag(e) => {
+            TypeRef::Tag(_e) => {
                 todo!()
             }
-            TypeRef::Global(ty) => {
+            TypeRef::Global(_ty) => {
                 todo!()
             }
-            TypeRef::Table(ty) => {
+            TypeRef::Table(_ty) => {
                 todo!()
             }
         }

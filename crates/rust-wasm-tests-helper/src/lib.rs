@@ -20,6 +20,7 @@
 
 extern crate c2zk_rust_wasm_tests_bundle1;
 
+#[allow(clippy::type_complexity)]
 pub fn wrap_main_with_io(
     main_func: &'static dyn Fn(),
 ) -> Box<dyn Fn(Vec<u64>, Vec<u64>) -> Vec<u64>> {

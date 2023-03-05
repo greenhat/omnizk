@@ -13,10 +13,12 @@ impl Default for TritonTargetConfig {
         Self {
             output_format: TritonOutputFormat::Source,
             ir_passes: vec![
-                Box::new(LocalsToMemPass::default()),
-                Box::new(GlobalsToMemPass::default()),
-                Box::new(BlocksToFuncPass::default()),
-                Box::new(PseudoOpSubPass::default()),
+                Box::<LocalsToMemPass>::default(),
+                Box::<GlobalsToMemPass>::default(),
+                Box::<BlocksToFuncPass>::default(),
+                // we might've added GlobalSet/Gets in the BlocksToFuncPass
+                Box::<GlobalsToMemPass>::default(),
+                Box::<PseudoOpSubPass>::default(),
             ],
         }
     }
