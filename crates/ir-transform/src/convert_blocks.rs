@@ -5,8 +5,10 @@ use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::BlockKind;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
+use c2zk_ir::ir::GlobalIndex;
 use c2zk_ir::ir::Inst;
 use c2zk_ir::ir::Module;
+use c2zk_ir::ir::Ty;
 use c2zk_ir::pass::IrPass;
 
 // TODO: since it's Triton specific, rename and/or move it to c2zk_ir_transform_tritonvm?
@@ -128,24 +130,30 @@ fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Fun
                             // handle Br* op
                             match traversed_blocks.last() {
                                 Some(BlockKind::Block) => {
-                                    new_func.push(Inst::GlobalGet {
-                                        global_idx: br_propagation_global_idx,
+                                    new_func.push(Inst::Call {
+                                        func_idx: module
+                                            .function_idx_by_name(NEXT_BR_PROPAGATION_FUNC_NAME)
+                                            .unwrap_or_else(|| {
+                                                module.push_function(next_br_propagation(
+                                                    br_propagation_global_idx,
+                                                ))
+                                            }),
                                     });
-                                    new_func.push(Inst::I32Const { value: -1 });
-                                    new_func.push(Inst::I32Add);
                                     // if not zero then return to the parent func(block), keep bailing out
                                     // zero is expected when we exited the targeted by Br op block
                                     new_func.push(TritonExt::Skiz.into());
                                     new_func.push(Inst::Return);
                                 }
                                 Some(BlockKind::Loop) => {
-                                    // decrease by 2 since we're recursing ("exiting" propagation early)
-                                    // earlier in loop than in block?
-                                    new_func.push(Inst::GlobalGet {
-                                        global_idx: br_propagation_global_idx,
+                                    new_func.push(Inst::Call {
+                                        func_idx: module
+                                            .function_idx_by_name(NEXT_BR_PROPAGATION_FUNC_NAME)
+                                            .unwrap_or_else(|| {
+                                                module.push_function(next_br_propagation(
+                                                    br_propagation_global_idx,
+                                                ))
+                                            }),
                                     });
-                                    new_func.push(Inst::I32Const { value: -1 });
-                                    new_func.push(Inst::I32Add);
                                     // if not zero then return to the parent func(block), keep bailing out
                                     // zero is expected when we exited into the targeted by Br op loop
                                     new_func.push(TritonExt::Skiz.into());
@@ -257,4 +265,38 @@ fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Fun
     }
     // dbg!(&new_func);
     new_func
+}
+
+const NEXT_BR_PROPAGATION_FUNC_NAME: &str = "next_br_propagation";
+
+fn next_br_propagation(global_index_br_propagation: GlobalIndex) -> Func {
+    let ins = vec![
+        Inst::GlobalGet {
+            global_idx: global_index_br_propagation,
+        },
+        Inst::Dup { idx: 0 },
+        Inst::I32Eqz,
+        TritonExt::Skiz.into(),
+        // exiting with 0 on the stack
+        Inst::Return,
+        // decrease, store, return
+        Inst::I32Const { value: -1 },
+        Inst::I32Add,
+        // leave return value
+        Inst::Dup { idx: 0 },
+        Inst::GlobalSet {
+            global_idx: global_index_br_propagation,
+        },
+        Inst::Return,
+    ];
+    Func::new(
+        NEXT_BR_PROPAGATION_FUNC_NAME.to_string(),
+        FuncType {
+            params: vec![],
+            results: vec![Ty::I32],
+        },
+        vec![],
+        ins,
+        HashMap::new(),
+    )
 }

@@ -107,10 +107,7 @@ fn test_nested_block_br_if() {
             return
             main_l0_b0:
             call main_l0_b0_l1_b0
-            push -2
-            call globals_get
-            push -1
-            add
+            call next_br_propagation
             skiz
             return
             push 7
@@ -120,14 +117,25 @@ fn test_nested_block_br_if() {
             push 3
             call c2zk_stdlib_pub_output
             call main_l0_b0_l1_b0_l2_b0
-            push -2
-            call globals_get
-            push -1
-            add
+            call next_br_propagation
             skiz
             return
             push 9
             call c2zk_stdlib_pub_output
+            return
+            next_br_propagation:
+            push -2
+            call globals_get
+            dup0
+            push 0
+            eq
+            skiz
+            return
+            push -1
+            add
+            dup0
+            push -2
+            call globals_set
             return
             main_l0_b0_l1_b0_l2_b0:
             push 8

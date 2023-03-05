@@ -110,10 +110,7 @@ fn test_loop_in_block() {
             return
             main_l0_b0:
             call main_l0_b0_l1_b0
-            push -2
-            call globals_get
-            push -1
-            add
+            call next_br_propagation
             skiz
             return
             push 6
@@ -132,6 +129,20 @@ fn test_loop_in_block() {
             recurse
             push 7
             call c2zk_stdlib_pub_output
+            return
+            next_br_propagation:
+            push -2
+            call globals_get
+            dup0
+            push 0
+            eq
+            skiz
+            return
+            push -1
+            add
+            dup0
+            push -2
+            call globals_set
             return"#]],
     );
 }
