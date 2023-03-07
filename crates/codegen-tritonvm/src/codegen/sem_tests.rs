@@ -63,24 +63,6 @@ fn check_triton(
 
     // pp_trace(&trace);
 
-    // dbg!(&_trace.last().unwrap().op_stack);
-    // dbg!(&_trace.last().unwrap().program[.._trace.last().unwrap().instruction_pointer]);
-    // dbg!(_trace.last().unwrap().instruction_pointer);
-    // dbg!(&_trace.last().unwrap().current_instruction());
-
-    // dbg!(&_trace
-    //     .iter()
-    //     .map(|s| s.op_stack.height())
-    //     .collect::<Vec<usize>>());
-
-    // dbg!(_trace.last().unwrap().cycle_count);
-    // dbg!(_trace.last().unwrap().op_stack.is_too_shallow());
-    // pretty print state
-    // dbg!(format!("{}", &_trace.last().unwrap()));
-    // dbg!(&_trace.last().unwrap().jump_stack);
-    // dbg!(&_trace.len());
-    // dbg!(pretty_stack(&_trace.last().unwrap().op_stack));
-    // dbg!(pretty_print_ram(&_trace.last().unwrap().ram));
     dbg!(&err);
     assert!(err.is_none());
     assert_eq!(
