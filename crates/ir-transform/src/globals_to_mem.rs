@@ -106,6 +106,11 @@ fn to_global_inst(idx: usize, inst: &Inst) -> Option<(usize, GlobalInst)> {
 
 fn global_get_func() -> Func {
     let ins = vec![
+        // treat each global value size as 4 bytes (i32)
+        Inst::I32Const {
+            value: Ty::I32.size() as i32,
+        },
+        Inst::I32Mul,
         Inst::I32Const {
             value: GLOBAL_MEMORY_BASE as i32,
         },
@@ -128,6 +133,11 @@ fn global_get_func() -> Func {
 fn global_set_func() -> Func {
     // first value, next pointer
     let ins = vec![
+        // treat each global value size as 4 bytes (i32)
+        Inst::I32Const {
+            value: Ty::I32.size() as i32,
+        },
+        Inst::I32Mul,
         Inst::I32Const {
             value: GLOBAL_MEMORY_BASE as i32,
         },

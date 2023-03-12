@@ -61,7 +61,7 @@ fn check_triton(
     let secret_input = secret_input.into_iter().map(Into::into).collect();
     let (trace, out, err) = triton_vm::vm::run(&program, input, secret_input);
 
-    // pp_trace(&trace);
+    pp_trace(&trace);
 
     dbg!(&err);
     assert!(err.is_none());
@@ -70,13 +70,14 @@ fn check_triton(
         expected_output
     );
     let stack = pretty_stack(&trace.last().unwrap().op_stack);
-    let expected_stack: Vec<u64> = Vec::new();
+    let expected_stack: Vec<u64> = vec![0; 16];
     assert_eq!(stack, expected_stack);
 }
 
 fn pp_trace(_trace: &[triton_vm::state::VMState]) {
     // iterate over last n traces
-    for state in _trace.iter().rev().take(400).rev() {
+    for state in _trace.iter() {
+        //.rev().take(400).rev() {
         let s = format!(
             "{}: {}",
             &state.current_instruction().unwrap(),
@@ -149,7 +150,7 @@ fn pretty_stack(stack: &OpStack) -> Vec<u64> {
         .stack
         .iter()
         .map(|b| b.value())
-        .filter(|v| *v != 0)
+        // .filter(|v| *v != 0)
         .rev()
         .collect::<Vec<u64>>()
 }

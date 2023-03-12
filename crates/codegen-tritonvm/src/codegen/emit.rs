@@ -97,6 +97,9 @@ pub fn emit_inst(
 }
 
 fn write_mem(sink: &mut InstBuffer, offset: &u32) {
+    // TODO: we're treating TritonVM memory model as KV store for now
+    // meaning that the pointer is the key and the value is the value
+    // ignoring the fact that Wasm pointer points to a byte
     if offset != &0 {
         // swap the value and the pointer to add the offset
         sink.push(AnInstruction::Swap(Ord16::ST1));

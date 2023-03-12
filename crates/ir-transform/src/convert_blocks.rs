@@ -189,8 +189,8 @@ fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Fun
                 };
             }
             Inst::Br { relative_depth } => {
-                dbg!(&capture_state);
-                dbg!(&traversed_blocks);
+                // dbg!(&capture_state);
+                // dbg!(&traversed_blocks);
                 if capture_state.nested_level() == 1 {
                     // dbg!(&extracted_func_builder);
                     if *relative_depth > 0 {

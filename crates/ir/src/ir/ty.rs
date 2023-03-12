@@ -14,6 +14,17 @@ pub enum Ty {
     ExternRef,
 }
 
+impl Ty {
+    pub fn size(&self) -> u32 {
+        match self {
+            Ty::I32 | Ty::F32 => 4,
+            Ty::I64 | Ty::F64 => 8,
+            Ty::V128 => 16,
+            Ty::FuncRef | Ty::ExternRef => 4,
+        }
+    }
+}
+
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
 pub struct FuncType {
     pub params: Vec<Ty>,

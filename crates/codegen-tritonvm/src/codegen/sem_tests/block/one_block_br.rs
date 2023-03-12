@@ -47,13 +47,13 @@ fn test_one_block_br() {
             write_mem
             pop
             pop
-            push -1
+            push -4
             add
             push -1
             call globals_set
             push -1
             call globals_get
-            push 1
+            push 4
             add
             push 0
             read_mem
@@ -62,7 +62,7 @@ fn test_one_block_br() {
             write_io
             push -1
             call globals_get
-            push 1
+            push 4
             add
             push -1
             call globals_set
@@ -78,11 +78,13 @@ fn test_one_block_br() {
             return
             return
             init_mem_for_locals:
-            push 00000000002147483643
+            push 00000000002147483635
             push -1
             call globals_set
             return
             globals_get:
+            push 4
+            mul
             push 00000000002147483647
             add
             push 0
@@ -91,6 +93,8 @@ fn test_one_block_br() {
             pop
             return
             globals_set:
+            push 4
+            mul
             push 00000000002147483647
             add
             swap1
