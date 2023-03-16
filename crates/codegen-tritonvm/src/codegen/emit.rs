@@ -30,7 +30,12 @@ pub fn emit_inst(
         Inst::I32Mul => sink.push(AnInstruction::Mul),
         Inst::I32And => sink.push(AnInstruction::And),
         Inst::I32GeU => {
+            // todo!("Wasm semantics: pop i2, pop i1, push i1 >= i2");
+            // todo!("Lt semantics: pop i1, pop i2, push i1 < i2");
+            // todo!("extract as an IR pass with tests");
             sink.append(vec![
+                // swap lhs and rhs from Wasm semantics to TritonVM Lt semantics
+                AnInstruction::Swap(Ord16::ST1),
                 // Duplicate the pair
                 AnInstruction::Dup(Ord16::ST1),
                 AnInstruction::Dup(Ord16::ST1),

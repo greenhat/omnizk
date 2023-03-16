@@ -449,6 +449,7 @@ fn test_fib() {
             push -1
             add
             push 7
+            swap1
             dup1
             dup1
             lt
