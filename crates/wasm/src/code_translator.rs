@@ -42,12 +42,16 @@ pub fn translate_operator(
         Operator::I64Const { value } => func_builder.ins().i64const(*value),
         Operator::I32Add => func_builder.ins().i32add(),
         Operator::I32Eqz => func_builder.ins().i32eqz(),
+        Operator::I32WrapI64 => func_builder.ins().i32wrapi64(),
+        Operator::I32GeU => func_builder.ins().i32geu(),
+        Operator::I32And => func_builder.ins().i32and(),
         Operator::I64Add => func_builder.ins().i64add(),
         Operator::I64Eqz => func_builder.ins().i64eqz(),
         Operator::I64And => func_builder.ins().i64and(),
         Operator::I64GeU => func_builder.ins().i64geu(),
         Operator::I64Ne => func_builder.ins().i64ne(),
         Operator::I64Eq => func_builder.ins().i64eq(),
+        Operator::I64ExtendI32U => func_builder.ins().i64extendi32u(),
         _ => todo!("Wasm op not implemented: {:?}", op),
     };
     Ok(())

@@ -54,6 +54,18 @@ impl<'a> InstBuilder<'a> {
         self.fbuilder.push(Inst::I32Eqz);
     }
 
+    pub fn i32wrapi64(&mut self) {
+        self.fbuilder.push(Inst::I32WrapI64);
+    }
+
+    pub fn i32and(&mut self) {
+        self.fbuilder.push(Inst::I32And);
+    }
+
+    pub fn i32geu(&mut self) {
+        self.fbuilder.push(Inst::I32GeU);
+    }
+
     pub fn i64add(&mut self) {
         self.fbuilder.push(Inst::I32Add);
     }
@@ -76,6 +88,10 @@ impl<'a> InstBuilder<'a> {
 
     pub fn i64ne(&mut self) {
         self.fbuilder.push(Inst::I64Ne);
+    }
+
+    pub fn i64extendi32u(&mut self) {
+        self.fbuilder.push(Inst::I64ExtendI32U);
     }
 
     pub fn call(&mut self, func_index: u32) {

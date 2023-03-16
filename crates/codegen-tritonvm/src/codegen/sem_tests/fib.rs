@@ -30,102 +30,98 @@ fn test_fib() {
                 call $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E
               )
               (func $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E (;3;) (type 2)
-                (local i64 i64 i64 i64)
-                block ;; label = @1
-                  call $_ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E
-                  local.tee 0
-                  i64.eqz
-                  i32.eqz
-                  br_if 0 (;@1;)
-                  i64.const 0
-                  call $_ZN11c2zk_stdlib10pub_output17h88275f26ad69ad8bE
-                  return
-                end
-                local.get 0
-                i64.const 7
-                i64.and
-                local.set 1
+                (local i32 i32 i32 i32)
                 block ;; label = @1
                   block ;; label = @2
-                    local.get 0
-                    i64.const -1
-                    i64.add
-                    i64.const 7
-                    i64.ge_u
+                    call $_ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E
+                    i32.wrap_i64
+                    local.tee 0
                     br_if 0 (;@2;)
-                    i64.const 1
-                    local.set 0
-                    i64.const 0
-                    local.set 2
+                    i32.const 0
+                    local.set 1
                     br 1 (;@1;)
                   end
                   local.get 0
-                  i64.const -8
-                  i64.and
-                  local.set 3
-                  i64.const 1
-                  local.set 0
-                  i64.const 0
+                  i32.const 7
+                  i32.and
                   local.set 2
-                  loop ;; label = @2
+                  block ;; label = @2
+                    block ;; label = @3
+                      local.get 0
+                      i32.const -1
+                      i32.add
+                      i32.const 7
+                      i32.ge_u
+                      br_if 0 (;@3;)
+                      i32.const 1
+                      local.set 0
+                      i32.const 0
+                      local.set 1
+                      br 1 (;@2;)
+                    end
                     local.get 0
-                    local.get 2
-                    i64.add
-                    local.tee 2
-                    local.get 0
-                    i64.add
-                    local.tee 0
-                    local.get 2
-                    i64.add
-                    local.tee 2
-                    local.get 0
-                    i64.add
-                    local.tee 0
-                    local.get 2
-                    i64.add
-                    local.tee 2
-                    local.get 0
-                    i64.add
-                    local.tee 0
-                    local.get 2
-                    i64.add
-                    local.tee 2
-                    local.get 0
-                    i64.add
+                    i32.const -8
+                    i32.and
+                    local.set 3
+                    i32.const 1
                     local.set 0
-                    local.get 3
-                    i64.const -8
-                    i64.add
-                    local.tee 3
-                    i64.eqz
-                    i32.eqz
-                    br_if 0 (;@2;)
+                    i32.const 0
+                    local.set 1
+                    loop ;; label = @3
+                      local.get 0
+                      local.get 1
+                      i32.add
+                      local.tee 1
+                      local.get 0
+                      i32.add
+                      local.tee 0
+                      local.get 1
+                      i32.add
+                      local.tee 1
+                      local.get 0
+                      i32.add
+                      local.tee 0
+                      local.get 1
+                      i32.add
+                      local.tee 1
+                      local.get 0
+                      i32.add
+                      local.tee 0
+                      local.get 1
+                      i32.add
+                      local.tee 1
+                      local.get 0
+                      i32.add
+                      local.set 0
+                      local.get 3
+                      i32.const -8
+                      i32.add
+                      local.tee 3
+                      br_if 0 (;@3;)
+                    end
                   end
-                end
-                block ;; label = @1
-                  local.get 1
-                  i64.eqz
-                  br_if 0 (;@1;)
                   local.get 2
+                  i32.eqz
+                  br_if 0 (;@1;)
+                  local.get 1
                   local.set 3
                   loop ;; label = @2
                     local.get 0
-                    local.tee 2
-                    local.get 3
-                    i64.add
-                    local.set 0
-                    local.get 2
-                    local.set 3
-                    local.get 1
-                    i64.const -1
-                    i64.add
                     local.tee 1
-                    i64.const 0
-                    i64.ne
+                    local.get 3
+                    i32.add
+                    local.set 0
+                    local.get 1
+                    local.set 3
+                    local.get 2
+                    i32.const -1
+                    i32.add
+                    local.tee 2
                     br_if 0 (;@2;)
                   end
                 end
-                local.get 2
+                local.get 1
+                i64.extend_i32_u
                 call $_ZN11c2zk_stdlib10pub_output17h88275f26ad69ad8bE
               )
               (func $_ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E (;4;) (type 0) (result i64)
@@ -192,29 +188,7 @@ fn test_fib() {
             call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0
             push -1
             call globals_get
-            push 16
-            add
-            push 0
-            read_mem
-            swap1
-            pop
-            push 7
-            and
-            push -1
-            call globals_get
-            swap1
-            swap1
             push 12
-            add
-            swap1
-            write_mem
-            pop
-            pop
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b2
-            push -1
-            call globals_get
-            push 8
             add
             push 0
             read_mem
@@ -285,6 +259,76 @@ fn test_fib() {
             pop
             return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0:
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b0
+            call next_br_propagation
+            skiz
+            return
+            push -1
+            call globals_get
+            push 16
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push 7
+            and
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 8
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1
+            call next_br_propagation
+            skiz
+            return
+            push -1
+            call globals_get
+            push 8
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push 0
+            eq
+            skiz
+            return
+            push -1
+            call globals_get
+            push 12
+            add
+            push 0
+            read_mem
+            swap1
+            pop
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 4
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b2
+            call next_br_propagation
+            skiz
+            return
+            push -1
+            call globals_get
+            push 16
+            add
+            push -1
+            call globals_set
+            return
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b0:
             call _ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E
             dup0
             push -1
@@ -297,30 +341,46 @@ fn test_fib() {
             write_mem
             pop
             pop
+            skiz
+            return
             push 0
-            eq
+            push -1
+            call globals_get
+            swap1
+            swap1
+            push 12
+            add
+            swap1
+            write_mem
+            pop
+            pop
+            push 2
+            push -2
+            call globals_set
+            return
+            push -1
+            call globals_get
+            push 16
+            add
+            push -1
+            call globals_set
+            return
+            next_br_propagation:
+            push -2
+            call globals_get
+            dup0
             push 0
             eq
             skiz
             return
-            push 0
-            call _ZN11c2zk_stdlib10pub_output17h88275f26ad69ad8bE
             push -1
-            call globals_get
-            push 16
             add
-            push -1
+            dup0
+            push -2
             call globals_set
             return
-            push -1
-            call globals_get
-            push 16
-            add
-            push -1
-            call globals_set
-            return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1:
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1_l1_b0
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1:
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1_l2_b0
             call next_br_propagation
             skiz
             return
@@ -360,13 +420,13 @@ fn test_fib() {
             call globals_get
             swap1
             swap1
-            push 8
+            push 12
             add
             swap1
             write_mem
             pop
             pop
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1_l1_b1
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1_l2_b1
             call next_br_propagation
             skiz
             return
@@ -377,7 +437,7 @@ fn test_fib() {
             push -1
             call globals_set
             return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1_l1_b0:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1_l2_b0:
             push -1
             call globals_get
             push 16
@@ -394,6 +454,7 @@ fn test_fib() {
             lt
             push 0
             eq
+            swap2
             swap1
             eq
             add
@@ -417,7 +478,7 @@ fn test_fib() {
             call globals_get
             swap1
             swap1
-            push 8
+            push 12
             add
             swap1
             write_mem
@@ -434,21 +495,7 @@ fn test_fib() {
             push -1
             call globals_set
             return
-            next_br_propagation:
-            push -2
-            call globals_get
-            dup0
-            push 0
-            eq
-            skiz
-            return
-            push -1
-            add
-            dup0
-            push -2
-            call globals_set
-            return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b1_l1_b1:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1_l2_b1:
             push -1
             call globals_get
             push 16
@@ -459,7 +506,7 @@ fn test_fib() {
             pop
             push -1
             call globals_get
-            push 8
+            push 12
             add
             push 0
             read_mem
@@ -471,7 +518,7 @@ fn test_fib() {
             call globals_get
             swap1
             swap1
-            push 8
+            push 12
             add
             swap1
             write_mem
@@ -499,7 +546,7 @@ fn test_fib() {
             pop
             push -1
             call globals_get
-            push 8
+            push 12
             add
             push 0
             read_mem
@@ -511,7 +558,7 @@ fn test_fib() {
             call globals_get
             swap1
             swap1
-            push 8
+            push 12
             add
             swap1
             write_mem
@@ -539,7 +586,7 @@ fn test_fib() {
             pop
             push -1
             call globals_get
-            push 8
+            push 12
             add
             push 0
             read_mem
@@ -551,7 +598,7 @@ fn test_fib() {
             call globals_get
             swap1
             swap1
-            push 8
+            push 12
             add
             swap1
             write_mem
@@ -579,7 +626,7 @@ fn test_fib() {
             pop
             push -1
             call globals_get
-            push 8
+            push 12
             add
             push 0
             read_mem
@@ -591,7 +638,7 @@ fn test_fib() {
             call globals_get
             swap1
             swap1
-            push 8
+            push 12
             add
             swap1
             write_mem
@@ -637,10 +684,6 @@ fn test_fib() {
             write_mem
             pop
             pop
-            push 0
-            eq
-            push 0
-            eq
             skiz
             recurse
             push -1
@@ -650,49 +693,7 @@ fn test_fib() {
             push -1
             call globals_set
             return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b2:
-            push -1
-            call globals_get
-            push 12
-            add
-            push 0
-            read_mem
-            swap1
-            pop
-            push 0
-            eq
-            skiz
-            return
-            push -1
-            call globals_get
-            push 8
-            add
-            push 0
-            read_mem
-            swap1
-            pop
-            push -1
-            call globals_get
-            swap1
-            swap1
-            push 4
-            add
-            swap1
-            write_mem
-            pop
-            pop
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b2_l1_b0
-            call next_br_propagation
-            skiz
-            return
-            push -1
-            call globals_get
-            push 16
-            add
-            push -1
-            call globals_set
-            return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b2_l1_b0:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b2:
             push -1
             call globals_get
             push 16
@@ -706,7 +707,7 @@ fn test_fib() {
             call globals_get
             swap1
             swap1
-            push 8
+            push 12
             add
             swap1
             write_mem
@@ -733,7 +734,7 @@ fn test_fib() {
             pop
             push -1
             call globals_get
-            push 8
+            push 12
             add
             push 0
             read_mem
@@ -751,7 +752,7 @@ fn test_fib() {
             pop
             push -1
             call globals_get
-            push 12
+            push 8
             add
             push 0
             read_mem
@@ -764,16 +765,12 @@ fn test_fib() {
             call globals_get
             swap1
             swap1
-            push 12
+            push 8
             add
             swap1
             write_mem
             pop
             pop
-            push 0
-            eq
-            push 0
-            eq
             skiz
             recurse
             push -1

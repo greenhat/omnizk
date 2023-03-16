@@ -28,6 +28,30 @@ pub fn emit_inst(
         Inst::I32Store { offset } => write_mem(sink, offset),
         Inst::I32Add => sink.push(AnInstruction::Add),
         Inst::I32Mul => sink.push(AnInstruction::Mul),
+        Inst::I32And => sink.push(AnInstruction::And),
+        Inst::I32GeU => {
+            sink.append(vec![
+                // Duplicate the pair
+                AnInstruction::Dup(Ord16::ST1),
+                AnInstruction::Dup(Ord16::ST1),
+                AnInstruction::Lt,
+                // invert Lt to Gt
+                AnInstruction::Push(0u32.into()),
+                AnInstruction::Eq,
+                // ----------------
+                // swap Gt with second element
+                AnInstruction::Swap(Ord16::ST2),
+                AnInstruction::Swap(Ord16::ST1),
+                AnInstruction::Eq,
+                // Gt + Eq
+                AnInstruction::Add,
+                // Gt + Eq == 1
+                AnInstruction::Push(1u32.into()),
+                AnInstruction::Eq,
+            ])
+        }
+        Inst::I32Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
+        Inst::I32WrapI64 => (),
         Inst::I64Add => sink.push(AnInstruction::Add),
         Inst::I64Mul => sink.push(AnInstruction::Mul),
         Inst::I64And => sink.push(AnInstruction::And),
@@ -42,7 +66,6 @@ pub fn emit_inst(
         Inst::SecretInputRead => sink.push(AnInstruction::Divine(None)),
         Inst::I64Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
         Inst::I64Eq => sink.push(AnInstruction::Eq),
-        Inst::I32Eqz => sink.append(vec![AnInstruction::Push(0u32.into()), AnInstruction::Eq]),
         Inst::I64Const { value } => sink.push(AnInstruction::Push(felt_i64(*value))),
         // TODO: extract to IR pass
         Inst::I64GeU => sink.append(vec![
@@ -55,6 +78,7 @@ pub fn emit_inst(
             AnInstruction::Eq,
             // ----------------
             // swap Gt with second element
+            AnInstruction::Swap(Ord16::ST2),
             AnInstruction::Swap(Ord16::ST1),
             AnInstruction::Eq,
             // Gt + Eq
@@ -69,6 +93,7 @@ pub fn emit_inst(
             AnInstruction::Push(0u32.into()),
             AnInstruction::Eq,
         ]),
+        Inst::I64ExtendI32U => (),
         // Extra (besides the wasm instructions)
         // -------------------------------------
         Inst::Swap { idx } => sink.push(AnInstruction::Swap(ord16_u8(*idx)?)),
