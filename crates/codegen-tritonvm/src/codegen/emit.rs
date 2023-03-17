@@ -74,6 +74,8 @@ pub fn emit_inst(
         Inst::I64Const { value } => sink.push(AnInstruction::Push(felt_i64(*value))),
         // TODO: extract to IR pass
         Inst::I64GeU => sink.append(vec![
+            // swap lhs and rhs from Wasm semantics to TritonVM Lt semantics
+            AnInstruction::Swap(Ord16::ST1),
             // Duplicate the pair
             AnInstruction::Dup(Ord16::ST1),
             AnInstruction::Dup(Ord16::ST1),
