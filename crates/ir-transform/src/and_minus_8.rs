@@ -13,7 +13,7 @@ impl IrPass for AndMinus8Pass {
             if let Inst::I32Const { value } = inst {
                 if *value < 0 {
                     if let Some(Inst::I32And) = iter.peek() {
-                        *value = i32::MAX - (*value).abs() - 1;
+                        *value = i32::MAX - ((*value).abs() - 1);
                     }
                 }
             }

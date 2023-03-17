@@ -6,8 +6,10 @@ use crate::codegen::sem_tests::check_wasm;
 #[test]
 fn test_fib() {
     // todo!("...651 is bigget than i32::MAX (...646)");
+    // let input = vec![18];
     let input = vec![25];
     let secret_input = vec![];
+    // let expected_output = vec![2584];
     let expected_output = vec![75025];
     let native_output = c2zk_rust_wasm_tests_helper::wrap_main_with_io(
         &c2zk_rust_wasm_tests_bundle1::fib::fib_seq,
@@ -392,7 +394,7 @@ fn test_fib() {
             read_mem
             swap1
             pop
-            push 00000000002147483638
+            push 00000000002147483640
             and
             push -1
             call globals_get
