@@ -1,4 +1,5 @@
 use c2zk_ir::pass::IrPass;
+use c2zk_ir_transform::AndMinus8Pass;
 use c2zk_ir_transform::BlocksToFuncPass;
 use c2zk_ir_transform::GlobalsToMemPass;
 use c2zk_ir_transform::LocalsToMemPass;
@@ -13,6 +14,7 @@ impl Default for TritonTargetConfig {
         Self {
             output_format: TritonOutputFormat::Source,
             ir_passes: vec![
+                Box::<AndMinus8Pass>::default(),
                 Box::<LocalsToMemPass>::default(),
                 Box::<GlobalsToMemPass>::default(),
                 Box::<BlocksToFuncPass>::default(),

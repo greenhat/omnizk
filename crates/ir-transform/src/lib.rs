@@ -18,11 +18,13 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
+mod and_minus_8;
 mod convert_blocks;
 mod globals_to_mem;
 mod locals_to_mem;
 mod pseudo_op_sub;
 
+pub use and_minus_8::AndMinus8Pass;
 pub use convert_blocks::BlocksToFuncPass;
 pub use globals_to_mem::GlobalsToMemPass;
 pub use locals_to_mem::LocalsToMemPass;

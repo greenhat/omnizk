@@ -392,7 +392,7 @@ fn test_fib() {
             read_mem
             swap1
             pop
-            push -8
+            push 00000000002147483638
             and
             push -1
             call globals_get
