@@ -21,6 +21,7 @@ impl IrPass for LocalsToMemPass {
             module.globals_alloc_size(),
         );
         for func in module.functions_mut().iter_mut() {
+            dbg!(&func);
             let mut new_func = Func::new(
                 func.name().to_string(),
                 func.sig().clone(),
@@ -83,7 +84,9 @@ impl IrPass for LocalsToMemPass {
             } else {
                 0
             };
-            for inst in func.instructions_mut().iter_mut() {
+
+            let mut iter = func.instructions_mut().iter_mut().peekable();
+            while let Some(inst) = iter.next() {
                 match inst {
                     Inst::LocalGet { local_idx } => {
                         new_func.push(Inst::GlobalGet {
@@ -113,24 +116,23 @@ impl IrPass for LocalsToMemPass {
                             offset: (reverse_index_base - *local_idx) * Ty::I32.size(),
                         });
                     }
-                    Inst::Return | Inst::End => {
-                        if total_local_count > 0 {
-                            // increase (rollback) the pointer stored in global base_local_offset
-                            // by the number of locals upon return
-                            new_func.push(Inst::GlobalGet {
-                                global_idx: global_idx_for_base_local_offset,
-                            });
-                            new_func.push(Inst::I32Const {
-                                value: total_local_count as i32 * Ty::I32.size() as i32,
-                            });
-                            new_func.push(Inst::I32Add);
-                            new_func.push(Inst::GlobalSet {
-                                global_idx: global_idx_for_base_local_offset,
-                            });
-                        }
-                        // original (return or end) instruction
-                        new_func.push(inst.clone());
+                    Inst::Return => {
+                        restore_base_local_offset(
+                            inst,
+                            &mut new_func,
+                            global_idx_for_base_local_offset,
+                            total_local_count,
+                        );
                     }
+                    Inst::End if iter.peek().is_none() => {
+                        restore_base_local_offset(
+                            inst,
+                            &mut new_func,
+                            global_idx_for_base_local_offset,
+                            total_local_count,
+                        );
+                    }
+
                     _ => new_func.push(inst.clone()),
                 };
             }
@@ -142,6 +144,30 @@ impl IrPass for LocalsToMemPass {
     fn run_func_pass(&self, _func: &mut c2zk_ir::ir::Func) {
         unreachable!();
     }
+}
+
+fn restore_base_local_offset(
+    inst: &Inst,
+    new_func: &mut Func,
+    global_idx_for_base_local_offset: GlobalIndex,
+    total_local_count: u32,
+) {
+    if total_local_count > 0 {
+        // increase (rollback) the pointer stored in global base_local_offset
+        // by the number of locals upon return
+        new_func.push(Inst::GlobalGet {
+            global_idx: global_idx_for_base_local_offset,
+        });
+        new_func.push(Inst::I32Const {
+            value: total_local_count as i32 * Ty::I32.size() as i32,
+        });
+        new_func.push(Inst::I32Add);
+        new_func.push(Inst::GlobalSet {
+            global_idx: global_idx_for_base_local_offset,
+        });
+    }
+    // original (return or end) instruction
+    new_func.push(inst.clone());
 }
 
 fn mod_prologue_func(

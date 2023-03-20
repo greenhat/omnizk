@@ -323,12 +323,6 @@ fn test_fib() {
             call next_br_propagation
             skiz
             return
-            push -1
-            call globals_get
-            push 16
-            add
-            push -1
-            call globals_set
             return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b0:
             call _ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E
@@ -360,12 +354,6 @@ fn test_fib() {
             push -2
             call globals_set
             return
-            push -1
-            call globals_get
-            push 16
-            add
-            push -1
-            call globals_set
             return
             next_br_propagation:
             push -2
@@ -432,12 +420,6 @@ fn test_fib() {
             call next_br_propagation
             skiz
             return
-            push -1
-            call globals_get
-            push 16
-            add
-            push -1
-            call globals_set
             return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1_l2_b0:
             push -1
@@ -491,12 +473,6 @@ fn test_fib() {
             push -2
             call globals_set
             return
-            push -1
-            call globals_get
-            push 16
-            add
-            push -1
-            call globals_set
             return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1_l2_b1:
             push -1
@@ -689,12 +665,6 @@ fn test_fib() {
             pop
             skiz
             recurse
-            push -1
-            call globals_get
-            push 16
-            add
-            push -1
-            call globals_set
             return
             _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b2:
             push -1
@@ -776,12 +746,6 @@ fn test_fib() {
             pop
             skiz
             recurse
-            push -1
-            call globals_get
-            push 16
-            add
-            push -1
-            call globals_set
             return"#]],
     )
 }
