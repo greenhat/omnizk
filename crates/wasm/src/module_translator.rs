@@ -117,9 +117,8 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
             }
 
             Payload::CustomSection(s) if s.name() == "name" => {
-                let result = NameSectionReader::new(s.data(), s.data_offset())
-                    .map_err(|e| e.into())
-                    .and_then(|s| parse_name_section(s, &mut mod_builder));
+                let subsections = NameSectionReader::new(s.data(), s.data_offset());
+                let result = parse_name_section(subsections, &mut mod_builder);
                 if let Err(e) = result {
                     log::warn!("failed to parse name section {:?}", e);
                 }
@@ -213,7 +212,7 @@ fn parse_local_decls(
     for _ in 0..local_count {
         let pos = reader.original_position();
         let count = reader.read_var_u32()?;
-        let ty = reader.read_val_type()?;
+        let ty = reader.read::<wasmparser::ValType>()?;
         validator.define_locals(pos, count, ty)?;
         builder.declare_local(count, ty.into_ir());
     }

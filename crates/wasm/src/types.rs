@@ -6,7 +6,7 @@
 use c2zk_ir::ir;
 use derive_more::From;
 pub use wasmparser;
-use wasmparser::{BlockType, ValType};
+use wasmparser::{BlockType, RefType, ValType};
 
 use std::convert::TryFrom;
 
@@ -172,7 +172,7 @@ impl Global {
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq)]
 pub struct Table {
     /// The table elements' Wasm type.
-    pub wasm_ty: ValType,
+    pub wasm_ty: RefType,
     /// The minimum number of elements in the table.
     pub minimum: u32,
     /// The maximum number of elements in the table.
@@ -257,8 +257,7 @@ impl IntoIr<ir::Ty> for wasmparser::ValType {
             wasmparser::ValType::F32 => ir::Ty::F32,
             wasmparser::ValType::F64 => ir::Ty::F64,
             wasmparser::ValType::V128 => ir::Ty::V128,
-            wasmparser::ValType::ExternRef => ir::Ty::ExternRef,
-            wasmparser::ValType::FuncRef => ir::Ty::FuncRef,
+            wasmparser::ValType::Ref(_) => todo!(),
         }
     }
 }
