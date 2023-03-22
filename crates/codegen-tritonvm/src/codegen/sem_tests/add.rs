@@ -70,10 +70,9 @@ fn test_add() {
             c2zk_stdlib_pub_output:
             push -1
             call globals_get
-            dup0
-            swap2
+            dup 0
+            swap 2
             write_mem
-            pop
             pop
             push -4
             add
@@ -83,9 +82,8 @@ fn test_add() {
             call globals_get
             push 4
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             write_io
             push -1
@@ -105,17 +103,15 @@ fn test_add() {
             _ZN28c2zk_rust_wasm_tests_bundle13add3add17h8212e59c2be7580eE:
             push -1
             call globals_get
-            dup0
-            swap2
+            dup 0
+            swap 2
             write_mem
-            pop
             pop
             push -4
             add
-            dup0
-            swap2
+            dup 0
+            swap 2
             write_mem
-            pop
             pop
             push -4
             add
@@ -125,17 +121,15 @@ fn test_add() {
             call globals_get
             push 4
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             push -1
             call globals_get
             push 8
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             add
             push -1
@@ -159,10 +153,9 @@ fn test_add() {
             _ZN11c2zk_stdlib10pub_output17h88275f26ad69ad8bE:
             push -1
             call globals_get
-            dup0
-            swap2
+            dup 0
+            swap 2
             write_mem
-            pop
             pop
             push -4
             add
@@ -172,9 +165,8 @@ fn test_add() {
             call globals_get
             push 4
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             call c2zk_stdlib_pub_output
             push -1
@@ -197,9 +189,8 @@ fn test_add() {
             mul
             push 00000000002147483647
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             return
             globals_set:
@@ -207,9 +198,8 @@ fn test_add() {
             mul
             push 00000000002147483647
             add
-            swap1
+            swap 1
             write_mem
-            pop
             pop
             return"#]],
     )

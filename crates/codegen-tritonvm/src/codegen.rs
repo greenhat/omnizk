@@ -79,7 +79,7 @@ mod tests {
         let out_source = inst_buf.pretty_print();
         expected_tree.assert_eq(&out_source);
         let program = inst_buf.program();
-        let (_trace, _out, err) = triton_vm::vm::run(&program, vec![], vec![]);
+        let (_trace, _out, err) = triton_vm::vm::debug(&program, vec![], vec![]);
         dbg!(&err);
         assert!(err.is_none());
     }
@@ -112,9 +112,8 @@ mod tests {
                 mul
                 push 00000000002147483647
                 add
-                push 0
                 read_mem
-                swap1
+                swap 1
                 pop
                 return
                 globals_set:
@@ -122,9 +121,8 @@ mod tests {
                 mul
                 push 00000000002147483647
                 add
-                swap1
+                swap 1
                 write_mem
-                pop
                 pop
                 return"#]],
         );

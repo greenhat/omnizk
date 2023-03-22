@@ -46,10 +46,9 @@ fn test_locals_func_exit() {
             c2zk_stdlib_pub_output:
             push -1
             call globals_get
-            dup0
-            swap2
+            dup 0
+            swap 2
             write_mem
-            pop
             pop
             push -4
             add
@@ -59,9 +58,8 @@ fn test_locals_func_exit() {
             call globals_get
             push 4
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             write_io
             push -1
@@ -77,17 +75,15 @@ fn test_locals_func_exit() {
             add:
             push -1
             call globals_get
-            dup0
-            swap2
+            dup 0
+            swap 2
             write_mem
-            pop
             pop
             push -4
             add
-            dup0
-            swap2
+            dup 0
+            swap 2
             write_mem
-            pop
             pop
             push -4
             add
@@ -97,17 +93,15 @@ fn test_locals_func_exit() {
             call globals_get
             push 8
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             push -1
             call globals_get
             push 4
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             add
             push -1
@@ -135,13 +129,12 @@ fn test_locals_func_exit() {
             push 5
             push -1
             call globals_get
-            swap1
-            swap1
+            swap 1
+            swap 1
             push 4
             add
-            swap1
+            swap 1
             write_mem
-            pop
             pop
             push 9
             push 7
@@ -150,9 +143,8 @@ fn test_locals_func_exit() {
             call globals_get
             push 4
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             call c2zk_stdlib_pub_output
             call c2zk_stdlib_pub_output
@@ -180,9 +172,8 @@ fn test_locals_func_exit() {
             mul
             push 00000000002147483647
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             return
             globals_set:
@@ -190,9 +181,8 @@ fn test_locals_func_exit() {
             mul
             push 00000000002147483647
             add
-            swap1
+            swap 1
             write_mem
-            pop
             pop
             return"#]],
     );

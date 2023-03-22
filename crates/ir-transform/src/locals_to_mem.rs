@@ -21,7 +21,7 @@ impl IrPass for LocalsToMemPass {
             module.globals_alloc_size(),
         );
         for func in module.functions_mut().iter_mut() {
-            dbg!(&func);
+            // dbg!(&func);
             let mut new_func = Func::new(
                 func.name().to_string(),
                 func.sig().clone(),

@@ -41,10 +41,9 @@ fn test_one_loop() {
             c2zk_stdlib_pub_output:
             push -1
             call globals_get
-            dup0
-            swap2
+            dup 0
+            swap 2
             write_mem
-            pop
             pop
             push -4
             add
@@ -54,9 +53,8 @@ fn test_one_loop() {
             call globals_get
             push 4
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             write_io
             push -1
@@ -84,9 +82,8 @@ fn test_one_loop() {
             mul
             push 00000000002147483647
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             return
             globals_set:
@@ -94,9 +91,8 @@ fn test_one_loop() {
             mul
             push 00000000002147483647
             add
-            swap1
+            swap 1
             write_mem
-            pop
             pop
             return
             main_l0_b0:
