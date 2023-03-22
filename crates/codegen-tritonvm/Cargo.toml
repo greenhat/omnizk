@@ -27,4 +27,4 @@ c2zk-rust-wasm-tests-bundle1 = { workspace = true }
 wat = { workspace = true }
 wasmprinter = { workspace = true }
 expect-test = "1.0.1"
-wasmtime = "5.0.0"
+wasmtime = "7.0.0"
