@@ -2,6 +2,7 @@
 members = [
   "crates/wasm",
   "crates/codegen-tritonvm",
+  "crates/codegen-midenvm",
   "crates/ir",
   "crates/ir-transform",
   "crates/frontend",

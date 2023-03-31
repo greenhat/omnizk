@@ -1,0 +1,25 @@
+[package]
+name = "c2zk-codegen-midenvm"
+version = "0.1.0"
+description = "Miden VM backend for c2zk"
+authors.workspace = true
+repository.workspace = true
+edition.workspace = true
+readme.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+c2zk-ir = { workspace = true }
+c2zk-ir-transform = { workspace = true }
+c2zk-codegen-shared = { workspace = true }
+
+[dev-dependencies]
+c2zk-frontend = { workspace = true }
+c2zk-rust-wasm-tests-helper = { workspace = true }
+c2zk-rust-wasm-tests-bundle1 = { workspace = true }
+wat = { workspace = true }
+wasmprinter = { workspace = true }
+expect-test = "1.0.1"
+wasmtime = "7.0.0"
