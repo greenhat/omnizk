@@ -1,10 +1,14 @@
+use c2zk_codegen_shared::func_index_to_label;
 use c2zk_ir::ir::Func;
+use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Module;
 
 mod inst_buf;
 pub use inst_buf::InstBuffer;
 mod emit;
 pub use emit::emit_inst;
+mod miden_inst;
+pub use miden_inst::*;
 
 use crate::MidenError;
 use crate::MidenTargetConfig;
@@ -16,7 +20,16 @@ pub fn compile_module(
     module: Module,
     config: &MidenTargetConfig,
 ) -> Result<InstBuffer, MidenError> {
-    todo!()
+    let mut sink = InstBuffer::new(config);
+    let func_names = module.func_names();
+    let mut builder = MidenAssemblyBuilder::new();
+    sink.push(builder.exec(func_index_to_label(module.start_func_idx, &func_names)));
+    for (idx, func) in module.into_functions().into_iter().enumerate() {
+        let idx = FuncIndex::from(idx as u32);
+        sink.push(builder.proc(func_index_to_label(idx, &func_names)));
+        compile_function(func, config, &mut sink, &func_names)?;
+    }
+    Ok(sink)
 }
 
 pub fn compile_function(
@@ -25,7 +38,14 @@ pub fn compile_function(
     sink: &mut InstBuffer,
     func_names: &[String],
 ) -> Result<(), MidenError> {
-    todo!()
+    for ins in func.instructions() {
+        let res = emit_inst(ins, config, sink, func_names);
+        if let Err(e) = res {
+            dbg!(&func);
+            return Err(e);
+        }
+    }
+    Ok(())
 }
 
 #[allow(clippy::unwrap_used)]

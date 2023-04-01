@@ -1,6 +1,6 @@
+use c2zk_codegen_shared::func_index_to_label;
 use c2zk_ir::ir::ext::Ext;
 use c2zk_ir::ir::ext::TritonExt;
-use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Inst;
 use triton_opcodes::instruction::AnInstruction;
 use triton_opcodes::ord_n::Ord16;
@@ -154,13 +154,6 @@ fn read_mem(sink: &mut InstBuffer, offset: &u32) {
     // swap the read value with the pointer (it's left after the read)
     sink.push(AnInstruction::Swap(Ord16::ST1));
     sink.push(AnInstruction::Pop);
-}
-
-pub(crate) fn func_index_to_label(func_index: FuncIndex, func_names: &[String]) -> String {
-    func_names
-        .get(usize::from(func_index))
-        .unwrap_or(&format!("f{}", u32::from(func_index)))
-        .to_string()
 }
 
 fn ord16_u8(x: u8) -> Result<Ord16, TritonError> {

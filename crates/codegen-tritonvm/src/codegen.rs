@@ -1,3 +1,4 @@
+use c2zk_codegen_shared::func_index_to_label;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Module;
@@ -13,8 +14,6 @@ mod sem_tests;
 
 use crate::TritonError;
 use crate::TritonTargetConfig;
-
-use self::emit::func_index_to_label;
 
 pub fn compile_module(
     module: Module,
