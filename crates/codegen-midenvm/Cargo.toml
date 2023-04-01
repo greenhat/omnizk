@@ -14,6 +14,7 @@ categories.workspace = true
 c2zk-ir = { workspace = true }
 c2zk-ir-transform = { workspace = true }
 c2zk-codegen-shared = { workspace = true }
+miden-assembly = "0.5"
 
 [dev-dependencies]
 c2zk-frontend = { workspace = true }

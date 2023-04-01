@@ -2,7 +2,7 @@ use crate::MidenOutputFormat;
 use crate::MidenTargetConfig;
 
 pub struct InstBuffer {
-    inner: Vec<LabelledInstruction>,
+    inner: Vec<String>,
 }
 impl InstBuffer {
     pub(crate) fn new(config: &MidenTargetConfig) -> Self {
@@ -12,33 +12,19 @@ impl InstBuffer {
         }
     }
 
-    #[allow(dead_code)]
-    pub(crate) fn program(&self) -> Program {
-        Program::new(&self.inner)
-    }
-
     pub(crate) fn pretty_print(&self) -> String {
-        self.inner
-            .iter()
-            .enumerate()
-            .map(|(idx, ins)| format!("{}", ins))
-            .collect::<Vec<String>>()
-            .join("\n")
+        self.inner.join("\n")
     }
 
-    pub(crate) fn push(&mut self, inst: AnInstruction<String>) {
-        self.inner.push(LabelledInstruction::Instruction(inst));
+    pub(crate) fn push(&mut self, inst: String) {
+        self.inner.push(inst);
     }
 
-    pub(crate) fn append(&mut self, insts: Vec<AnInstruction<String>>) {
-        let mut insts = insts
-            .into_iter()
-            .map(LabelledInstruction::Instruction)
-            .collect::<Vec<_>>();
+    pub(crate) fn append(&mut self, mut insts: Vec<String>) {
         self.inner.append(&mut insts);
     }
 
-    pub(crate) fn push_label(&mut self, label: String) {
-        self.inner.push(LabelledInstruction::Label(label));
+    pub(crate) fn push_func_label(&mut self, label: String) {
+        self.inner.push(format!("proc.{label}"));
     }
 }
