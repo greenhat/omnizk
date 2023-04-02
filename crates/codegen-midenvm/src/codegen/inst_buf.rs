@@ -17,7 +17,8 @@ impl InstBuffer {
         self.inner
             .iter()
             .map(|inst| String::from(inst.clone()))
-            .collect()
+            .collect::<Vec<String>>()
+            .join("\n")
     }
 
     pub(crate) fn push(&mut self, inst: MidenInst) {

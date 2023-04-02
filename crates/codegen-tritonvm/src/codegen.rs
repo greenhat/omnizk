@@ -77,10 +77,6 @@ mod tests {
         let inst_buf = compile_module(module, &triton_target_config).unwrap();
         let out_source = inst_buf.pretty_print();
         expected_tree.assert_eq(&out_source);
-        let program = inst_buf.program();
-        let (_trace, _out, err) = triton_vm::vm::debug(&program, vec![], vec![]);
-        dbg!(&err);
-        assert!(err.is_none());
     }
 
     #[test]

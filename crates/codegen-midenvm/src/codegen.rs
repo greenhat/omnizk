@@ -22,13 +22,18 @@ pub fn compile_module(
 ) -> Result<InstBuffer, MidenError> {
     let mut sink = InstBuffer::new(config);
     let func_names = module.func_names();
-    let mut builder = MidenAssemblyBuilder::new();
-    sink.push(builder.exec(func_index_to_label(module.start_func_idx, &func_names)));
+    let builder = MidenAssemblyBuilder::new();
+    let start_func_index = module.start_func_idx;
     for (idx, func) in module.into_functions().into_iter().enumerate() {
         let idx = FuncIndex::from(idx as u32);
         sink.push(builder.proc(func_index_to_label(idx, &func_names)));
         compile_function(func, config, &mut sink, &func_names)?;
     }
+    sink.push(builder.begin());
+    // TODO: store public inputs from stack
+    sink.push(builder.exec(func_index_to_label(start_func_index, &func_names)));
+    // TODO: put public outputs on stack
+    sink.push(builder.end());
     Ok(sink)
 }
 
@@ -53,6 +58,7 @@ pub fn compile_function(
 mod tests {
 
     use super::*;
+    use expect_test::expect;
 
     #[cfg(test)]
     fn check(input: &str, expected_tree: expect_test::Expect) {
@@ -70,10 +76,25 @@ mod tests {
         let inst_buf = compile_module(module, &triton_target_config).unwrap();
         let out_source = inst_buf.pretty_print();
         expected_tree.assert_eq(&out_source);
-        let program = inst_buf.pretty_print();
-        // TODO: execute the program
-        todo!();
-        // dbg!(&err);
-        // assert!(err.is_none());
+    }
+
+    #[test]
+    fn test_smoke() {
+        check(
+            r#"
+(module 
+    (start $f1)
+    (func $f1 
+        i32.const 1
+        return)
+)"#,
+            expect![[r#"
+                proc.f1
+                push.1
+                end
+                begin
+                call.f1
+                end"#]],
+        );
     }
 }

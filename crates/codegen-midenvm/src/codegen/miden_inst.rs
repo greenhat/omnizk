@@ -11,11 +11,27 @@ impl MidenAssemblyBuilder {
         Self {}
     }
 
-    pub fn proc(&mut self, name: String) -> MidenInst {
+    pub fn begin(&self) -> MidenInst {
+        "begin".to_string().into()
+    }
+
+    pub fn proc(&self, name: String) -> MidenInst {
         format!("proc.{name}").into()
     }
 
-    pub fn exec(&mut self, name: String) -> MidenInst {
+    pub fn exec(&self, name: String) -> MidenInst {
         format!("call.{name}").into()
+    }
+
+    pub fn push(&self, num: i64) -> MidenInst {
+        format!("push.{num}").into()
+    }
+
+    pub fn adv_push(&self, num: u32) -> MidenInst {
+        format!("adv_push.{num}").into()
+    }
+
+    pub fn end(&self) -> MidenInst {
+        "end".to_string().into()
     }
 }

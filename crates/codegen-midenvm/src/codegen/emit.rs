@@ -1,6 +1,7 @@
 use c2zk_ir::ir::Inst;
 
 use crate::InstBuffer;
+use crate::MidenAssemblyBuilder;
 use crate::MidenError;
 use crate::MidenTargetConfig;
 
@@ -11,17 +12,18 @@ pub fn emit_inst(
     sink: &mut InstBuffer,
     func_names: &[String],
 ) -> Result<(), MidenError> {
+    let b = MidenAssemblyBuilder::new();
     match ins {
         Inst::Unreachable => todo!(),
         Inst::Nop => todo!(),
         Inst::Call { func_idx } => todo!(),
-        Inst::End => todo!(),
-        Inst::Return => todo!(),
+        Inst::End => sink.push(b.end()),
+        Inst::Return => (), // TODO: this is vaid only if next inst is End
         Inst::Loop { block_type } => todo!(),
         Inst::Block { blockty } => todo!(),
         Inst::BrIf { relative_depth } => todo!(),
         Inst::Br { relative_depth } => todo!(),
-        Inst::I32Const { value } => todo!(),
+        Inst::I32Const { value } => sink.push(b.push(*value as i64)),
         Inst::I64Const { value } => todo!(),
         Inst::GlobalGet { global_idx } => todo!(),
         Inst::GlobalSet { global_idx } => todo!(),
@@ -45,11 +47,14 @@ pub fn emit_inst(
         Inst::I64Ne => todo!(),
         Inst::I64Eq => todo!(),
         Inst::I64ExtendI32U => todo!(),
-        Inst::PubInputRead => todo!(),
+        Inst::PubInputRead => todo!(
+            "on program start read inputs from the stack (sdepth pushes the current stack depth), into memory"
+        ),
         Inst::PubOutputWrite => todo!(),
         Inst::SecretInputRead => todo!(),
         Inst::Swap { idx } => todo!(),
         Inst::Dup { idx } => todo!(),
         Inst::Ext(_) => todo!(),
-    }
+    };
+    Ok(())
 }
