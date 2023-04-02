@@ -11,6 +11,7 @@ mod smoke;
 
 use c2zk_ir::pass::run_ir_passes;
 use miden_assembly::Assembler;
+use miden_processor::AdviceInputs;
 use miden_processor::MemAdviceProvider;
 use miden_processor::StackInputs;
 use miden_stdlib::StdLibrary;
@@ -58,13 +59,12 @@ fn check_miden(
         .with_library(&StdLibrary::default())
         .unwrap();
     let program = assembler.compile(program).unwrap();
-    // TODO: feed inputs
-    let trace = miden_processor::execute(
-        &program,
-        StackInputs::default(),
-        MemAdviceProvider::default(),
-    )
-    .unwrap();
+    let stack_inputs = StackInputs::try_from_values(input).unwrap();
+    let adv_provider: MemAdviceProvider = AdviceInputs::default()
+        .with_stack_values(secret_input)
+        .unwrap()
+        .into();
+    let trace = miden_processor::execute(&program, stack_inputs, adv_provider).unwrap();
     let stack = pretty_stack(trace.stack_outputs().stack());
     assert_eq!(stack, expected_output);
 }
