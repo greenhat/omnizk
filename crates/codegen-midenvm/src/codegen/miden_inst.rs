@@ -20,7 +20,7 @@ impl MidenAssemblyBuilder {
     }
 
     pub fn exec(&self, name: String) -> MidenInst {
-        format!("call.{name}").into()
+        format!("exec.{name}").into()
     }
 
     pub fn push(&self, num: i64) -> MidenInst {
@@ -33,5 +33,9 @@ impl MidenAssemblyBuilder {
 
     pub fn end(&self) -> MidenInst {
         "end".to_string().into()
+    }
+
+    pub fn add(&self) -> MidenInst {
+        "add".to_string().into()
     }
 }

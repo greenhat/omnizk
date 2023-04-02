@@ -15,6 +15,8 @@ c2zk-ir = { workspace = true }
 c2zk-ir-transform = { workspace = true }
 c2zk-codegen-shared = { workspace = true }
 miden-assembly = "0.5"
+miden-stdlib = "0.4"
+miden-processor = "0.5"
 derive_more = { workspace = true }
 
 [dev-dependencies]

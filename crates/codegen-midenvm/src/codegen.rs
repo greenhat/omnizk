@@ -93,7 +93,7 @@ mod tests {
                 push.1
                 end
                 begin
-                call.f1
+                exec.f1
                 end"#]],
         );
     }

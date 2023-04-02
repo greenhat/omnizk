@@ -32,7 +32,7 @@ pub fn emit_inst(
         Inst::LocalSet { local_idx } => todo!(),
         Inst::I32Load { offset } => todo!(),
         Inst::I32Store { offset } => todo!(),
-        Inst::I32Add => todo!(),
+        Inst::I32Add => sink.push(b.add()),
         Inst::I32Sub => todo!(),
         Inst::I32Mul => todo!(),
         Inst::I32Eqz => todo!(),
