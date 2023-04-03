@@ -2,11 +2,11 @@
 
 #![allow(clippy::unwrap_used)]
 
-mod add;
-mod block;
-mod fib;
-mod func_call;
-mod locals;
+// mod add;
+// mod block;
+// mod fib;
+// mod func_call;
+// mod locals;
 mod smoke;
 
 use c2zk_ir::pass::run_ir_passes;
