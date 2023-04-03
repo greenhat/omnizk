@@ -16,7 +16,7 @@ impl IrPass for LocalsToMemPass {
     fn run_mod_pass(&self, module: &mut Module) {
         let global_idx_for_base_local_offset = module.global_index_storing_base_local_offset();
         // dbg!(&module);
-        let prologue_func = mod_prologue_func(
+        let prologue_func = init_mem_for_locals_func(
             global_idx_for_base_local_offset,
             module.globals_alloc_size(),
         );
@@ -170,7 +170,7 @@ fn restore_base_local_offset(
     new_func.push(inst.clone());
 }
 
-fn mod_prologue_func(
+fn init_mem_for_locals_func(
     global_idx_for_base_local_offset: GlobalIndex,
     globals_alloc_size: u32,
 ) -> Func {
