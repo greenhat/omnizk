@@ -51,6 +51,7 @@ pub enum Inst {
     I32Load {
         offset: u32,
     },
+    /// The stack is expected to be [value, addr]
     I32Store {
         offset: u32,
     },

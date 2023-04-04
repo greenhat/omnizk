@@ -23,6 +23,7 @@ mod convert_blocks;
 mod globals_to_mem;
 mod locals_to_mem;
 mod pseudo_op_sub;
+mod save_stack_pub_inputs;
 
 pub use and_minus_8::AndMinus8Pass;
 pub use convert_blocks::BlocksToFuncPass;

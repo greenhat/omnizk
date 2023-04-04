@@ -2,7 +2,7 @@
 
 #![allow(clippy::unwrap_used)]
 
-// mod add;
+mod add;
 // mod block;
 // mod fib;
 // mod func_call;

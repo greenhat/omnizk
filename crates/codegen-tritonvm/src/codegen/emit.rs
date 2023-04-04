@@ -113,6 +113,9 @@ pub fn emit_inst(
             TritonExt::Lsb => todo!("it's pseudo op now"),
             TritonExt::Assert => sink.push(AnInstruction::Assert),
         },
+
+        // Extention instructions for unsupported architecures
+        Inst::Ext(_) => return Err(unexpected_inst(ins)),
         // Should not be emitted (eliminated in the IR transformation passes)
         Inst::Block { blockty } => return Err(unexpected_inst(ins)),
         Inst::Loop { block_type } => return Err(unexpected_inst(ins)),
