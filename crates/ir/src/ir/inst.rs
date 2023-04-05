@@ -48,6 +48,7 @@ pub enum Inst {
     LocalSet {
         local_idx: u32,
     },
+    /// The stack is expected to be [addr]
     I32Load {
         offset: u32,
     },
