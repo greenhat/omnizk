@@ -30,3 +30,4 @@ pub use convert_blocks::BlocksToFuncPass;
 pub use globals_to_mem::GlobalsToMemPass;
 pub use locals_to_mem::LocalsToMemPass;
 pub use pseudo_op_sub::PseudoOpSubPass;
+pub use save_stack_pub_inputs::SaveStackPubInputsPass;

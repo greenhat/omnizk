@@ -12,7 +12,6 @@ use c2zk_ir::ir::Module;
 use c2zk_ir::ir::Ty;
 use c2zk_ir::pass::IrPass;
 
-// TODO: we should convert Inst::PubInputRead and Inst::PubOutputWrite to memory access in this pass as well.
 // TODO: since it's Miden specific we should move it to Miden crate or a miden module in this crate
 
 #[derive(Default)]
@@ -35,10 +34,7 @@ impl IrPass for SaveStackPubInputsPass {
     }
 }
 
-// TODO: move memory address by type size (8 byts for i64)
-
 fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex) -> Func {
-    // TODO: can be re-written with GlobalGet/GlobalSet moved outside the loop
     let ins = vec![
         MidenExt::SDepth.into(), // to enter the while.true loop
         MidenExt::While.into(),
@@ -49,7 +45,9 @@ fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex) -> Func {
         Inst::Dup { idx: 0 },         // duplicate the address
         Inst::Swap { idx: 3 },        // put value on top
         Inst::I32Store { offset: 0 }, // store the stack value
-        Inst::I32Const { value: -1 },
+        Inst::I32Const {
+            value: -(Ty::I64.size() as i32),
+        },
         Inst::I32Add, // decrement the address
         Inst::GlobalSet {
             global_idx: pub_inputs_addr_idx,
@@ -77,7 +75,9 @@ fn get_next_pub_input_func(pub_inputs_addr_idx: GlobalIndex) -> Func {
         }, // get the address
         Inst::Dup { idx: 0 },        // duplicate the address
         Inst::I32Load { offset: 0 }, // load the previously saved public input
-        Inst::I32Const { value: 1 },
+        Inst::I32Const {
+            value: (Ty::I64.size() as i32),
+        },
         Inst::I32Add, // increment the address
         Inst::GlobalSet {
             global_idx: pub_inputs_addr_idx,
@@ -103,7 +103,9 @@ fn store_pub_output_func(pub_outputs_addr_idx: GlobalIndex) -> Func {
         Inst::Dup { idx: 0 },         // duplicate the address
         Inst::Swap { idx: 3 },        // put value on top
         Inst::I32Store { offset: 0 }, // store the stack value to public outputs memory region
-        Inst::I32Const { value: -1 },
+        Inst::I32Const {
+            value: -(Ty::I64.size() as i32),
+        },
         Inst::I32Add, // decrement the address
         Inst::GlobalSet {
             global_idx: pub_outputs_addr_idx,
@@ -125,8 +127,6 @@ fn load_pub_outputs_on_stack_func(
     pub_outputs_addr_orig_idx: GlobalIndex,
     pub_outputs_addr_idx: GlobalIndex,
 ) -> Func {
-    // TODO: can be re-written with GlobalGet/GlobalSet moved outside the loop
-    // and residual addresses on the stack removed
     let ins = vec![
         Inst::GlobalGet {
             global_idx: pub_outputs_addr_idx,
@@ -141,7 +141,9 @@ fn load_pub_outputs_on_stack_func(
         }, // get the address
         Inst::Dup { idx: 0 },        // duplicate the address
         Inst::I32Load { offset: 0 }, // load the public output on the stack
-        Inst::I32Const { value: 1 },
+        Inst::I32Const {
+            value: (Ty::I64.size() as i32),
+        },
         Inst::I32Add,         // increment the address
         Inst::Dup { idx: 0 }, // duplicate the address
         Inst::GlobalSet {
