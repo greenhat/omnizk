@@ -21,6 +21,7 @@ pub struct SaveStackPubInputsPass;
 pub const SAVE_PUB_INPUTS_FUNC_NAME: &str = "save_pub_inputs";
 pub const GET_NEXT_PUB_INPUT_FUNC_NAME: &str = "omni_miden_pub_input";
 pub const STORE_PUB_OUTPUT_FUNC_NAME: &str = "omni_miden_pub_output";
+pub const LOAD_PUB_OUTPUTS_ON_STACK_FUNC_NAME: &str = "load_pub_outputs_on_stack";
 
 impl IrPass for SaveStackPubInputsPass {
     fn run_mod_pass(&self, module: &mut Module) {
@@ -33,6 +34,8 @@ impl IrPass for SaveStackPubInputsPass {
         todo!()
     }
 }
+
+// TODO: move memory address by type size (8 byts for i64)
 
 fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex) -> Func {
     // TODO: can be re-written with GlobalGet/GlobalSet moved outside the loop
@@ -100,8 +103,8 @@ fn store_pub_output_func(pub_outputs_addr_idx: GlobalIndex) -> Func {
         Inst::Dup { idx: 0 },         // duplicate the address
         Inst::Swap { idx: 3 },        // put value on top
         Inst::I32Store { offset: 0 }, // store the stack value to public outputs memory region
-        Inst::I32Const { value: 1 },
-        Inst::I32Add, // increment the address
+        Inst::I32Const { value: -1 },
+        Inst::I32Add, // decrement the address
         Inst::GlobalSet {
             global_idx: pub_outputs_addr_idx,
         },
@@ -118,6 +121,45 @@ fn store_pub_output_func(pub_outputs_addr_idx: GlobalIndex) -> Func {
     )
 }
 
-fn load_pub_outputs_on_stack_func() -> Func {
-    todo!()
+fn load_pub_outputs_on_stack_func(
+    pub_outputs_addr_orig_idx: GlobalIndex,
+    pub_outputs_addr_idx: GlobalIndex,
+) -> Func {
+    // TODO: can be re-written with GlobalGet/GlobalSet moved outside the loop
+    // and residual addresses on the stack removed
+    let ins = vec![
+        Inst::GlobalGet {
+            global_idx: pub_outputs_addr_idx,
+        }, // get the address
+        Inst::GlobalGet {
+            global_idx: pub_outputs_addr_orig_idx,
+        }, // get the original(start) address
+        Inst::I32Sub, // get the number of public outputs * type size
+        MidenExt::While.into(),
+        Inst::GlobalGet {
+            global_idx: pub_outputs_addr_idx,
+        }, // get the address
+        Inst::Dup { idx: 0 },        // duplicate the address
+        Inst::I32Load { offset: 0 }, // load the public output on the stack
+        Inst::I32Const { value: 1 },
+        Inst::I32Add,         // increment the address
+        Inst::Dup { idx: 0 }, // duplicate the address
+        Inst::GlobalSet {
+            global_idx: pub_outputs_addr_idx,
+        }, // set the address
+        Inst::GlobalGet {
+            global_idx: pub_outputs_addr_orig_idx,
+        }, // get the original(start) address
+        Inst::I32Sub, // get the number of public outputs * type size for while to continue (if > 0)
+    ];
+    Func::new(
+        LOAD_PUB_OUTPUTS_ON_STACK_FUNC_NAME.to_string(),
+        FuncType {
+            params: vec![],
+            results: vec![],
+        },
+        vec![],
+        ins,
+        HashMap::new(),
+    )
 }
