@@ -8,18 +8,23 @@ use c2zk_ir::ir::Module;
 use c2zk_ir::ir::Ty;
 use c2zk_ir::pass::IrPass;
 
-#[derive(Default)]
-pub struct LocalsToMemPass;
+pub struct LocalsToMemPass {
+    start_addr: i32,
+}
+
+impl LocalsToMemPass {
+    pub fn new(start_addr: i32) -> Self {
+        Self { start_addr }
+    }
+}
 
 impl IrPass for LocalsToMemPass {
     #[allow(clippy::wildcard_enum_match_arm)]
     fn run_mod_pass(&self, module: &mut Module) {
-        let global_idx_for_base_local_offset = module.global_index_storing_base_local_offset();
+        let global_idx_for_base_local_offset = module.add_global(Ty::I32);
         // dbg!(&module);
-        let prologue_func = init_mem_for_locals_func(
-            global_idx_for_base_local_offset,
-            module.globals_alloc_size(),
-        );
+        let prologue_func =
+            init_mem_for_locals_func(global_idx_for_base_local_offset, self.start_addr);
         for func in module.functions_mut().iter_mut() {
             // dbg!(&func);
             let mut new_func = Func::new(
@@ -36,19 +41,19 @@ impl IrPass for LocalsToMemPass {
                 });
                 // store the function parameters to memory
                 for (i, _param) in func.sig().params.iter().enumerate() {
+                    // decrease the pointer by the size of the param (4 bytes/i32 for now)
+                    new_func.push(Inst::I32Const {
+                        value: -(Ty::I32.size() as i32),
+                    });
+                    new_func.push(Inst::I32Add);
                     new_func.push(Inst::Dup { idx: 0 });
                     // put func param on top
                     new_func.push(Inst::Swap { idx: 2 });
                     // TODO: store op according to the param type
                     new_func.push_with_comment(
                         Inst::I32Store { offset: 0 },
-                        format!("store param {} to memory", i),
+                        format!("store param {i} to memory"),
                     );
-                    // decrease the pointer by the size of the param (4 bytes/i32 for now)
-                    new_func.push(Inst::I32Const {
-                        value: -(Ty::I32.size() as i32),
-                    });
-                    new_func.push(Inst::I32Add);
                 }
                 // store the pointer to the global
                 new_func.push(Inst::GlobalSet {
@@ -80,7 +85,9 @@ impl IrPass for LocalsToMemPass {
                 // although it looks like here should be total_local_count - 1
                 // but the last pointer stored in global base_local_offset is NEXT address
                 // after the last stored local, so it's total_local_count - 1 + 1
-                total_local_count
+                // EDIT: now, since we decrease the start address by the size of the first local
+                // we need to shift the index by 1
+                total_local_count - 1
             } else {
                 0
             };
@@ -172,16 +179,14 @@ fn restore_base_local_offset(
 
 fn init_mem_for_locals_func(
     global_idx_for_base_local_offset: GlobalIndex,
-    globals_alloc_size: u32,
+    start_addr: i32,
 ) -> Func {
     Func::new(
         "init_mem_for_locals".to_string(),
         FuncType::void_void(),
         Vec::new(),
         vec![
-            Inst::I32Const {
-                value: i32::MAX - globals_alloc_size as i32,
-            },
+            Inst::I32Const { value: start_addr },
             Inst::GlobalSet {
                 global_idx: global_idx_for_base_local_offset,
             },

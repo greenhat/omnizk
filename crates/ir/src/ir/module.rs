@@ -2,18 +2,21 @@ use super::Func;
 use super::FuncIndex;
 use super::GlobalIndex;
 use super::Inst;
+use super::Ty;
 
 #[derive(Debug)]
 pub struct Module {
     functions: Vec<Func>,
     pub start_func_idx: FuncIndex,
+    globals: Vec<Ty>,
 }
 
 impl Module {
-    pub fn new(functions: Vec<Func>, start_func_idx: FuncIndex) -> Self {
+    pub fn new(functions: Vec<Func>, start_func_idx: FuncIndex, globals: Vec<Ty>) -> Self {
         Self {
             functions,
             start_func_idx,
+            globals,
         }
     }
 
@@ -21,11 +24,16 @@ impl Module {
         &self.functions
     }
 
-    /// The memory size for for storing all globals
-    pub fn globals_alloc_size(&self) -> u32 {
-        // TODO: implement
-        2 * 4 + 4
-    }
+    // /// The memory size for storing all globals
+    // pub fn globals_alloc_size(&self) -> u32 {
+    //     // TODO: implement
+    //     // 2 * 4 + 4
+    //     let mut size = 0;
+    //     for ty in &self.globals {
+    //         size += ty.size();
+    //     }
+    //     size
+    // }
 
     pub fn into_functions(self) -> Vec<Func> {
         self.functions
@@ -73,14 +81,9 @@ impl Module {
         FuncIndex::from(self.functions.len() as u32)
     }
 
-    pub fn global_index_storing_base_local_offset(&self) -> GlobalIndex {
-        // TODO: last existing global index + 1
-        1.into()
-    }
-
-    pub fn global_index_storing_br_propagation(&self) -> GlobalIndex {
-        // TODO: last existing global index + 2
-        2.into()
+    pub fn add_global(&mut self, ty: Ty) -> GlobalIndex {
+        self.globals.push(ty);
+        GlobalIndex::from(self.globals.len() as u32 - 1)
     }
 
     /// Adds the function and prepends it's call in the beginning of the start function.

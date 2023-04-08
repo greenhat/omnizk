@@ -39,29 +39,27 @@ fn test_one_loop() {
             read_io
             return
             c2zk_stdlib_pub_output:
-            push -1
+            push 0
             call globals_get
+            push -4
+            add
             dup 0
             swap 2
             write_mem
             pop
-            push -4
-            add
-            push -1
+            push 0
             call globals_set
-            push -1
+            push 0
             call globals_get
-            push 4
-            add
             read_mem
             swap 1
             pop
             write_io
-            push -1
+            push 0
             call globals_get
             push 4
             add
-            push -1
+            push 0
             call globals_set
             return
             c2zk_stdlib_secret_input:
@@ -73,27 +71,9 @@ fn test_one_loop() {
             return
             return
             init_mem_for_locals:
-            push 00000000002147483635
-            push -1
+            push 00000000002147483647
+            push 0
             call globals_set
-            return
-            globals_get:
-            push 4
-            mul
-            push 00000000002147483647
-            add
-            read_mem
-            swap 1
-            pop
-            return
-            globals_set:
-            push 4
-            mul
-            push 00000000002147483647
-            add
-            swap 1
-            write_mem
-            pop
             return
             main_l0_b0:
             push 9
@@ -103,6 +83,24 @@ fn test_one_loop() {
             eq
             skiz
             recurse
+            return
+            globals_get:
+            push -4
+            mul
+            push 00000000002147482623
+            add
+            read_mem
+            swap 1
+            pop
+            return
+            globals_set:
+            push -4
+            mul
+            push 00000000002147482623
+            add
+            swap 1
+            write_mem
+            pop
             return"#]],
     );
 }

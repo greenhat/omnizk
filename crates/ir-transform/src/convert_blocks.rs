@@ -28,12 +28,13 @@ impl BlocksToFuncPass {
 
 impl IrPass for BlocksToFuncPass {
     fn run_mod_pass(&self, module: &mut Module) {
+        let br_propagation_global_idx = module.add_global(Ty::I32);
         for i in 0..module.functions().len() {
             #[allow(clippy::unwrap_used)]
             let func_in = module.function(i as u32).unwrap().clone();
             // TODO: this cloned Func is a hack to get around the borrow checker
             // dbg!(&func_in);
-            let func_out = run(func_in, module, Vec::new());
+            let func_out = run(func_in, module, Vec::new(), br_propagation_global_idx);
             module.set_function(i.into(), func_out);
         }
     }
@@ -66,7 +67,12 @@ impl CaptureState {
     // }
 }
 
-fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Func {
+fn run(
+    func: Func,
+    module: &mut Module,
+    traversed_blocks: Vec<BlockKind>,
+    br_propagation_global_idx: GlobalIndex,
+) -> Func {
     // dbg!(&block_nested_level);
     // TODO: exit early if there are no blocks
     let mut new_func = Func::new(
@@ -85,7 +91,6 @@ fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Fun
         func.name()
     ));
     extracted_func_builder.set_signature(FuncType::new(vec![], vec![]));
-    let br_propagation_global_idx = module.global_index_storing_br_propagation();
     for inst in func.instructions() {
         // dbg!(&capture_opt);
         #[allow(clippy::wildcard_enum_match_arm)]
@@ -169,6 +174,7 @@ fn run(func: Func, module: &mut Module, traversed_blocks: Vec<BlockKind>) -> Fun
                                 extracted_func,
                                 module,
                                 itertools::concat(vec![traversed_blocks.clone(), vec![block_kind]]),
+                                br_propagation_global_idx,
                             );
                             extracted_func_count += 1;
                             extracted_func_builder = FuncBuilder::new(format!(

@@ -130,7 +130,7 @@ impl ModuleBuilder {
 
         // dbg!(&funcs);
         if let Some(start_func_idx) = self.start_func_idx {
-            Ok(Module::new(funcs, start_func_idx))
+            Ok(Module::new(funcs, start_func_idx, Vec::new()))
         } else {
             Err(ModuleBuilderError::StartFuncUndefined)
         }

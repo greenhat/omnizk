@@ -39,29 +39,27 @@ fn test_nested_block() {
             read_io
             return
             c2zk_stdlib_pub_output:
-            push -1
+            push 0
             call globals_get
+            push -4
+            add
             dup 0
             swap 2
             write_mem
             pop
-            push -4
-            add
-            push -1
+            push 0
             call globals_set
-            push -1
+            push 0
             call globals_get
-            push 4
-            add
             read_mem
             swap 1
             pop
             write_io
-            push -1
+            push 0
             call globals_get
             push 4
             add
-            push -1
+            push 0
             call globals_set
             return
             c2zk_stdlib_secret_input:
@@ -73,27 +71,9 @@ fn test_nested_block() {
             return
             return
             init_mem_for_locals:
-            push 00000000002147483635
-            push -1
+            push 00000000002147483647
+            push 0
             call globals_set
-            return
-            globals_get:
-            push 4
-            mul
-            push 00000000002147483647
-            add
-            read_mem
-            swap 1
-            pop
-            return
-            globals_set:
-            push 4
-            mul
-            push 00000000002147483647
-            add
-            swap 1
-            write_mem
-            pop
             return
             main_l0_b0:
             push 3
@@ -108,7 +88,7 @@ fn test_nested_block() {
             call c2zk_stdlib_pub_output
             return
             next_br_propagation:
-            push -2
+            push 1
             call globals_get
             dup 0
             push 0
@@ -118,8 +98,26 @@ fn test_nested_block() {
             push -1
             add
             dup 0
-            push -2
+            push 1
             call globals_set
+            return
+            globals_get:
+            push -4
+            mul
+            push 00000000002147482623
+            add
+            read_mem
+            swap 1
+            pop
+            return
+            globals_set:
+            push -4
+            mul
+            push 00000000002147482623
+            add
+            swap 1
+            write_mem
+            pop
             return"#]],
     );
 }

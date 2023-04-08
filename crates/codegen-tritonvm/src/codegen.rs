@@ -98,23 +98,23 @@ mod tests {
                 return
                 return
                 init_mem_for_locals:
-                push 00000000002147483635
-                push -1
+                push 00000000002147483647
+                push 0
                 call globals_set
                 return
                 globals_get:
-                push 4
+                push -4
                 mul
-                push 00000000002147483647
+                push 00000000002147482623
                 add
                 read_mem
                 swap 1
                 pop
                 return
                 globals_set:
-                push 4
+                push -4
                 mul
-                push 00000000002147483647
+                push 00000000002147482623
                 add
                 swap 1
                 write_mem

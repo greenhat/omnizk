@@ -24,13 +24,37 @@ pub const LOAD_PUB_OUTPUTS_ON_STACK_FUNC_NAME: &str = "load_pub_outputs_on_stack
 
 impl IrPass for SaveStackPubInputsPass {
     fn run_mod_pass(&self, module: &mut Module) {
+        // TODO: lazy add globals and functions to module, i.e. only add them if they are used
+        let pub_inputs_addr_orig_idx = module.add_global(Ty::I32);
+        let pub_inputs_addr_idx = module.add_global(Ty::I32);
+        let save_pub_inputs_func_idx = module
+            .function_idx_by_name(SAVE_PUB_INPUTS_FUNC_NAME)
+            .unwrap_or_else(|| module.push_function(save_pub_inputs_func(pub_inputs_addr_idx)));
+
+        let get_next_pub_input_func_idx = module
+            .function_idx_by_name(GET_NEXT_PUB_INPUT_FUNC_NAME)
+            .unwrap_or_else(|| module.push_function(get_next_pub_input_func(pub_inputs_addr_idx)));
+
+        let store_pub_output_func_idx = module
+            .function_idx_by_name(STORE_PUB_OUTPUT_FUNC_NAME)
+            .unwrap_or_else(|| module.push_function(store_pub_output_func(pub_inputs_addr_idx)));
+
+        let load_pub_outputs_on_stack_func_idx = module
+            .function_idx_by_name(LOAD_PUB_OUTPUTS_ON_STACK_FUNC_NAME)
+            .unwrap_or_else(|| {
+                module.push_function(load_pub_outputs_on_stack_func(
+                    pub_inputs_addr_orig_idx,
+                    pub_inputs_addr_idx,
+                ))
+            });
+
         for func in module.functions_mut().iter_mut() {
             self.run_func_pass(func);
         }
     }
 
     fn run_func_pass(&self, func: &mut c2zk_ir::ir::Func) {
-        todo!()
+        // todo!()
     }
 }
 

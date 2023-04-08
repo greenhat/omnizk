@@ -11,7 +11,7 @@ impl Default for MidenTargetConfig {
         Self {
             output_format: MidenOutputFormat::Source,
             ir_passes: vec![
-                Box::<GlobalsToMemPass>::default(),
+                Box::new(GlobalsToMemPass::new(i32::MAX)),
                 Box::<SaveStackPubInputsPass>::default(),
             ],
         }

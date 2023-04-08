@@ -15,11 +15,10 @@ impl Default for TritonTargetConfig {
             output_format: TritonOutputFormat::Source,
             ir_passes: vec![
                 Box::<AndMinus8Pass>::default(),
-                Box::<LocalsToMemPass>::default(),
-                Box::<GlobalsToMemPass>::default(),
+                Box::new(LocalsToMemPass::new(i32::MAX)),
                 Box::<BlocksToFuncPass>::default(),
-                // we might've added GlobalSet/Gets in the BlocksToFuncPass
-                Box::<GlobalsToMemPass>::default(),
+                // TODO: pass the start address for globals (determine in MemoryLayout)
+                Box::new(GlobalsToMemPass::new(i32::MAX - 1024)),
                 Box::<PseudoOpSubPass>::default(),
             ],
         }
@@ -30,3 +29,5 @@ pub enum TritonOutputFormat {
     Binary,
     Source,
 }
+
+// TODO: introduce MemoryLayout to manage the addresses for globals and locals

@@ -40,41 +40,35 @@ fn test_func_call() {
             read_io
             return
             c2zk_stdlib_pub_output:
-            push -1
+            push 0
             call globals_get
+            push -4
+            add
             dup 0
             swap 2
             write_mem
             pop
-            push -4
-            add
-            push -1
+            push 0
             call globals_set
-            push -1
+            push 0
             call globals_get
-            push 4
-            add
             read_mem
             swap 1
             pop
             write_io
-            push -1
+            push 0
             call globals_get
             push 4
             add
-            push -1
+            push 0
             call globals_set
             return
             c2zk_stdlib_secret_input:
             divine
             return
             add:
-            push -1
+            push 0
             call globals_get
-            dup 0
-            swap 2
-            write_mem
-            pop
             push -4
             add
             dup 0
@@ -83,35 +77,37 @@ fn test_func_call() {
             pop
             push -4
             add
-            push -1
+            dup 0
+            swap 2
+            write_mem
+            pop
+            push 0
             call globals_set
-            push -1
-            call globals_get
-            push 8
-            add
-            read_mem
-            swap 1
-            pop
-            push -1
+            push 0
             call globals_get
             push 4
             add
             read_mem
             swap 1
             pop
+            push 0
+            call globals_get
+            read_mem
+            swap 1
+            pop
             add
-            push -1
+            push 0
             call globals_get
             push 8
             add
-            push -1
+            push 0
             call globals_set
             return
-            push -1
+            push 0
             call globals_get
             push 8
             add
-            push -1
+            push 0
             call globals_set
             return
             main:
@@ -123,23 +119,23 @@ fn test_func_call() {
             return
             return
             init_mem_for_locals:
-            push 00000000002147483635
-            push -1
+            push 00000000002147483647
+            push 0
             call globals_set
             return
             globals_get:
-            push 4
+            push -4
             mul
-            push 00000000002147483647
+            push 00000000002147482623
             add
             read_mem
             swap 1
             pop
             return
             globals_set:
-            push 4
+            push -4
             mul
-            push 00000000002147483647
+            push 00000000002147482623
             add
             swap 1
             write_mem
