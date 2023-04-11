@@ -15,7 +15,7 @@ pub enum Ty {
 }
 
 impl Ty {
-    pub fn size(&self) -> u32 {
+    pub fn size(&self) -> i32 {
         match self {
             Ty::I32 | Ty::F32 => 4,
             Ty::I64 | Ty::F64 => 8,

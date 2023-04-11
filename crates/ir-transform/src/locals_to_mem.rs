@@ -100,7 +100,7 @@ impl IrPass for LocalsToMemPass {
                             global_idx: global_idx_for_base_local_offset,
                         });
                         new_func.push(Inst::I32Load {
-                            offset: (reverse_index_base - *local_idx) * Ty::I32.size(),
+                            offset: (reverse_index_base - *local_idx) * Ty::I32.size() as u32,
                         });
                     }
                     Inst::LocalSet { local_idx } => {
@@ -109,7 +109,7 @@ impl IrPass for LocalsToMemPass {
                         });
                         new_func.push(Inst::Swap { idx: 1 });
                         new_func.push(Inst::I32Store {
-                            offset: (reverse_index_base - *local_idx) * Ty::I32.size(),
+                            offset: (reverse_index_base - *local_idx) * Ty::I32.size() as u32,
                         });
                     }
                     Inst::LocalTee { local_idx } => {
@@ -120,7 +120,7 @@ impl IrPass for LocalsToMemPass {
                         });
                         new_func.push(Inst::Swap { idx: 1 });
                         new_func.push(Inst::I32Store {
-                            offset: (reverse_index_base - *local_idx) * Ty::I32.size(),
+                            offset: (reverse_index_base - *local_idx) * Ty::I32.size() as u32,
                         });
                     }
                     Inst::Return => {

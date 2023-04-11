@@ -113,7 +113,7 @@ fn global_get_func(start_addr: i32) -> Func {
     let ins = vec![
         // treat each global value size as 4 bytes (i32)
         Inst::I32Const {
-            value: -(Ty::I32.size() as i32),
+            value: -Ty::I32.size(),
         },
         Inst::I32Mul,
         Inst::I32Const { value: start_addr },
@@ -139,7 +139,7 @@ fn global_set_func(start_addr: i32) -> Func {
     let ins = vec![
         // treat each global value size as 4 bytes (i32)
         Inst::I32Const {
-            value: -(Ty::I32.size() as i32),
+            value: -Ty::I32.size(),
         },
         Inst::I32Mul,
         Inst::I32Const { value: start_addr },
