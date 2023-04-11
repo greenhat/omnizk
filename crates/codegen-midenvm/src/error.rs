@@ -1,10 +1,11 @@
-use c2zk_ir::ir::Inst;
 use thiserror::Error;
+
+use crate::EmitError;
 
 #[derive(Debug, Error)]
 pub enum MidenError {
     #[error("Invalid instruction: {0}")]
     InvalidInst(String),
-    #[error("Unsupported instruction: {0:?}")]
-    UnsupportedInstruction(Inst),
+    #[error("Emit error: {0:?}")]
+    Emit(#[from] EmitError),
 }

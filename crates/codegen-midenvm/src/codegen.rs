@@ -6,7 +6,7 @@ use c2zk_ir::ir::Module;
 mod inst_buf;
 pub use inst_buf::InstBuffer;
 mod emit;
-pub use emit::emit_inst;
+pub use emit::*;
 mod miden_inst;
 pub use miden_inst::*;
 
@@ -46,8 +46,8 @@ pub fn compile_function(
     for ins in func.instructions() {
         let res = emit_inst(ins, config, sink, func_names);
         if let Err(e) = res {
-            // dbg!(&func);
-            return Err(e);
+            dbg!(&func);
+            return Err(e.into());
         }
     }
     Ok(())
