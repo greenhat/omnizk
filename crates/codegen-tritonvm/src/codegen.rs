@@ -40,11 +40,7 @@ pub fn compile_function(
     sink: &mut InstBuffer,
     func_names: &[String],
 ) -> Result<(), TritonError> {
-    for (idx, ins) in func.instructions().iter().enumerate() {
-        if let Some(comment) = func.comments().get(&idx) {
-            sink.push_comment_for_next_ins(comment.clone());
-        } else {
-        }
+    for ins in func.instructions().iter() {
         let res = emit_inst(ins, config, sink, func_names);
         if let Err(e) = res {
             dbg!(&func);

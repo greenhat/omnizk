@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use c2zk_frontend_shared::FuncBuilder;
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::BlockKind;
@@ -80,7 +78,6 @@ fn run(
         func.sig().clone(),
         func.locals().to_vec(),
         Vec::new(),
-        HashMap::new(),
     );
     let block_nested_level = traversed_blocks.len();
     let mut capture_state = CaptureState::default();
@@ -303,6 +300,5 @@ fn next_br_propagation(global_index_br_propagation: GlobalIndex) -> Func {
         },
         vec![],
         ins,
-        HashMap::new(),
     )
 }

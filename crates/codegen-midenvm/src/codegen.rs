@@ -31,9 +31,7 @@ pub fn compile_module(
         compile_function(func, config, &mut sink, &func_names)?;
     }
     sink.push(builder.begin());
-    // TODO: store public inputs from stack
     sink.push(builder.exec(func_index_to_label(start_func_index, &func_names)));
-    // TODO: put public outputs on stack
     sink.push(builder.end());
     Ok(sink)
 }

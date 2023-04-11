@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use super::FuncType;
 use super::Inst;
 use super::Ty;
@@ -10,22 +8,14 @@ pub struct Func {
     sig: FuncType,
     locals: Vec<Ty>,
     ins: Vec<Inst>,
-    comments: HashMap<usize, String>,
 }
 
 impl Func {
-    pub fn new(
-        name: String,
-        sig: FuncType,
-        locals: Vec<Ty>,
-        ins: Vec<Inst>,
-        comments: HashMap<usize, String>,
-    ) -> Self {
+    pub fn new(name: String, sig: FuncType, locals: Vec<Ty>, ins: Vec<Inst>) -> Self {
         Self {
             name,
             sig,
             ins,
-            comments,
             locals,
         }
     }
@@ -46,10 +36,6 @@ impl Func {
         &mut self.ins
     }
 
-    pub fn comments(&self) -> &HashMap<usize, String> {
-        &self.comments
-    }
-
     pub fn push(&mut self, inst: Inst) {
         self.ins.push(inst);
     }
@@ -57,15 +43,6 @@ impl Func {
     // Prepends an instruction to the beginning of the function.
     pub fn prepend(&mut self, inst: Inst) {
         self.ins.insert(0, inst);
-    }
-
-    pub fn push_with_comment(&mut self, inst: Inst, comment: String) {
-        self.ins.push(inst);
-        self.comments.insert(self.ins.len() - 1, comment);
-    }
-
-    pub fn set_comment(&mut self, idx: usize, comment: String) {
-        self.comments.insert(idx, comment);
     }
 
     pub fn set_name(&mut self, name: String) {

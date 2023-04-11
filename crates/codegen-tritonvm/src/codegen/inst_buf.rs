@@ -43,22 +43,6 @@ impl InstBuffer {
         self.inner.push(LabelledInstruction::Instruction(inst));
     }
 
-    // pub(crate) fn push_with_comment(&mut self, inst: AnInstruction<String>, comment: String) {
-    //     self.comments.insert(self.inner.len(), comment);
-    //     self.push(inst);
-    // }
-
-    pub(crate) fn push_comment_for_next_ins(&mut self, comment: String) {
-        self.comments.insert(
-            if self.inner.is_empty() {
-                0
-            } else {
-                self.inner.len()
-            },
-            comment,
-        );
-    }
-
     pub(crate) fn append(&mut self, insts: Vec<AnInstruction<String>>) {
         let mut insts = insts
             .into_iter()

@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::Inst;
@@ -53,6 +51,5 @@ fn triton_i32_sub_func() -> Func {
         },
         vec![],
         ins,
-        HashMap::new(),
     )
 }

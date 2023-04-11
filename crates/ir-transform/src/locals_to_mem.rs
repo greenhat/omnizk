@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::GlobalIndex;
@@ -32,7 +30,6 @@ impl IrPass for LocalsToMemPass {
                 func.sig().clone(),
                 Vec::new(),
                 Vec::new(),
-                HashMap::new(),
             );
             // dbg!(&func);
             if !func.sig().params.is_empty() {
@@ -40,7 +37,7 @@ impl IrPass for LocalsToMemPass {
                     global_idx: global_idx_for_base_local_offset,
                 });
                 // store the function parameters to memory
-                for (i, _param) in func.sig().params.iter().enumerate() {
+                for _ in func.sig().params.iter() {
                     // decrease the pointer by the size of the param (4 bytes/i32 for now)
                     new_func.push(Inst::I32Const {
                         value: -Ty::I32.size(),
@@ -50,10 +47,7 @@ impl IrPass for LocalsToMemPass {
                     // put func param on top
                     new_func.push(Inst::Swap { idx: 2 });
                     // TODO: store op according to the param type
-                    new_func.push_with_comment(
-                        Inst::I32Store { offset: 0 },
-                        format!("store param {i} to memory"),
-                    );
+                    new_func.push(Inst::I32Store { offset: 0 });
                 }
                 // store the pointer to the global
                 new_func.push(Inst::GlobalSet {
@@ -68,12 +62,9 @@ impl IrPass for LocalsToMemPass {
                     value: -(func.locals().len() as i32 * Ty::I32.size()),
                 });
                 new_func.push(Inst::I32Add);
-                new_func.push_with_comment(
-                    Inst::GlobalSet {
-                        global_idx: global_idx_for_base_local_offset,
-                    },
-                    "END prologue for locals access via memory".to_string(),
-                );
+                new_func.push(Inst::GlobalSet {
+                    global_idx: global_idx_for_base_local_offset,
+                });
             }
 
             let param_count = func.sig().params.len() as u32;
@@ -192,6 +183,5 @@ fn init_mem_for_locals_func(
             },
             Inst::Return,
         ],
-        HashMap::new(),
     )
 }

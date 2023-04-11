@@ -24,17 +24,6 @@ impl Module {
         &self.functions
     }
 
-    // /// The memory size for storing all globals
-    // pub fn globals_alloc_size(&self) -> u32 {
-    //     // TODO: implement
-    //     // 2 * 4 + 4
-    //     let mut size = 0;
-    //     for ty in &self.globals {
-    //         size += ty.size();
-    //     }
-    //     size
-    // }
-
     pub fn into_functions(self) -> Vec<Func> {
         self.functions
     }
@@ -94,5 +83,22 @@ impl Module {
             func_idx: prologue_idx,
         });
         prologue_idx
+    }
+
+    pub fn wrap_start_func(&mut self, name: String, before: Vec<Inst>, after: Vec<Inst>) {
+        let start_func = &mut self.functions[u32::from(self.start_func_idx) as usize];
+        let new_start_func_body = before
+            .into_iter()
+            .chain(start_func.instructions().iter().cloned())
+            .chain(after.into_iter())
+            .collect();
+        let new_start_func = Func::new(
+            name,
+            start_func.sig().clone(),
+            Vec::new(),
+            new_start_func_body,
+        );
+        let new_start_func_idx = self.push_function(new_start_func);
+        self.start_func_idx = new_start_func_idx;
     }
 }

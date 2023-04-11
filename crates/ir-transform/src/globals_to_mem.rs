@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::GlobalIndex;
@@ -130,7 +128,6 @@ fn global_get_func(start_addr: i32) -> Func {
         },
         vec![],
         ins,
-        HashMap::new(),
     )
 }
 
@@ -157,6 +154,5 @@ fn global_set_func(start_addr: i32) -> Func {
         },
         vec![],
         ins,
-        HashMap::new(),
     )
 }

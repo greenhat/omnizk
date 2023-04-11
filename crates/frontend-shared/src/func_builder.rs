@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::Inst;
@@ -13,7 +11,6 @@ pub struct FuncBuilder {
     name: String,
     sig: Option<FuncType>,
     ins: Vec<Inst>,
-    comments: HashMap<usize, String>,
     locals: Vec<Ty>,
 }
 
@@ -23,7 +20,6 @@ impl FuncBuilder {
             name,
             ins: Vec::new(),
             sig: None,
-            comments: HashMap::new(),
             locals: Vec::new(),
         }
     }
@@ -38,13 +34,7 @@ impl FuncBuilder {
         let sig = self.sig.clone().ok_or_else(|| {
             FuncBuilderError::MissingSignature(format!("FuncBuilder: {:?}", &self))
         })?;
-        Ok(Func::new(
-            self.name,
-            sig,
-            self.locals,
-            self.ins,
-            self.comments,
-        ))
+        Ok(Func::new(self.name, sig, self.locals, self.ins))
     }
 
     pub fn ins(&mut self) -> InstBuilder {
@@ -53,10 +43,6 @@ impl FuncBuilder {
 
     pub fn push(&mut self, inst: Inst) {
         self.ins.push(inst);
-    }
-    pub fn push_with_comment(&mut self, inst: Inst, comment: String) {
-        self.ins.push(inst);
-        self.comments.insert(self.ins.len() - 1, comment);
     }
 
     pub fn push_insts(&mut self, insts: Vec<Inst>) {

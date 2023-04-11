@@ -1,8 +1,6 @@
 //! In Miden VM public inputs are stored on the stack. This pass saves the public inputs from the stack
 //! and stores them in the memory
 
-use std::collections::HashMap;
-
 use c2zk_ir::ir::ext::MidenExt;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
@@ -35,7 +33,7 @@ pub const LOAD_PUB_OUTPUTS_ON_STACK_FUNC_NAME: &str = "load_pub_outputs_on_stack
 
 impl IrPass for SaveStackPubInputsPass {
     fn run_mod_pass(&self, module: &mut Module) {
-        // TODO: lazy add globals and functions to module, i.e. only add them if they are used
+        // TODO: lazy add globals and functions to module, i.e. only add them if they are used (OTOH IO is always used)
         let pub_inputs_addr_idx = module.add_global(Ty::I32);
         let pub_outputs_addr_idx = module.add_global(Ty::I32);
         let save_pub_inputs_func_idx = module
@@ -64,11 +62,20 @@ impl IrPass for SaveStackPubInputsPass {
                 ))
             });
 
-        // TODO: call save_pub_inputs_func from main function
         // TODO: swap PubInputRead and PubOutputWrite to func calls
         for func in module.functions_mut().iter_mut() {
             self.run_func_pass(func);
         }
+
+        module.wrap_start_func(
+            "start_with_miden_io_persistent".to_string(),
+            vec![Inst::Call {
+                func_idx: save_pub_inputs_func_idx,
+            }],
+            vec![Inst::Call {
+                func_idx: load_pub_outputs_on_stack_func_idx,
+            }],
+        );
     }
 
     fn run_func_pass(&self, func: &mut c2zk_ir::ir::Func) {
@@ -107,7 +114,6 @@ fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_addre
         },
         vec![],
         ins,
-        HashMap::new(),
     )
 }
 
@@ -134,7 +140,6 @@ fn get_next_pub_input_func(pub_inputs_addr_idx: GlobalIndex) -> Func {
         },
         vec![],
         ins,
-        HashMap::new(),
     )
 }
 
@@ -162,7 +167,6 @@ fn store_pub_output_func(pub_outputs_addr_idx: GlobalIndex) -> Func {
         },
         vec![],
         ins,
-        HashMap::new(),
     )
 }
 
@@ -210,6 +214,5 @@ fn load_pub_outputs_on_stack_func(
         },
         vec![],
         ins,
-        HashMap::new(),
     )
 }
