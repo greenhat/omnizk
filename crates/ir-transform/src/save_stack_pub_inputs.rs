@@ -33,7 +33,6 @@ pub const LOAD_PUB_OUTPUTS_ON_STACK_FUNC_NAME: &str = "load_pub_outputs_on_stack
 
 impl IrPass for SaveStackPubInputsPass {
     fn run_mod_pass(&self, module: &mut Module) {
-        // TODO: lazy add globals and functions to module, i.e. only add them if they are used (OTOH IO is always used)
         let pub_inputs_addr_idx = module.add_global(Ty::I32);
         let pub_outputs_addr_idx = module.add_global(Ty::I32);
         let save_pub_inputs_func_idx = module
@@ -62,9 +61,18 @@ impl IrPass for SaveStackPubInputsPass {
                 ))
             });
 
-        // TODO: swap PubInputRead and PubOutputWrite to func calls
         for func in module.functions_mut().iter_mut() {
-            self.run_func_pass(func);
+            for inst in func.instructions_mut() {
+                if let Inst::PubInputRead = inst {
+                    *inst = Inst::Call {
+                        func_idx: get_next_pub_input_func_idx,
+                    };
+                } else if let Inst::PubOutputWrite = inst {
+                    *inst = Inst::Call {
+                        func_idx: store_pub_output_func_idx,
+                    };
+                }
+            }
         }
 
         module.wrap_start_func(
@@ -78,8 +86,8 @@ impl IrPass for SaveStackPubInputsPass {
         );
     }
 
-    fn run_func_pass(&self, func: &mut c2zk_ir::ir::Func) {
-        // todo!()
+    fn run_func_pass(&self, _func: &mut c2zk_ir::ir::Func) {
+        unreachable!();
     }
 }
 
