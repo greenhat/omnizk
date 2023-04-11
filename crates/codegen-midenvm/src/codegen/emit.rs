@@ -1,3 +1,5 @@
+use c2zk_ir::ir::ext::Ext;
+use c2zk_ir::ir::ext::MidenExt;
 use c2zk_ir::ir::Inst;
 use thiserror::Error;
 
@@ -23,8 +25,15 @@ pub fn emit_inst(
     match ins {
         Inst::End => sink.push(b.end()),
         Inst::Return => (), // TODO: this is vaid only if next inst is End
+        Inst::Dup { idx } => sink.push(b.dup(*idx)),
+        Inst::Swap { idx } => sink.push(b.swap(*idx)),
         Inst::I32Const { value } => sink.push(b.push(*value as i64)),
         Inst::I32Add => sink.push(b.add()),
+        Inst::Ext(Ext::Miden(miden_inst)) => match miden_inst {
+            MidenExt::SDepth => sink.push(b.sdepth()),
+            MidenExt::While => sink.push(b.while_true()),
+            MidenExt::End => sink.push(b.end()),
+        },
         _ => return Err(EmitError::UnsupportedInstruction(ins.clone())),
     };
     Ok(())

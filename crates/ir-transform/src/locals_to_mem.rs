@@ -43,7 +43,7 @@ impl IrPass for LocalsToMemPass {
                 for (i, _param) in func.sig().params.iter().enumerate() {
                     // decrease the pointer by the size of the param (4 bytes/i32 for now)
                     new_func.push(Inst::I32Const {
-                        value: -(Ty::I32.size() as i32),
+                        value: -Ty::I32.size(),
                     });
                     new_func.push(Inst::I32Add);
                     new_func.push(Inst::Dup { idx: 0 });
@@ -65,7 +65,7 @@ impl IrPass for LocalsToMemPass {
                     global_idx: global_idx_for_base_local_offset,
                 });
                 new_func.push(Inst::I32Const {
-                    value: -(func.locals().len() as i32 * Ty::I32.size() as i32),
+                    value: -(func.locals().len() as i32 * Ty::I32.size()),
                 });
                 new_func.push(Inst::I32Add);
                 new_func.push_with_comment(
@@ -166,7 +166,7 @@ fn restore_base_local_offset(
             global_idx: global_idx_for_base_local_offset,
         });
         new_func.push(Inst::I32Const {
-            value: total_local_count as i32 * Ty::I32.size() as i32,
+            value: total_local_count as i32 * Ty::I32.size(),
         });
         new_func.push(Inst::I32Add);
         new_func.push(Inst::GlobalSet {

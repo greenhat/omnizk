@@ -38,4 +38,26 @@ impl MidenAssemblyBuilder {
     pub fn add(&self) -> MidenInst {
         "add".to_string().into()
     }
+
+    pub fn while_true(&self) -> MidenInst {
+        "while.true".to_string().into()
+    }
+
+    pub fn sdepth(&self) -> MidenInst {
+        "sdepth".to_string().into()
+    }
+
+    pub fn dup(&self, idx: u8) -> MidenInst {
+        format!("dup.{idx}").into()
+    }
+
+    pub fn swap(&self, idx: u8) -> MidenInst {
+        format!("swap.{idx}").into()
+    }
+}
+
+impl Default for MidenAssemblyBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
 }

@@ -13,6 +13,7 @@ pub use miden_inst::*;
 use crate::MidenError;
 use crate::MidenTargetConfig;
 
+#[allow(dead_code)]
 #[cfg(test)]
 mod sem_tests;
 

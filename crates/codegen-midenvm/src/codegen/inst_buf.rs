@@ -25,7 +25,7 @@ impl InstBuffer {
         self.inner.push(inst);
     }
 
-    pub(crate) fn append(&mut self, mut insts: Vec<MidenInst>) {
-        self.inner.append(&mut insts);
-    }
+    // pub(crate) fn append(&mut self, mut insts: Vec<MidenInst>) {
+    //     self.inner.append(&mut insts);
+    // }
 }
