@@ -46,7 +46,7 @@ pub fn compile_function(
     for ins in func.instructions() {
         let res = emit_inst(ins, config, sink, func_names);
         if let Err(e) = res {
-            dbg!(&func);
+            // dbg!(&func);
             return Err(e);
         }
     }

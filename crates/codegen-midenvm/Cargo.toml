@@ -18,6 +18,7 @@ miden-assembly = "0.5"
 miden-stdlib = "0.4"
 miden-processor = "0.5"
 derive_more = { workspace = true }
+thiserror = { workspace = true }
 
 [dev-dependencies]
 c2zk-frontend = { workspace = true }
