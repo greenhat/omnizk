@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
 use c2zk_codegen_shared::func_index_to_label;
 use c2zk_ir::ir::ext::Ext;
 use c2zk_ir::ir::ext::TritonExt;
+use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Inst;
 use triton_opcodes::instruction::AnInstruction;
 use triton_opcodes::ord_n::Ord16;
@@ -16,7 +19,7 @@ pub fn emit_inst(
     ins: &Inst,
     config: &TritonTargetConfig,
     sink: &mut InstBuffer,
-    func_names: &[String],
+    func_names: &HashMap<FuncIndex, String>,
 ) -> Result<(), TritonError> {
     match ins {
         Inst::Unreachable => (),

@@ -46,7 +46,7 @@ impl IrPass for GlobalsToMemPass {
         // dbg!(global_get_func_idx);
         // dbg!(global_set_func_idx);
 
-        for func in module.functions_mut().iter_mut() {
+        for (_idx, func) in module.functions_iter_mut() {
             let found_globals: Vec<(usize, GlobalInst)> = func
                 .instructions()
                 .iter()

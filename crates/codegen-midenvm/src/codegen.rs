@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use c2zk_codegen_shared::func_index_to_label;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncIndex;
@@ -25,8 +27,7 @@ pub fn compile_module(
     let func_names = module.func_names();
     let builder = MidenAssemblyBuilder::new();
     let start_func_index = module.start_func_idx;
-    for (idx, func) in module.into_functions().into_iter().enumerate() {
-        let idx = FuncIndex::from(idx as u32);
+    for (idx, func) in module.functions_into_iter() {
         sink.push(builder.proc(func_index_to_label(idx, &func_names)));
         compile_function(func, config, &mut sink, &func_names)?;
     }
@@ -40,7 +41,7 @@ pub fn compile_function(
     func: Func,
     config: &MidenTargetConfig,
     sink: &mut InstBuffer,
-    func_names: &[String],
+    func_names: &HashMap<FuncIndex, String>,
 ) -> Result<(), MidenError> {
     for ins in func.instructions() {
         let res = emit_inst(ins, config, sink, func_names);

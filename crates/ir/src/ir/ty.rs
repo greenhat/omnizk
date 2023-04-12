@@ -1,3 +1,4 @@
+use derive_more::Add;
 use derive_more::From;
 use derive_more::Into;
 
@@ -44,7 +45,7 @@ impl FuncType {
     }
 }
 
-#[derive(Debug, Clone, Copy, From, Into, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, From, Into, PartialEq, Eq, Hash, Ord, PartialOrd, Add)]
 pub struct FuncIndex(u32);
 
 #[derive(Debug, Clone, Copy, From, Into, PartialEq, Eq, Hash)]

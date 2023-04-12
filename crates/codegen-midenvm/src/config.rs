@@ -1,4 +1,5 @@
 use c2zk_ir::pass::IrPass;
+use c2zk_ir_transform::DceUnusedFunctionsPass;
 use c2zk_ir_transform::GlobalsToMemPass;
 use c2zk_ir_transform::SaveStackPubInputsPass;
 
@@ -21,6 +22,7 @@ impl Default for MidenTargetConfig {
                     memory_layout.pub_outputs_start_address,
                 )),
                 Box::new(GlobalsToMemPass::new(memory_layout.globals_start_address)),
+                Box::<DceUnusedFunctionsPass>::default(),
             ],
             memory_layout,
         }

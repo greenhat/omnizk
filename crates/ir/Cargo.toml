@@ -12,5 +12,6 @@ categories.workspace = true
 
 [dependencies]
 derive_more = { workspace = true }
+indexmap = { workspace = true }
 
 [dev-dependencies]

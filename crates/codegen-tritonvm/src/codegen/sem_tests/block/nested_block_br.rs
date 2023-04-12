@@ -42,8 +42,14 @@ fn test_nested_block_br() {
         expect![[r#"
             call main
             halt
-            c2zk_stdlib_pub_input:
-            read_io
+            globals_set:
+            push -4
+            mul
+            push 00000000002147482623
+            add
+            swap 1
+            write_mem
+            pop
             return
             c2zk_stdlib_pub_output:
             push 0
@@ -69,8 +75,14 @@ fn test_nested_block_br() {
             push 0
             call globals_set
             return
-            c2zk_stdlib_secret_input:
-            divine
+            globals_get:
+            push -4
+            mul
+            push 00000000002147482623
+            add
+            read_mem
+            swap 1
+            pop
             return
             main:
             call init_mem_for_locals
@@ -117,24 +129,6 @@ fn test_nested_block_br() {
             dup 0
             push 1
             call globals_set
-            return
-            globals_get:
-            push -4
-            mul
-            push 00000000002147482623
-            add
-            read_mem
-            swap 1
-            pop
-            return
-            globals_set:
-            push -4
-            mul
-            push 00000000002147482623
-            add
-            swap 1
-            write_mem
-            pop
             return"#]],
     );
 }

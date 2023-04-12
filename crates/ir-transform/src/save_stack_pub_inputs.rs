@@ -61,7 +61,7 @@ impl IrPass for SaveStackPubInputsPass {
                 ))
             });
 
-        for func in module.functions_mut().iter_mut() {
+        for (_idx, func) in module.functions_iter_mut() {
             for inst in func.instructions_mut() {
                 if let Inst::PubInputRead = inst {
                     *inst = Inst::Call {

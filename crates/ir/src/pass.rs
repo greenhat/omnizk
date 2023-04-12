@@ -15,7 +15,7 @@ pub trait IrPass {
     }
 
     fn run_mod_pass(&self, module: &mut Module) {
-        for func in module.functions_mut().iter_mut() {
+        for (_idx, func) in module.functions_iter_mut() {
             self.run_func_pass(func);
         }
     }

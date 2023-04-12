@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use c2zk_codegen_shared::func_index_to_label;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncIndex;
@@ -26,8 +28,7 @@ pub fn compile_module(
         &func_names,
     )));
     sink.push(AnInstruction::Halt);
-    for (idx, func) in module.into_functions().into_iter().enumerate() {
-        let idx = FuncIndex::from(idx as u32);
+    for (idx, func) in module.functions_into_iter() {
         sink.push_label(func_index_to_label(idx, &func_names));
         compile_function(func, config, &mut sink, &func_names)?;
     }
@@ -38,7 +39,7 @@ pub fn compile_function(
     func: Func,
     config: &TritonTargetConfig,
     sink: &mut InstBuffer,
-    func_names: &[String],
+    func_names: &HashMap<FuncIndex, String>,
 ) -> Result<(), TritonError> {
     for ins in func.instructions().iter() {
         let res = emit_inst(ins, config, sink, func_names);
@@ -97,15 +98,6 @@ mod tests {
                 push 00000000002147483647
                 push 0
                 call globals_set
-                return
-                globals_get:
-                push -4
-                mul
-                push 00000000002147482623
-                add
-                read_mem
-                swap 1
-                pop
                 return
                 globals_set:
                 push -4

@@ -23,7 +23,7 @@ impl IrPass for LocalsToMemPass {
         // dbg!(&module);
         let prologue_func =
             init_mem_for_locals_func(global_idx_for_base_local_offset, self.start_addr);
-        for func in module.functions_mut().iter_mut() {
+        for (_idx, func) in module.functions_iter_mut() {
             // dbg!(&func);
             let mut new_func = Func::new(
                 func.name().to_string(),

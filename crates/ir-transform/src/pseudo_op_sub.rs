@@ -15,7 +15,7 @@ impl IrPass for PseudoOpSubPass {
         let mut made_subst = false;
         let existing_func_idx = module.function_idx_by_name(PSEUDO_OP_SUB_FUNC_NAME);
         let next_free_func_idx = module.next_free_function_idx();
-        for func in module.functions_mut().iter_mut() {
+        for (_idx, func) in module.functions_iter_mut() {
             for inst in func.instructions_mut().iter_mut() {
                 if let Inst::I32Sub = inst {
                     *inst = Inst::Call {

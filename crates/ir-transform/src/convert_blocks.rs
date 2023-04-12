@@ -2,6 +2,7 @@ use c2zk_frontend_shared::FuncBuilder;
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::BlockKind;
 use c2zk_ir::ir::Func;
+use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::GlobalIndex;
 use c2zk_ir::ir::Inst;
@@ -27,13 +28,17 @@ impl BlocksToFuncPass {
 impl IrPass for BlocksToFuncPass {
     fn run_mod_pass(&self, module: &mut Module) {
         let br_propagation_global_idx = module.add_global(Ty::I32);
-        for i in 0..module.functions().len() {
-            #[allow(clippy::unwrap_used)]
-            let func_in = module.function(i as u32).unwrap().clone();
-            // TODO: this cloned Func is a hack to get around the borrow checker
-            // dbg!(&func_in);
-            let func_out = run(func_in, module, Vec::new(), br_propagation_global_idx);
-            module.set_function(i.into(), func_out);
+        let func_indices: Vec<FuncIndex> = module.functions_iter().map(|(idx, _)| *idx).collect();
+        for idx in func_indices {
+            #[allow(clippy::unwrap_used)] // we just collected the indices (see above)
+            let func_in = module.function(&idx).unwrap();
+            let func_out = run(
+                func_in.clone(),
+                module,
+                Vec::new(),
+                br_propagation_global_idx,
+            );
+            module.set_function(idx, func_out);
         }
     }
 
