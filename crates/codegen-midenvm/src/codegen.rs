@@ -73,6 +73,7 @@ mod tests {
         let triton_target_config = MidenTargetConfig::default();
         run_ir_passes(&mut module, &triton_target_config.ir_passes);
         let triton_target_config = MidenTargetConfig::default();
+        dbg!(&module);
         let inst_buf = compile_module(module, &triton_target_config).unwrap();
         let out_source = inst_buf.pretty_print();
         expected_tree.assert_eq(&out_source);
@@ -92,9 +93,73 @@ mod tests {
                 proc.f1
                 push.1
                 end
-                begin
+
+                end
+
+                proc.save_pub_inputs
+                sdepth
+                while.true
+                sdepth
+                push.2147483647
+                dup.0
+                swap.3
+                swap.1
+                mem_store
+                push.-8
+                add
+                push.0
+                exec.globals_set
+                push.-1
+                add
+                end
+
+                proc.globals_set
+                push.-4
+                mul
+                push.2147467263
+                add
+                swap.1
+                swap.1
+                mem_store
+                end
+
+                proc.globals_get
+                push.-4
+                mul
+                push.2147467263
+                add
+                mem_load
+                end
+
+                proc.load_pub_outputs_on_stack
+                push.1
+                exec.globals_get
+                push.2147483647
+                sub
+                while.true
+                push.1
+                exec.globals_get
+                dup.0
+                mem_load
+                push.8
+                add
+                dup.0
+                push.1
+                exec.globals_set
+                push.2147483647
+                sub
+                end
+
+                proc.start_with_miden_io_persistent
+                exec.save_pub_inputs
                 exec.f1
-                end"#]],
+                exec.load_pub_outputs_on_stack
+                end
+
+                begin
+                exec.start_with_miden_io_persistent
+                end
+            "#]],
         );
     }
 }

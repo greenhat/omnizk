@@ -10,7 +10,6 @@ pub enum MidenExt {
     SDepth,
     /// https://0xpolygonmiden.github.io/miden-vm/user_docs/assembly/flow_control.html#condition-controlled-loops
     While,
-    End,
 }
 
 impl From<MidenExt> for Inst {

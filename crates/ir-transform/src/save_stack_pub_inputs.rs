@@ -80,9 +80,12 @@ impl IrPass for SaveStackPubInputsPass {
             vec![Inst::Call {
                 func_idx: save_pub_inputs_func_idx,
             }],
-            vec![Inst::Call {
-                func_idx: load_pub_outputs_on_stack_func_idx,
-            }],
+            vec![
+                Inst::Call {
+                    func_idx: load_pub_outputs_on_stack_func_idx,
+                },
+                Inst::End,
+            ],
         );
     }
 
@@ -112,7 +115,7 @@ fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_addre
         }, // set the new address
         Inst::I32Const { value: -1 },
         Inst::I32Add, // decrement the stack depth counter (brought by SDepth)
-        MidenExt::End.into(),
+        Inst::End,
     ];
     Func::new(
         SAVE_PUB_INPUTS_FUNC_NAME.to_string(),
@@ -139,6 +142,7 @@ fn get_next_pub_input_func(pub_inputs_addr_idx: GlobalIndex) -> Func {
         Inst::GlobalSet {
             global_idx: pub_inputs_addr_idx,
         },
+        Inst::End,
     ];
     Func::new(
         GET_NEXT_PUB_INPUT_FUNC_NAME.to_string(),
@@ -166,6 +170,7 @@ fn store_pub_output_func(pub_outputs_addr_idx: GlobalIndex) -> Func {
         Inst::GlobalSet {
             global_idx: pub_outputs_addr_idx,
         },
+        Inst::End,
     ];
     Func::new(
         STORE_PUB_OUTPUT_FUNC_NAME.to_string(),
@@ -213,6 +218,7 @@ fn load_pub_outputs_on_stack_func(
         },
         // get the number of public outputs * type size for while to continue (if > 0)
         Inst::I32Sub,
+        Inst::End,
     ];
     Func::new(
         LOAD_PUB_OUTPUTS_ON_STACK_FUNC_NAME.to_string(),

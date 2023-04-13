@@ -2,12 +2,13 @@
 
 #![allow(clippy::unwrap_used)]
 
-mod add;
+// mod add;
+// mod smoke;
+
 // mod block;
 // mod fib;
 // mod func_call;
 // mod locals;
-mod smoke;
 
 use c2zk_ir::pass::run_ir_passes;
 use miden_assembly::Assembler;

@@ -16,7 +16,14 @@ impl InstBuffer {
     pub(crate) fn pretty_print(&self) -> String {
         self.inner
             .iter()
-            .map(|inst| String::from(inst.clone()))
+            .map(|inst| {
+                let str = String::from(inst.clone());
+                if str != "end" {
+                    str
+                } else {
+                    format!("{str}\n")
+                }
+            })
             .collect::<Vec<String>>()
             .join("\n")
     }
@@ -24,8 +31,4 @@ impl InstBuffer {
     pub(crate) fn push(&mut self, inst: MidenInst) {
         self.inner.push(inst);
     }
-
-    // pub(crate) fn append(&mut self, mut insts: Vec<MidenInst>) {
-    //     self.inner.append(&mut insts);
-    // }
 }

@@ -4,6 +4,7 @@ use indexmap::IndexMap;
 
 use super::Func;
 use super::FuncIndex;
+use super::FuncType;
 use super::GlobalIndex;
 use super::Inst;
 use super::Ty;
@@ -105,19 +106,19 @@ impl Module {
         prologue_idx
     }
 
+    #[allow(clippy::unwrap_used)]
     pub fn wrap_start_func(&mut self, name: String, before: Vec<Inst>, after: Vec<Inst>) {
-        let start_func = self.start_function_mut();
+        let call_start_func = vec![Inst::Call {
+            func_idx: self.start_func_idx,
+        }];
+        dbg!(self.functions.get(&self.start_func_idx).unwrap());
         let new_start_func_body = before
             .into_iter()
-            .chain(start_func.instructions().iter().cloned())
+            .chain(call_start_func.into_iter())
             .chain(after.into_iter())
             .collect();
-        let new_start_func = Func::new(
-            name,
-            start_func.sig().clone(),
-            Vec::new(),
-            new_start_func_body,
-        );
+        let new_start_func =
+            Func::new(name, FuncType::void_void(), Vec::new(), new_start_func_body);
         let new_start_func_idx = self.push_function(new_start_func);
         self.start_func_idx = new_start_func_idx;
     }

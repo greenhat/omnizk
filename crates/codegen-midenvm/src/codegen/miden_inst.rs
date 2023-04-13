@@ -54,6 +54,22 @@ impl MidenAssemblyBuilder {
     pub fn swap(&self, idx: u8) -> MidenInst {
         format!("swap.{idx}").into()
     }
+
+    pub fn mul(&self) -> MidenInst {
+        "mul".to_string().into()
+    }
+
+    pub fn mem_store(&self) -> MidenInst {
+        "mem_store".to_string().into()
+    }
+
+    pub(crate) fn mem_load(&self) -> MidenInst {
+        "mem_load".to_string().into()
+    }
+
+    pub(crate) fn sub(&self) -> MidenInst {
+        "sub".to_string().into()
+    }
 }
 
 impl Default for MidenAssemblyBuilder {
