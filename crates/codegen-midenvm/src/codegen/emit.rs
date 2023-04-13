@@ -21,32 +21,43 @@ pub enum EmitError {
 
 #[allow(unused_variables)]
 pub fn emit_inst(
-    ins: &Inst,
+    inst_iter: &mut impl Iterator<Item = Inst>,
     config: &MidenTargetConfig,
     sink: &mut InstBuffer,
     func_names: &HashMap<FuncIndex, String>,
 ) -> Result<(), EmitError> {
     let b = MidenAssemblyBuilder::new();
-    todo!("compress Return folowed by End into single End");
-    #[allow(clippy::wildcard_enum_match_arm)]
-    match ins {
-        Inst::End => sink.push(b.end()),
-        Inst::Return => sink.push(b.end()), // TODO: this is vaid only if this Return is the last one
-        Inst::Dup { idx } => sink.push(b.dup(*idx)),
-        Inst::Swap { idx } => sink.push(b.swap(*idx)),
-        Inst::Call { func_idx } => sink.push(b.exec(func_index_to_label(*func_idx, func_names))),
-        Inst::I32Const { value } => sink.push(b.push(*value as i64)),
-        Inst::I32Add => sink.push(b.add()),
-        Inst::I32Sub => sink.push(b.sub()),
-        Inst::I32Mul => sink.push(b.mul()),
-        Inst::I32Store { offset } => emit_mem_store(sink, &b, *offset as i32),
-        Inst::I32Load { offset } => emit_mem_load(sink, &b, *offset as i32),
-        Inst::Ext(Ext::Miden(miden_inst)) => match miden_inst {
-            MidenExt::SDepth => sink.push(b.sdepth()),
-            MidenExt::While => sink.push(b.while_true()),
-        },
-        _ => return Err(EmitError::UnsupportedInstruction(ins.clone())),
-    };
+    while let Some(inst) = inst_iter.next() {
+        #[allow(clippy::wildcard_enum_match_arm)]
+        match inst {
+            Inst::End => sink.push(b.end()),
+            Inst::Return => {
+                if let Some(Inst::End) = inst_iter.peekable().peek() {
+                    // Return followed by End shuold be replaced with just End
+                    sink.push(b.end());
+                    // consume the End
+                    inst_iter.next();
+                } else if inst_iter.peekable().peek().is_none() {
+                    // Return at the end of the function should be replaced with End
+                    sink.push(b.end());
+                }
+            }
+            Inst::Dup { idx } => sink.push(b.dup(idx)),
+            Inst::Swap { idx } => sink.push(b.swap(idx)),
+            Inst::Call { func_idx } => sink.push(b.exec(func_index_to_label(func_idx, func_names))),
+            Inst::I32Const { value } => sink.push(b.push(value as i64)),
+            Inst::I32Add => sink.push(b.add()),
+            Inst::I32Sub => sink.push(b.sub()),
+            Inst::I32Mul => sink.push(b.mul()),
+            Inst::I32Store { offset } => emit_mem_store(sink, &b, offset as i32),
+            Inst::I32Load { offset } => emit_mem_load(sink, &b, offset as i32),
+            Inst::Ext(Ext::Miden(miden_inst)) => match miden_inst {
+                MidenExt::SDepth => sink.push(b.sdepth()),
+                MidenExt::While => sink.push(b.while_true()),
+            },
+            inst => return Err(EmitError::UnsupportedInstruction(inst)),
+        }
+    }
     Ok(())
 }
 

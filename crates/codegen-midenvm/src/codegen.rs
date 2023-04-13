@@ -43,12 +43,10 @@ pub fn compile_function(
     sink: &mut InstBuffer,
     func_names: &HashMap<FuncIndex, String>,
 ) -> Result<(), MidenError> {
-    for ins in func.instructions() {
-        let res = emit_inst(ins, config, sink, func_names);
-        if let Err(e) = res {
-            dbg!(&func);
-            return Err(e.into());
-        }
+    let mut iter = func.instructions_into_iter();
+    let res = emit_inst(&mut iter, config, sink, func_names);
+    if let Err(e) = res {
+        return Err(e.into());
     }
     Ok(())
 }
@@ -92,8 +90,6 @@ mod tests {
             expect![[r#"
                 proc.f1
                 push.1
-                end
-
                 end
 
                 proc.save_pub_inputs

@@ -36,6 +36,10 @@ impl Func {
         &mut self.ins
     }
 
+    pub fn instructions_into_iter(self) -> impl Iterator<Item = Inst> {
+        self.ins.into_iter()
+    }
+
     pub fn push(&mut self, inst: Inst) {
         self.ins.push(inst);
     }
