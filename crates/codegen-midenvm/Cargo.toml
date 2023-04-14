@@ -17,6 +17,7 @@ c2zk-codegen-shared = { workspace = true }
 miden-assembly = "0.5"
 miden-stdlib = "0.4"
 miden-processor = "0.5"
+winter-math = { version = "0.6", default-features = false }
 derive_more = { workspace = true }
 thiserror = { workspace = true }
 

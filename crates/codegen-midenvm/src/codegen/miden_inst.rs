@@ -1,5 +1,7 @@
 use derive_more::From;
 use derive_more::Into;
+use winter_math::fields::f64::BaseElement;
+use winter_math::StarkField;
 
 #[derive(Debug, Clone, Into, From)]
 pub struct MidenInst(String);
@@ -23,8 +25,9 @@ impl MidenAssemblyBuilder {
         format!("exec.{name}").into()
     }
 
-    pub fn push(&self, num: i64) -> MidenInst {
-        format!("push.{num}").into()
+    pub fn push_i64(&self, num: i64) -> MidenInst {
+        let felt = felt_i64(num);
+        format!("push.{felt}").into()
     }
 
     pub fn adv_push(&self, num: u32) -> MidenInst {
@@ -75,5 +78,13 @@ impl MidenAssemblyBuilder {
 impl Default for MidenAssemblyBuilder {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+fn felt_i64(v: i64) -> BaseElement {
+    if v < 0 {
+        BaseElement::new(BaseElement::MODULUS - v.unsigned_abs())
+    } else {
+        BaseElement::new(v as u64)
     }
 }

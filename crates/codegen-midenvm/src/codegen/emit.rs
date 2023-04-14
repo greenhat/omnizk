@@ -45,7 +45,7 @@ pub fn emit_inst(
             Inst::Dup { idx } => sink.push(b.dup(idx)),
             Inst::Swap { idx } => sink.push(b.swap(idx)),
             Inst::Call { func_idx } => sink.push(b.exec(func_index_to_label(func_idx, func_names))),
-            Inst::I32Const { value } => sink.push(b.push(value as i64)),
+            Inst::I32Const { value } => sink.push(b.push_i64(value as i64)),
             Inst::I32Add => sink.push(b.add()),
             Inst::I32Sub => sink.push(b.sub()),
             Inst::I32Mul => sink.push(b.mul()),
@@ -65,7 +65,7 @@ fn emit_mem_store(sink: &mut InstBuffer, builder: &MidenAssemblyBuilder, offset:
     // Midex expects address to be on top of the stack, but Wasm Store expects value to be on top
     sink.push(builder.swap(1));
     if offset != 0 {
-        sink.push(builder.push(offset as i64));
+        sink.push(builder.push_i64(offset as i64));
         sink.push(builder.add());
     }
     sink.push(builder.mem_store());
@@ -73,7 +73,7 @@ fn emit_mem_store(sink: &mut InstBuffer, builder: &MidenAssemblyBuilder, offset:
 
 fn emit_mem_load(sink: &mut InstBuffer, builder: &MidenAssemblyBuilder, offset: i32) {
     if offset != 0 {
-        sink.push(builder.push(offset as i64));
+        sink.push(builder.push_i64(offset as i64));
         sink.push(builder.add());
     }
     sink.push(builder.mem_load());

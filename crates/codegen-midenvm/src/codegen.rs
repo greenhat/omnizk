@@ -101,16 +101,16 @@ mod tests {
                 swap.3
                 swap.1
                 mem_store
-                push.-8
+                push.18446744069414584313
                 add
                 push.0
                 exec.globals_set
-                push.-1
+                push.18446744069414584320
                 add
                 end
 
                 proc.globals_set
-                push.-4
+                push.18446744069414584317
                 mul
                 push.2147467263
                 add
@@ -120,7 +120,7 @@ mod tests {
                 end
 
                 proc.globals_get
-                push.-4
+                push.18446744069414584317
                 mul
                 push.2147467263
                 add

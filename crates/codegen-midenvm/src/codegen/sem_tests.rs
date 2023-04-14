@@ -3,7 +3,7 @@
 #![allow(clippy::unwrap_used)]
 
 // mod add;
-// mod smoke;
+mod smoke;
 
 // mod block;
 // mod fib;
