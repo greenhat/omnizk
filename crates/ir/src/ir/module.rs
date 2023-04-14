@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
 use indexmap::IndexMap;
+use thiserror::Error;
+use topological_sort::TopologicalSort;
 
 use super::Func;
 use super::FuncIndex;
@@ -42,6 +44,12 @@ impl Module {
 
     pub fn functions_into_iter(self) -> impl Iterator<Item = (FuncIndex, Func)> {
         self.functions.into_iter()
+    }
+
+    pub fn functions_into_iter_topo_sort(
+        self,
+    ) -> Result<impl Iterator<Item = (FuncIndex, Func)>, TopoSortError> {
+        topo_sort_functions(self.functions.into_iter())
     }
 
     pub fn functions_iter_mut(&mut self) -> impl Iterator<Item = (&FuncIndex, &mut Func)> {
@@ -122,4 +130,40 @@ impl Module {
         let new_start_func_idx = self.push_function(new_start_func);
         self.start_func_idx = new_start_func_idx;
     }
+}
+
+pub fn topo_sort_functions(
+    functions: impl Iterator<Item = (FuncIndex, Func)>,
+) -> Result<impl Iterator<Item = (FuncIndex, Func)>, TopoSortError> {
+    let mut topo_sort = TopologicalSort::new();
+
+    let mut functions_map = functions.collect::<IndexMap<_, _>>();
+
+    for (idx, func) in functions_map.iter() {
+        topo_sort.insert(*idx);
+        for dep in func.dependencies() {
+            topo_sort.add_dependency(dep, *idx);
+        }
+    }
+    let mut sorted = Vec::new();
+    while !topo_sort.is_empty() {
+        let mut func_indices = topo_sort.pop_all();
+        if func_indices.is_empty() {
+            return Err(TopoSortError::Cycle(topo_sort));
+        }
+        func_indices.sort();
+        sorted.append(&mut func_indices);
+    }
+    Ok(
+        #[allow(clippy::unwrap_used)] // functions_map has all possible FuncIndex keys
+        sorted
+            .into_iter()
+            .map(move |idx| (idx, functions_map.remove(&idx).unwrap())),
+    )
+}
+
+#[derive(Debug, Error)]
+pub enum TopoSortError {
+    #[error("Cycle in function dependencies: {0:?}")]
+    Cycle(TopologicalSort<FuncIndex>),
 }

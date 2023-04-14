@@ -13,5 +13,7 @@ categories.workspace = true
 [dependencies]
 derive_more = { workspace = true }
 indexmap = { workspace = true }
+thiserror = { workspace = true }
+topological-sort = { workspace = true }
 
 [dev-dependencies]

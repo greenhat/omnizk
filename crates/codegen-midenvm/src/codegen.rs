@@ -27,7 +27,7 @@ pub fn compile_module(
     let func_names = module.func_names();
     let builder = MidenAssemblyBuilder::new();
     let start_func_index = module.start_func_idx;
-    for (idx, func) in module.functions_into_iter() {
+    for (idx, func) in module.functions_into_iter_topo_sort()? {
         sink.push(builder.proc(func_index_to_label(idx, &func_names)));
         compile_function(func, config, &mut sink, &func_names)?;
     }
@@ -92,6 +92,24 @@ mod tests {
                 push.1
                 end
 
+                proc.globals_get
+                push.18446744069414584317
+                mul
+                push.2147467263
+                add
+                mem_load
+                end
+
+                proc.globals_set
+                push.18446744069414584317
+                mul
+                push.2147467263
+                add
+                swap.1
+                swap.1
+                mem_store
+                end
+
                 proc.save_pub_inputs
                 sdepth
                 while.true
@@ -107,24 +125,6 @@ mod tests {
                 exec.globals_set
                 push.18446744069414584320
                 add
-                end
-
-                proc.globals_set
-                push.18446744069414584317
-                mul
-                push.2147467263
-                add
-                swap.1
-                swap.1
-                mem_store
-                end
-
-                proc.globals_get
-                push.18446744069414584317
-                mul
-                push.2147467263
-                add
-                mem_load
                 end
 
                 proc.load_pub_outputs_on_stack

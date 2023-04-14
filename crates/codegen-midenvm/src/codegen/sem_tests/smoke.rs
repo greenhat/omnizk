@@ -9,8 +9,8 @@ fn test_smoke() {
     check_miden(
         r#"
 (module 
-    (start $f1)
-    (func $f1 
+    (start $main)
+    (func $main 
         i32.const 1
         i32.const 1
         i32.add
@@ -21,10 +21,28 @@ fn test_smoke() {
         secret_input,
         expected_output,
         expect![[r#"
-            proc.f1
+            proc.main
             push.1
             push.1
             add
+            end
+
+            proc.globals_get
+            push.18446744069414584317
+            mul
+            push.2147467263
+            add
+            mem_load
+            end
+
+            proc.globals_set
+            push.18446744069414584317
+            mul
+            push.2147467263
+            add
+            swap.1
+            swap.1
+            mem_store
             end
 
             proc.save_pub_inputs
@@ -42,24 +60,6 @@ fn test_smoke() {
             exec.globals_set
             push.18446744069414584320
             add
-            end
-
-            proc.globals_set
-            push.18446744069414584317
-            mul
-            push.2147467263
-            add
-            swap.1
-            swap.1
-            mem_store
-            end
-
-            proc.globals_get
-            push.18446744069414584317
-            mul
-            push.2147467263
-            add
-            mem_load
             end
 
             proc.load_pub_outputs_on_stack
@@ -83,7 +83,7 @@ fn test_smoke() {
 
             proc.start_with_miden_io_persistent
             exec.save_pub_inputs
-            exec.f1
+            exec.main
             exec.load_pub_outputs_on_stack
             end
 

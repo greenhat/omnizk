@@ -1,3 +1,4 @@
+use super::FuncIndex;
 use super::FuncType;
 use super::Inst;
 use super::Ty;
@@ -59,5 +60,17 @@ impl Func {
 
     pub fn locals(&self) -> &[Ty] {
         &self.locals
+    }
+
+    /// Returns the indices of the functions that this function calls.
+    pub fn dependencies(&self) -> Vec<FuncIndex> {
+        #[allow(clippy::wildcard_enum_match_arm)]
+        self.ins
+            .iter()
+            .filter_map(|inst| match inst {
+                Inst::Call { func_idx } => Some(*func_idx),
+                _ => None,
+            })
+            .collect()
     }
 }
