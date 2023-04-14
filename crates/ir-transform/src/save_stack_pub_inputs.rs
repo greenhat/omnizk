@@ -115,6 +115,9 @@ fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_addre
         }, // set the new address
         Inst::I32Const { value: -1 },
         Inst::I32Add, // decrement the stack depth counter (brought by SDepth)
+        // while.true end
+        Inst::End,
+        // function end
         Inst::End,
     ];
     Func::new(

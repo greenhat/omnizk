@@ -62,6 +62,8 @@ fn test_smoke() {
             add
             end
 
+            end
+
             proc.load_pub_outputs_on_stack
             push.1
             exec.globals_get
