@@ -221,6 +221,9 @@ fn load_pub_outputs_on_stack_func(
         },
         // get the number of public outputs * type size for while to continue (if > 0)
         Inst::I32Sub,
+        // While.true end
+        Inst::End,
+        // function end
         Inst::End,
     ];
     Func::new(

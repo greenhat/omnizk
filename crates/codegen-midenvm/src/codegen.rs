@@ -148,6 +148,8 @@ mod tests {
                 sub
                 end
 
+                end
+
                 proc.start_with_miden_io_persistent
                 exec.save_pub_inputs
                 exec.f1
