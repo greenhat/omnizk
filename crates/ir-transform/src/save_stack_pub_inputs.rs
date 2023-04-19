@@ -96,29 +96,35 @@ impl IrPass for SaveStackPubInputsPass {
 
 fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_address: i32) -> Func {
     let ins = vec![
-        MidenExt::SDepth.into(), // to enter the while.true loop
-        Inst::Dup { idx: 0 },
-        MidenExt::NeqImm(0).into(), // while.true condition
-        MidenExt::While.into(),
-        MidenExt::SDepth.into(),
         // set the start address
         Inst::I32Const {
             value: pub_inputs_start_address,
         },
-        Inst::Dup { idx: 0 },         // duplicate the address
-        Inst::Swap { idx: 3 },        // put value on top
+        Inst::LocalSet { local_idx: 0 },
+        MidenExt::SDepth.into(), // get the current stack depth to enter the while.true loop
+        // Stack: [stack_depth, ...]
+        MidenExt::NeqImm(0).into(), // while.true condition
+        // Stack: [0/1, ...]
+        MidenExt::While.into(),
+        Inst::LocalGet { local_idx: 0 }, // get the current address
+        // Stack: [address, pub input values ...]
+        Inst::Swap { idx: 1 }, // put the public input value on top
+        // Stack: [pub input, address, pub input values ...]
         Inst::I32Store { offset: 0 }, // store the stack value
-        Inst::I32Const {
-            value: -Ty::I64.size(),
-        },
-        Inst::I32Add, // decrement the address
+        // Stack: [pub input values ...]
+        Inst::LocalGet { local_idx: 0 }, // get the current address
+        // Stack: [address, pub input values ...]
+        Inst::I32Const { value: 1 },
+        Inst::I32Sub, // decrement the address
+        // Stack: [new address, pub input values ...]
         Inst::GlobalSet {
             global_idx: pub_inputs_addr_idx,
-        }, // set the new address
-        Inst::I32Const { value: -1 },
-        Inst::I32Add,         // decrement the stack depth counter (brought by SDepth)
-        Inst::Dup { idx: 0 }, // duplicate the stack depth counter
+        },
+        // Stack: [pub input values ...]
+        MidenExt::SDepth.into(), // get the current stack depth
+        // Stack: [stack_depth, pub input values ...]
         MidenExt::NeqImm(0).into(), // while.true condition
+        // Stack: [0/1, pub input values ...]
         // while.true end
         Inst::End,
         // function end
@@ -130,7 +136,7 @@ fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_addre
             params: vec![],
             results: vec![],
         },
-        vec![],
+        vec![Ty::I32],
         ins,
     )
 }

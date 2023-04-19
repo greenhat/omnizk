@@ -57,6 +57,7 @@ pub enum Inst {
         offset: u32,
     },
     I32Add,
+    /// The stack is expected to be [b, a] for a - b op
     I32Sub,
     I32Mul,
     I32Eqz,
