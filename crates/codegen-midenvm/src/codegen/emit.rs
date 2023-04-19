@@ -54,6 +54,7 @@ pub fn emit_inst(
             Inst::Ext(Ext::Miden(miden_inst)) => match miden_inst {
                 MidenExt::SDepth => sink.push(b.sdepth()),
                 MidenExt::While => sink.push(b.while_true()),
+                MidenExt::NeqImm(imm) => sink.push(b.neq_imm(imm)),
             },
             inst => return Err(EmitError::UnsupportedInstruction(inst)),
         }

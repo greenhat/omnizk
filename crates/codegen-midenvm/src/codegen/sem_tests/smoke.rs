@@ -47,6 +47,8 @@ fn test_smoke() {
 
             proc.save_pub_inputs
             sdepth
+            dup.0
+            neq.0
             while.true
             sdepth
             push.2147483647
@@ -60,6 +62,8 @@ fn test_smoke() {
             exec.globals_set
             push.18446744069414584320
             add
+            dup.0
+            neq.0
             end
 
             end
@@ -69,6 +73,8 @@ fn test_smoke() {
             exec.globals_get
             push.2147483647
             sub
+            dup.0
+            neq.0
             while.true
             push.1
             exec.globals_get
@@ -81,6 +87,8 @@ fn test_smoke() {
             exec.globals_set
             push.2147483647
             sub
+            dup.0
+            neq.0
             end
 
             end

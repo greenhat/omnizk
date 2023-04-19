@@ -119,7 +119,7 @@ impl Module {
         let call_start_func = vec![Inst::Call {
             func_idx: self.start_func_idx,
         }];
-        dbg!(self.functions.get(&self.start_func_idx).unwrap());
+        // dbg!(self.functions.get(&self.start_func_idx).unwrap());
         let new_start_func_body = before
             .into_iter()
             .chain(call_start_func.into_iter())

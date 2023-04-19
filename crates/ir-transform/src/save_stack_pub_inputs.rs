@@ -97,6 +97,8 @@ impl IrPass for SaveStackPubInputsPass {
 fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_address: i32) -> Func {
     let ins = vec![
         MidenExt::SDepth.into(), // to enter the while.true loop
+        Inst::Dup { idx: 0 },
+        MidenExt::NeqImm(0).into(), // while.true condition
         MidenExt::While.into(),
         MidenExt::SDepth.into(),
         // set the start address
@@ -114,7 +116,9 @@ fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_addre
             global_idx: pub_inputs_addr_idx,
         }, // set the new address
         Inst::I32Const { value: -1 },
-        Inst::I32Add, // decrement the stack depth counter (brought by SDepth)
+        Inst::I32Add,         // decrement the stack depth counter (brought by SDepth)
+        Inst::Dup { idx: 0 }, // duplicate the stack depth counter
+        MidenExt::NeqImm(0).into(), // while.true condition
         // while.true end
         Inst::End,
         // function end
@@ -200,6 +204,8 @@ fn load_pub_outputs_on_stack_func(
             value: pub_inputs_start_address,
         },
         Inst::I32Sub, // get the number of public outputs * type size
+        Inst::Dup { idx: 0 },
+        MidenExt::NeqImm(0).into(), // while.true condition
         MidenExt::While.into(),
         Inst::GlobalGet {
             global_idx: pub_outputs_addr_idx,
@@ -221,6 +227,8 @@ fn load_pub_outputs_on_stack_func(
         },
         // get the number of public outputs * type size for while to continue (if > 0)
         Inst::I32Sub,
+        Inst::Dup { idx: 0 },
+        MidenExt::NeqImm(0).into(), // while.true condition
         // While.true end
         Inst::End,
         // function end

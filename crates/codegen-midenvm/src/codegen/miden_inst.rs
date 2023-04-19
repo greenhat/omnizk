@@ -73,6 +73,10 @@ impl MidenAssemblyBuilder {
     pub(crate) fn sub(&self) -> MidenInst {
         "sub".to_string().into()
     }
+
+    pub(crate) fn neq_imm(&self, imm: i32) -> MidenInst {
+        format!("neq.{imm}").into()
+    }
 }
 
 impl Default for MidenAssemblyBuilder {

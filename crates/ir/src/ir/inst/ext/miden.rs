@@ -10,6 +10,9 @@ pub enum MidenExt {
     SDepth,
     /// https://0xpolygonmiden.github.io/miden-vm/user_docs/assembly/flow_control.html#condition-controlled-loops
     While,
+    /// NeqImm compares the top of the stack with an immediate value and pushes 1 onto the stack if
+    /// not equal.
+    NeqImm(i32),
 }
 
 impl From<MidenExt> for Inst {
