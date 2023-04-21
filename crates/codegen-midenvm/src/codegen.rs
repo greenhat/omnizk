@@ -28,7 +28,7 @@ pub fn compile_module(
     let builder = MidenAssemblyBuilder::new();
     let start_func_index = module.start_func_idx;
     for (idx, func) in module.functions_into_iter_topo_sort()? {
-        sink.push(builder.proc(func_index_to_label(idx, &func_names)));
+        sink.push(builder.proc(func_index_to_label(idx, &func_names), func.locals().len()));
         compile_function(func, config, &mut sink, &func_names)?;
     }
     sink.push(builder.begin());
@@ -88,11 +88,14 @@ mod tests {
         return)
 )"#,
             expect![[r#"
-                proc.f1
+                proc.f1.0
                 push.1
                 end
 
-                proc.globals_get
+                proc.load_pub_outputs_on_stack.0
+                end
+
+                proc.globals_get.0
                 push.18446744069414584317
                 mul
                 push.2147467263
@@ -100,7 +103,7 @@ mod tests {
                 mem_load
                 end
 
-                proc.globals_set
+                proc.globals_set.0
                 push.18446744069414584317
                 mul
                 push.2147467263
@@ -110,55 +113,30 @@ mod tests {
                 mem_store
                 end
 
-                proc.save_pub_inputs
-                sdepth
-                dup.0
-                neq.0
-                while.true
-                sdepth
+                proc.save_pub_inputs.1
                 push.2147483647
-                dup.0
-                swap.3
+                loc_store.0
+                sdepth
+                push.16
+                neq
+                while.true
+                loc_load.0
+                swap.1
                 swap.1
                 mem_store
-                push.18446744069414584313
-                add
+                loc_load.0
+                push.1
+                sub
                 push.0
                 exec.globals_set
-                push.18446744069414584320
-                add
-                dup.0
-                neq.0
+                sdepth
+                push.16
+                neq
                 end
 
                 end
 
-                proc.load_pub_outputs_on_stack
-                push.1
-                exec.globals_get
-                push.2147483647
-                sub
-                dup.0
-                neq.0
-                while.true
-                push.1
-                exec.globals_get
-                dup.0
-                mem_load
-                push.8
-                add
-                dup.0
-                push.1
-                exec.globals_set
-                push.2147483647
-                sub
-                dup.0
-                neq.0
-                end
-
-                end
-
-                proc.start_with_miden_io_persistent
+                proc.start_with_miden_io_persistent.0
                 exec.save_pub_inputs
                 exec.f1
                 exec.load_pub_outputs_on_stack

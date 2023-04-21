@@ -13,6 +13,9 @@ pub enum MidenExt {
     /// NeqImm compares the top of the stack with an immediate value and pushes 1 onto the stack if
     /// not equal.
     NeqImm(i32),
+    /// Neq compares the top of the stack with the second element on the stack and pushes 1 onto the
+    /// stack if not equal.
+    Neq,
 }
 
 impl From<MidenExt> for Inst {

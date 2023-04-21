@@ -12,11 +12,15 @@ mod smoke;
 
 use c2zk_ir::pass::run_ir_passes;
 use miden_assembly::Assembler;
+use miden_processor::math::Felt;
 use miden_processor::AdviceInputs;
 use miden_processor::MemAdviceProvider;
 use miden_processor::StackInputs;
+use miden_processor::VmState;
+use miden_processor::VmStateIterator;
 use miden_stdlib::StdLibrary;
 use wasmtime::*;
+use winter_math::StarkField;
 
 use crate::compile_module;
 use crate::MidenTargetConfig;
@@ -65,8 +69,14 @@ fn check_miden(
         .with_stack_values(secret_input)
         .unwrap()
         .into();
-    let trace = miden_processor::execute(&program, stack_inputs, adv_provider).unwrap();
-    let stack = pretty_stack(trace.stack_outputs().stack());
+    dbg!(&program);
+    // let trace = miden_processor::execute(&program, stack_inputs, adv_provider).unwrap();
+    let e_iter = miden_processor::execute_iter(&program, stack_inputs, adv_provider);
+    let vm_state = build_vm_state(e_iter);
+    dbg!(&vm_state);
+    // assert_eq!(0, 1);
+    // let stack = pretty_stack(trace.stack_outputs().stack());
+    let stack = pretty_stack_felt(&vm_state.last().unwrap().stack);
     assert_eq!(stack, expected_output);
 }
 
@@ -128,4 +138,21 @@ fn pretty_stack(stack: &[u64]) -> Vec<u64> {
         .copied()
         .filter(|x| *x != 0)
         .collect::<Vec<_>>()
+}
+
+fn pretty_stack_felt(stack: &[Felt]) -> Vec<u64> {
+    stack
+        .iter()
+        .map(|x| x.as_int())
+        .filter(|x| *x != 0)
+        .collect::<Vec<_>>()
+}
+
+/// This is a helper function to build a vector of [VmStatePartial] from a specified [VmStateIterator].
+fn build_vm_state(vm_state_iterator: VmStateIterator) -> Vec<VmState> {
+    let mut vm_state = Vec::new();
+    for state in vm_state_iterator {
+        vm_state.push(state.unwrap());
+    }
+    vm_state
 }

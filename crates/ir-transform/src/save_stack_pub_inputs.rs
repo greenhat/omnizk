@@ -95,6 +95,7 @@ impl IrPass for SaveStackPubInputsPass {
 }
 
 fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_address: i32) -> Func {
+    let min_stack_depth = 16;
     let ins = vec![
         // set the start address
         Inst::I32Const {
@@ -103,8 +104,11 @@ fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_addre
         Inst::LocalSet { local_idx: 0 },
         MidenExt::SDepth.into(), // get the current stack depth to enter the while.true loop
         // Stack: [stack_depth, ...]
-        MidenExt::NeqImm(0).into(), // while.true condition
-        // Stack: [0/1, ...]
+        Inst::I32Const {
+            value: min_stack_depth,
+        },
+        MidenExt::Neq.into(),
+        // // Stack: [0/1, ...]
         MidenExt::While.into(),
         Inst::LocalGet { local_idx: 0 }, // get the current address
         // Stack: [address, pub input values ...]
@@ -123,7 +127,10 @@ fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_addre
         // Stack: [pub input values ...]
         MidenExt::SDepth.into(), // get the current stack depth
         // Stack: [stack_depth, pub input values ...]
-        MidenExt::NeqImm(0).into(), // while.true condition
+        Inst::I32Const {
+            value: min_stack_depth,
+        },
+        MidenExt::Neq.into(),
         // Stack: [0/1, pub input values ...]
         // while.true end
         Inst::End,
@@ -201,42 +208,42 @@ fn load_pub_outputs_on_stack_func(
     pub_inputs_start_address: i32,
 ) -> Func {
     let ins = vec![
-        // get the address
-        Inst::GlobalGet {
-            global_idx: pub_outputs_addr_idx,
-        },
-        // get the original(start) address
-        Inst::I32Const {
-            value: pub_inputs_start_address,
-        },
-        Inst::I32Sub, // get the number of public outputs * type size
-        Inst::Dup { idx: 0 },
-        MidenExt::NeqImm(0).into(), // while.true condition
-        MidenExt::While.into(),
-        Inst::GlobalGet {
-            global_idx: pub_outputs_addr_idx,
-        }, // get the address
-        Inst::Dup { idx: 0 },        // duplicate the address
-        Inst::I32Load { offset: 0 }, // load the public output on the stack
-        Inst::I32Const {
-            value: Ty::I64.size(),
-        },
-        Inst::I32Add,         // increment the address
-        Inst::Dup { idx: 0 }, // duplicate the address
-        // set the address
-        Inst::GlobalSet {
-            global_idx: pub_outputs_addr_idx,
-        },
-        // get the original(start) address
-        Inst::I32Const {
-            value: pub_inputs_start_address,
-        },
-        // get the number of public outputs * type size for while to continue (if > 0)
-        Inst::I32Sub,
-        Inst::Dup { idx: 0 },
-        MidenExt::NeqImm(0).into(), // while.true condition
-        // While.true end
-        Inst::End,
+        // // get the address
+        // Inst::GlobalGet {
+        //     global_idx: pub_outputs_addr_idx,
+        // },
+        // // get the original(start) address
+        // Inst::I32Const {
+        //     value: pub_inputs_start_address,
+        // },
+        // Inst::I32Sub, // get the number of public outputs * type size
+        // Inst::Dup { idx: 0 },
+        // MidenExt::NeqImm(0).into(), // while.true condition
+        // MidenExt::While.into(),
+        // Inst::GlobalGet {
+        //     global_idx: pub_outputs_addr_idx,
+        // }, // get the address
+        // Inst::Dup { idx: 0 },        // duplicate the address
+        // Inst::I32Load { offset: 0 }, // load the public output on the stack
+        // Inst::I32Const {
+        //     value: Ty::I64.size(),
+        // },
+        // Inst::I32Add,         // increment the address
+        // Inst::Dup { idx: 0 }, // duplicate the address
+        // // set the address
+        // Inst::GlobalSet {
+        //     global_idx: pub_outputs_addr_idx,
+        // },
+        // // get the original(start) address
+        // Inst::I32Const {
+        //     value: pub_inputs_start_address,
+        // },
+        // // get the number of public outputs * type size for while to continue (if > 0)
+        // Inst::I32Sub,
+        // Inst::Dup { idx: 0 },
+        // MidenExt::NeqImm(0).into(), // while.true condition
+        // // While.true end
+        // Inst::End,
         // function end
         Inst::End,
     ];

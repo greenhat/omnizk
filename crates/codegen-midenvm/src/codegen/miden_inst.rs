@@ -17,8 +17,8 @@ impl MidenAssemblyBuilder {
         "begin".to_string().into()
     }
 
-    pub fn proc(&self, name: String) -> MidenInst {
-        format!("proc.{name}").into()
+    pub fn proc(&self, name: String, num_of_locals: usize) -> MidenInst {
+        format!("proc.{name}.{num_of_locals}").into()
     }
 
     pub fn exec(&self, name: String) -> MidenInst {
@@ -76,6 +76,22 @@ impl MidenAssemblyBuilder {
 
     pub(crate) fn neq_imm(&self, imm: i32) -> MidenInst {
         format!("neq.{imm}").into()
+    }
+
+    pub(crate) fn loc_load(&self, local_idx: u32) -> MidenInst {
+        format!("loc_load.{local_idx}").into()
+    }
+
+    pub(crate) fn loc_store(&self, local_idx: u32) -> MidenInst {
+        format!("loc_store.{local_idx}").into()
+    }
+
+    pub(crate) fn neq(&self) -> MidenInst {
+        "neq".to_string().into()
+    }
+
+    pub(crate) fn drop(&self) -> MidenInst {
+        "drop".to_string().into()
     }
 }
 

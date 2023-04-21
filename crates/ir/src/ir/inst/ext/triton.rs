@@ -6,6 +6,8 @@ use super::Ext;
 /// see https://triton-vm.org/spec/instructions.html
 #[derive(Debug, Clone)]
 pub enum TritonExt {
+    // TODO: remove and use Inst::Drop instead
+    /// drops the top of the stack
     Pop,
     /// skip the next op if top of stack is 0
     Skiz,

@@ -85,6 +85,8 @@ pub enum Inst {
     Dup {
         idx: u8,
     },
+    /// Deletes the top stack item
+    Drop,
     // Extention instructions for target arch
     Ext(Ext),
 }
