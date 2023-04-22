@@ -53,6 +53,10 @@ pub fn emit_inst(
             Inst::I32Load { offset } => emit_mem_load(sink, &b, offset as i32),
             Inst::LocalSet { local_idx } => sink.push(b.loc_store(local_idx)),
             Inst::LocalGet { local_idx } => sink.push(b.loc_load(local_idx)),
+            Inst::LocalTee { local_idx } => {
+                sink.push(b.dup(0));
+                sink.push(b.loc_store(local_idx));
+            }
             Inst::Drop => sink.push(b.drop()),
             Inst::Ext(Ext::Miden(miden_inst)) => match miden_inst {
                 MidenExt::SDepth => sink.push(b.sdepth()),

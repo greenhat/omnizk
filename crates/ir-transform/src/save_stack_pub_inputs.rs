@@ -30,6 +30,7 @@ pub const SAVE_PUB_INPUTS_FUNC_NAME: &str = "save_pub_inputs";
 pub const GET_NEXT_PUB_INPUT_FUNC_NAME: &str = "omni_miden_pub_input";
 pub const STORE_PUB_OUTPUT_FUNC_NAME: &str = "omni_miden_pub_output";
 pub const LOAD_PUB_OUTPUTS_ON_STACK_FUNC_NAME: &str = "load_pub_outputs_on_stack";
+pub const INIT_PUB_OUTPUTS_FUNC_NAME: &str = "init_pub_outputs";
 
 impl IrPass for SaveStackPubInputsPass {
     fn run_mod_pass(&self, module: &mut Module) {
@@ -47,6 +48,15 @@ impl IrPass for SaveStackPubInputsPass {
         let get_next_pub_input_func_idx = module
             .function_idx_by_name(GET_NEXT_PUB_INPUT_FUNC_NAME)
             .unwrap_or_else(|| module.push_function(get_next_pub_input_func(pub_inputs_addr_idx)));
+
+        let init_pub_outputs_func_idx = module
+            .function_idx_by_name(INIT_PUB_OUTPUTS_FUNC_NAME)
+            .unwrap_or_else(|| {
+                module.push_function(init_pub_outputs_func(
+                    pub_outputs_addr_idx,
+                    self.pub_outputs_start_address,
+                ))
+            });
 
         let store_pub_output_func_idx = module
             .function_idx_by_name(STORE_PUB_OUTPUT_FUNC_NAME)
@@ -77,9 +87,14 @@ impl IrPass for SaveStackPubInputsPass {
 
         module.wrap_start_func(
             "start_with_miden_io_persistent".to_string(),
-            vec![Inst::Call {
-                func_idx: save_pub_inputs_func_idx,
-            }],
+            vec![
+                Inst::Call {
+                    func_idx: save_pub_inputs_func_idx,
+                },
+                Inst::Call {
+                    func_idx: init_pub_outputs_func_idx,
+                },
+            ],
             vec![
                 Inst::Call {
                     func_idx: load_pub_outputs_on_stack_func_idx,
@@ -94,8 +109,9 @@ impl IrPass for SaveStackPubInputsPass {
     }
 }
 
+const MIN_STACK_DEPTH: i32 = 16;
+
 fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_address: i32) -> Func {
-    let min_stack_depth = 16;
     let ins = vec![
         // set the start address
         Inst::I32Const {
@@ -105,7 +121,7 @@ fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_addre
         MidenExt::SDepth.into(), // get the current stack depth to enter the while.true loop
         // Stack: [stack_depth, ...]
         Inst::I32Const {
-            value: min_stack_depth,
+            value: MIN_STACK_DEPTH,
         },
         MidenExt::Neq.into(),
         // // Stack: [0/1, ...]
@@ -118,7 +134,9 @@ fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_addre
         // Stack: [pub input values ...]
         Inst::LocalGet { local_idx: 0 }, // get the current address
         // Stack: [address, pub input values ...]
-        Inst::I32Const { value: 1 },
+        Inst::I32Const {
+            value: Ty::I64.size(),
+        },
         Inst::I32Sub, // decrement the address
         // Stack: [new address, pub input values ...]
         Inst::GlobalSet {
@@ -128,7 +146,7 @@ fn save_pub_inputs_func(pub_inputs_addr_idx: GlobalIndex, pub_inputs_start_addre
         MidenExt::SDepth.into(), // get the current stack depth
         // Stack: [stack_depth, pub input values ...]
         Inst::I32Const {
-            value: min_stack_depth,
+            value: MIN_STACK_DEPTH,
         },
         MidenExt::Neq.into(),
         // Stack: [0/1, pub input values ...]
@@ -175,13 +193,37 @@ fn get_next_pub_input_func(pub_inputs_addr_idx: GlobalIndex) -> Func {
     )
 }
 
+fn init_pub_outputs_func(
+    pub_outputs_addr_idx: GlobalIndex,
+    pub_outputs_start_address: i32,
+) -> Func {
+    let ins = vec![
+        Inst::I32Const {
+            value: pub_outputs_start_address,
+        },
+        Inst::GlobalSet {
+            global_idx: pub_outputs_addr_idx,
+        },
+        Inst::End,
+    ];
+    Func::new(
+        INIT_PUB_OUTPUTS_FUNC_NAME.to_string(),
+        FuncType {
+            params: vec![],
+            results: vec![],
+        },
+        vec![],
+        ins,
+    )
+}
+
 fn store_pub_output_func(pub_outputs_addr_idx: GlobalIndex) -> Func {
     let ins = vec![
         Inst::GlobalGet {
             global_idx: pub_outputs_addr_idx,
         }, // get the address
         Inst::Dup { idx: 0 },         // duplicate the address
-        Inst::Swap { idx: 3 },        // put value on top
+        Inst::Swap { idx: 2 },        // put value on top
         Inst::I32Store { offset: 0 }, // store the stack value to public outputs memory region
         Inst::I32Const {
             value: -Ty::I64.size(),
@@ -208,42 +250,37 @@ fn load_pub_outputs_on_stack_func(
     pub_inputs_start_address: i32,
 ) -> Func {
     let ins = vec![
-        // // get the address
-        // Inst::GlobalGet {
-        //     global_idx: pub_outputs_addr_idx,
-        // },
-        // // get the original(start) address
-        // Inst::I32Const {
-        //     value: pub_inputs_start_address,
-        // },
-        // Inst::I32Sub, // get the number of public outputs * type size
-        // Inst::Dup { idx: 0 },
-        // MidenExt::NeqImm(0).into(), // while.true condition
-        // MidenExt::While.into(),
-        // Inst::GlobalGet {
-        //     global_idx: pub_outputs_addr_idx,
-        // }, // get the address
-        // Inst::Dup { idx: 0 },        // duplicate the address
-        // Inst::I32Load { offset: 0 }, // load the public output on the stack
-        // Inst::I32Const {
-        //     value: Ty::I64.size(),
-        // },
-        // Inst::I32Add,         // increment the address
-        // Inst::Dup { idx: 0 }, // duplicate the address
-        // // set the address
-        // Inst::GlobalSet {
-        //     global_idx: pub_outputs_addr_idx,
-        // },
-        // // get the original(start) address
-        // Inst::I32Const {
-        //     value: pub_inputs_start_address,
-        // },
-        // // get the number of public outputs * type size for while to continue (if > 0)
-        // Inst::I32Sub,
-        // Inst::Dup { idx: 0 },
-        // MidenExt::NeqImm(0).into(), // while.true condition
-        // // While.true end
-        // Inst::End,
+        // get the address
+        Inst::GlobalGet {
+            global_idx: pub_outputs_addr_idx,
+        },
+        Inst::LocalTee { local_idx: 0 },
+        // get the original(start) address
+        Inst::I32Const {
+            value: pub_inputs_start_address,
+        },
+        Inst::I32Sub, // get the number of public outputs * 8 (i64 type size)
+        MidenExt::NeqImm(0).into(), // while.true condition
+        MidenExt::While.into(),
+        Inst::LocalGet { local_idx: 0 }, // get the address
+        Inst::Dup { idx: 0 },            // duplicate the address
+        Inst::I32Load { offset: 0 },     // load the public output on the stack
+        Inst::I32Const {
+            value: Ty::I64.size(),
+        },
+        Inst::I32Add, // increment the address
+        // set the address
+        Inst::LocalTee { local_idx: 0 },
+        // get the original(start) address
+        Inst::I32Const {
+            value: pub_inputs_start_address,
+        },
+        // get the number of public outputs * type size for while to continue (if > 0)
+        Inst::I32Sub,
+        Inst::Dup { idx: 0 },
+        MidenExt::NeqImm(0).into(), // while.true condition
+        // While.true end
+        Inst::End,
         // function end
         Inst::End,
     ];
@@ -253,7 +290,7 @@ fn load_pub_outputs_on_stack_func(
             params: vec![],
             results: vec![],
         },
-        vec![],
+        vec![Ty::I32],
         ins,
     )
 }

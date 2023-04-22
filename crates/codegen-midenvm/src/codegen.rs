@@ -92,9 +92,6 @@ mod tests {
                 push.1
                 end
 
-                proc.load_pub_outputs_on_stack.0
-                end
-
                 proc.globals_get.0
                 push.18446744069414584317
                 mul
@@ -125,7 +122,7 @@ mod tests {
                 swap.1
                 mem_store
                 loc_load.0
-                push.1
+                push.8
                 sub
                 push.0
                 exec.globals_set
@@ -136,8 +133,39 @@ mod tests {
 
                 end
 
+                proc.init_pub_outputs.0
+                push.2147483647
+                push.1
+                exec.globals_set
+                end
+
+                proc.load_pub_outputs_on_stack.1
+                push.1
+                exec.globals_get
+                dup.0
+                loc_store.0
+                push.2147483647
+                sub
+                neq.0
+                while.true
+                loc_load.0
+                dup.0
+                mem_load
+                push.8
+                add
+                dup.0
+                loc_store.0
+                push.2147483647
+                sub
+                dup.0
+                neq.0
+                end
+
+                end
+
                 proc.start_with_miden_io_persistent.0
                 exec.save_pub_inputs
+                exec.init_pub_outputs
                 exec.f1
                 exec.load_pub_outputs_on_stack
                 end
