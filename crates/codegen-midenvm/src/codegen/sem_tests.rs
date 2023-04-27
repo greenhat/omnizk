@@ -133,19 +133,12 @@ fn check_wat(
     );
 }
 
-fn pretty_stack(stack: &[u64]) -> Vec<u64> {
-    stack
-        .iter()
-        .copied()
-        .filter(|x| *x != 0)
-        .collect::<Vec<_>>()
-}
-
 fn pretty_stack_felt(stack: &[Felt]) -> Vec<u64> {
     stack
         .iter()
         .map(|x| x.as_int())
         .filter(|x| *x != 0)
+        .rev()
         .collect::<Vec<_>>()
 }
 
