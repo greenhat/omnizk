@@ -3,6 +3,7 @@
 #![allow(clippy::unwrap_used)]
 
 // mod add;
+mod pub_inputs;
 mod smoke;
 
 // mod block;
