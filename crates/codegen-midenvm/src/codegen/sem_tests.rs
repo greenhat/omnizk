@@ -11,6 +11,8 @@ mod smoke;
 // mod func_call;
 // mod locals;
 
+use std::ops::RangeFrom;
+
 use c2zk_ir::pass::run_ir_passes;
 use miden_assembly::Assembler;
 use miden_processor::math::Felt;
@@ -73,11 +75,24 @@ fn check_miden(
     dbg!(&program);
     // let trace = miden_processor::execute(&program, stack_inputs, adv_provider).unwrap();
     let e_iter = miden_processor::execute_iter(&program, stack_inputs, adv_provider);
-    let vm_state = build_vm_state(e_iter);
-    dbg!(&vm_state);
+    let vm_state = build_vm_state(e_iter, 0..);
+    eprintln!(
+        "{}",
+        &vm_state
+            .iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>()
+            .join("\n")
+    );
     // assert_eq!(0, 1);
     // let stack = pretty_stack(trace.stack_outputs().stack());
     let stack = pretty_stack_felt(&vm_state.last().unwrap().stack);
+    // fill expected_output with zeros if it's shorter than stack
+    let expected_output = expected_output
+        .into_iter()
+        .chain(std::iter::repeat(0))
+        .take(stack.len())
+        .collect::<Vec<_>>();
     assert_eq!(stack, expected_output);
 }
 
@@ -134,18 +149,16 @@ fn check_wat(
 }
 
 fn pretty_stack_felt(stack: &[Felt]) -> Vec<u64> {
-    stack
-        .iter()
-        .map(|x| x.as_int())
-        .filter(|x| *x != 0)
-        .rev()
-        .collect::<Vec<_>>()
+    stack.iter().map(|x| x.as_int()).collect::<Vec<_>>()
 }
 
 /// This is a helper function to build a vector of [VmStatePartial] from a specified [VmStateIterator].
-fn build_vm_state(vm_state_iterator: VmStateIterator) -> Vec<VmState> {
+fn build_vm_state(vm_state_iterator: VmStateIterator, range: RangeFrom<usize>) -> Vec<VmState> {
     let mut vm_state = Vec::new();
-    for state in vm_state_iterator {
+    for (idx, state) in vm_state_iterator.enumerate() {
+        if !range.contains(&idx) {
+            continue;
+        }
         vm_state.push(state.unwrap());
     }
     vm_state

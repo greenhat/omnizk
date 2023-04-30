@@ -16,6 +16,10 @@ pub enum MidenExt {
     /// Neq compares the top of the stack with the second element on the stack and pushes 1 onto the
     /// stack if not equal.
     Neq,
+    /// if.true pops the top of the stack and if it is 1, executes the code block. If 0,
+    /// executes Elso.
+    If,
+    Else,
 }
 
 impl From<MidenExt> for Inst {

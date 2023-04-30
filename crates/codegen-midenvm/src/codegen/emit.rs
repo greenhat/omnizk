@@ -63,6 +63,8 @@ pub fn emit_inst(
                 MidenExt::While => sink.push(b.while_true()),
                 MidenExt::NeqImm(imm) => sink.push(b.neq_imm(imm)),
                 MidenExt::Neq => sink.push(b.neq()),
+                MidenExt::If => sink.push(b.if_true()),
+                MidenExt::Else => sink.push(b.if_else()),
             },
             inst => return Err(EmitError::UnsupportedInstruction(inst)),
         }

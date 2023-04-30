@@ -93,6 +93,14 @@ impl MidenAssemblyBuilder {
     pub(crate) fn drop(&self) -> MidenInst {
         "drop".to_string().into()
     }
+
+    pub(crate) fn if_true(&self) -> MidenInst {
+        "if.true".to_string().into()
+    }
+
+    pub(crate) fn if_else(&self) -> MidenInst {
+        "else".to_string().into()
+    }
 }
 
 impl Default for MidenAssemblyBuilder {

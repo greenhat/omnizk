@@ -3,9 +3,12 @@ use expect_test::expect;
 
 #[test]
 fn test_pub_inputs() {
-    let input = vec![1, 2];
+    // let input = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2];
+    let input = vec![5, 7];
+    // prepend with 16 zeroes
+    // let input = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2];
     let secret_input = vec![];
-    let expected_output = vec![2, 1];
+    let expected_output = vec![7, 5];
     check_miden(
         r#"
 (module 
@@ -45,36 +48,49 @@ fn test_pub_inputs() {
             mem_store
             end
 
-            proc.save_pub_inputs.1
+            proc.save_pub_inputs.2
             push.2147483647
             loc_store.0
             sdepth
-            push.16
-            neq
+            loc_store.1
+            push.1
             while.true
+            dup.0
+            neq.0
+            if.true
             loc_load.0
-            swap.1
+            dup.0
+            swap.2
             swap.1
             mem_store
-            loc_load.0
             push.8
             sub
-            push.0
-            exec.globals_set
-            sdepth
-            push.16
-            neq
+            loc_store.0
+            else
+            drop
             end
 
+            loc_load.1
+            push.1
+            sub
+            dup.0
+            loc_store.1
+            neq.0
+            end
+
+            loc_load.0
+            push.0
+            exec.globals_set
             end
 
             proc.omni_miden_pub_input.0
             push.0
             exec.globals_get
-            dup.0
-            mem_load
             push.8
             add
+            dup.0
+            mem_load
+            swap.1
             push.0
             exec.globals_set
             end
