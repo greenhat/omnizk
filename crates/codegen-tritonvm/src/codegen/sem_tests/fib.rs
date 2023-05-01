@@ -29,13 +29,13 @@ fn test_fib() {
               (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
               (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
               (func $__main (;2;) (type 2)
-                call $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E
+                call $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE
               )
-              (func $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E (;3;) (type 2)
+              (func $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE (;3;) (type 2)
                 (local i32 i32 i32 i32)
                 block ;; label = @1
                   block ;; label = @2
-                    call $_ZN11c2zk_stdlib9pub_input17h6397ea668b208b48E
+                    call $_ZN11c2zk_stdlib9pub_input17h4dc54be4a473b24cE
                     i32.wrap_i64
                     local.tee 0
                     br_if 0 (;@2;)
@@ -124,12 +124,12 @@ fn test_fib() {
                 end
                 local.get 1
                 i64.extend_i32_u
-                call $_ZN11c2zk_stdlib10pub_output17h458bc26f7eb14631E
+                call $_ZN11c2zk_stdlib10pub_output17h052bf0348afc7d69E
               )
-              (func $_ZN11c2zk_stdlib9pub_input17h6397ea668b208b48E (;4;) (type 0) (result i64)
+              (func $_ZN11c2zk_stdlib9pub_input17h4dc54be4a473b24cE (;4;) (type 0) (result i64)
                 call $c2zk_stdlib_pub_input
               )
-              (func $_ZN11c2zk_stdlib10pub_output17h458bc26f7eb14631E (;5;) (type 1) (param i64)
+              (func $_ZN11c2zk_stdlib10pub_output17h052bf0348afc7d69E (;5;) (type 1) (param i64)
                 local.get 0
                 call $c2zk_stdlib_pub_output
               )
@@ -174,16 +174,16 @@ fn test_fib() {
             return
             __main:
             call init_mem_for_locals
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE
             return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE:
             push 0
             call globals_get
             push -16
             add
             push 0
             call globals_set
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0
             push 0
             call globals_get
             push 8
@@ -191,7 +191,7 @@ fn test_fib() {
             read_mem
             swap 1
             pop
-            call _ZN11c2zk_stdlib10pub_output17h458bc26f7eb14631E
+            call _ZN11c2zk_stdlib10pub_output17h052bf0348afc7d69E
             push 0
             call globals_get
             push 16
@@ -199,10 +199,10 @@ fn test_fib() {
             push 0
             call globals_set
             return
-            _ZN11c2zk_stdlib9pub_input17h6397ea668b208b48E:
+            _ZN11c2zk_stdlib9pub_input17h4dc54be4a473b24cE:
             call c2zk_stdlib_pub_input
             return
-            _ZN11c2zk_stdlib10pub_output17h458bc26f7eb14631E:
+            _ZN11c2zk_stdlib10pub_output17h052bf0348afc7d69E:
             push 0
             call globals_get
             push -4
@@ -231,8 +231,8 @@ fn test_fib() {
             push 0
             call globals_set
             return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0:
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0_l1_b0
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0:
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0_l1_b0
             call next_br_propagation
             skiz
             return
@@ -254,7 +254,7 @@ fn test_fib() {
             swap 1
             write_mem
             pop
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0_l1_b1
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0_l1_b1
             call next_br_propagation
             skiz
             return
@@ -281,13 +281,13 @@ fn test_fib() {
             swap 1
             write_mem
             pop
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0_l1_b2
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0_l1_b2
             call next_br_propagation
             skiz
             return
             return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0_l1_b0:
-            call _ZN11c2zk_stdlib9pub_input17h6397ea668b208b48E
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0_l1_b0:
+            call _ZN11c2zk_stdlib9pub_input17h4dc54be4a473b24cE
             dup 0
             push 0
             call globals_get
@@ -329,8 +329,8 @@ fn test_fib() {
             push 1
             call globals_set
             return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0_l1_b1:
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0_l1_b1_l2_b0
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0_l1_b1:
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0_l1_b1_l2_b0
             call next_br_propagation
             skiz
             return
@@ -368,12 +368,12 @@ fn test_fib() {
             swap 1
             write_mem
             pop
-            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0_l1_b1_l2_b1
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0_l1_b1_l2_b1
             call next_br_propagation
             skiz
             return
             return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0_l1_b1_l2_b0:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0_l1_b1_l2_b0:
             push 0
             call globals_get
             push 12
@@ -423,7 +423,7 @@ fn test_fib() {
             call globals_set
             return
             return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0_l1_b1_l2_b1:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0_l1_b1_l2_b1:
             push 0
             call globals_get
             push 12
@@ -590,7 +590,7 @@ fn test_fib() {
             skiz
             recurse
             return
-            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E_l0_b0_l1_b2:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h483c7a395d220fcbE_l0_b0_l1_b2:
             push 0
             call globals_get
             push 12
