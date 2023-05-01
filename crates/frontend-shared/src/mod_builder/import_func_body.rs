@@ -46,10 +46,11 @@ impl ImportFuncBody {
                         ty: FuncType::new(vec![Ty::I64], vec![]),
                     },
                     vec![
-                        Inst::LocalGet { local_idx: 0 },
-                        Inst::PubOutputWrite,
-                        Inst::Return,
-                    ],
+                    todo!("declare locals (for miden)");
+                                    Inst::LocalGet { local_idx: 0 },
+                                    Inst::PubOutputWrite,
+                                    Inst::Return,
+                                ],
                 ),
                 (
                     ImportFunc {

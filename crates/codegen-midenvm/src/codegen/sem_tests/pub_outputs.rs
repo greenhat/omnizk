@@ -2,18 +2,28 @@ use super::check_miden;
 use expect_test::expect;
 
 #[test]
-fn test_smoke() {
+fn test_pub_outputs() {
     let input = vec![];
     let secret_input = vec![];
-    let expected_output = vec![2];
+    let expected_output = vec![9, 7, 5, 3];
     check_miden(
         r#"
 (module 
+    (type (;0;) (func (result i64)))
+    (type (;1;) (func (param i64)))
+    (type (;2;) (func))
+    (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
+    (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
+    (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
+    (export "main" (func $main))
     (start $main)
     (func $main 
-        i32.const 1
-        i32.const 1
-        i32.add
+        i64.const 3
+        i64.const 5
+        call $c2zk_stdlib_pub_output
+        i64.const 7
+        call $c2zk_stdlib_pub_output
+        i64.const 9
         return)
 )"#
         .to_string(),
@@ -21,12 +31,6 @@ fn test_smoke() {
         secret_input,
         expected_output,
         expect![[r#"
-            proc.main.0
-            push.1
-            push.1
-            add
-            end
-
             proc.globals_get.0
             push.18446744069414584317
             mul
@@ -80,8 +84,33 @@ fn test_smoke() {
             exec.globals_set
             end
 
+            proc.omni_miden_pub_input.0
+            push.0
+            exec.globals_get
+            push.8
+            add
+            dup.0
+            mem_load
+            swap.1
+            push.0
+            exec.globals_set
+            end
+
             proc.init_pub_outputs.0
             push.2147483647
+            push.1
+            exec.globals_set
+            end
+
+            proc.omni_miden_pub_output.0
+            push.1
+            exec.globals_get
+            dup.0
+            swap.2
+            swap.1
+            mem_store
+            push.8
+            sub
             push.1
             exec.globals_set
             end
@@ -109,6 +138,20 @@ fn test_smoke() {
             neq.0
             end
 
+            end
+
+            proc.c2zk_stdlib_pub_output.0
+            loc_load.0
+            exec.omni_miden_pub_output
+            end
+
+            proc.main.0
+            push.3
+            push.5
+            exec.c2zk_stdlib_pub_output
+            push.7
+            exec.c2zk_stdlib_pub_output
+            push.9
             end
 
             proc.start_with_miden_io_persistent.0

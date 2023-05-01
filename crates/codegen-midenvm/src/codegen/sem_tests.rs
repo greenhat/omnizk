@@ -4,6 +4,7 @@
 
 // mod add;
 mod pub_inputs;
+mod pub_outputs;
 mod smoke;
 
 // mod block;

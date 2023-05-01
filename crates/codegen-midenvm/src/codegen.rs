@@ -152,11 +152,11 @@ mod tests {
                 end
 
                 proc.load_pub_outputs_on_stack.1
+                push.2147483647
                 push.1
                 exec.globals_get
                 dup.0
                 loc_store.0
-                push.2147483647
                 sub
                 neq.0
                 while.true
@@ -168,6 +168,7 @@ mod tests {
                 dup.0
                 loc_store.0
                 push.2147483647
+                swap.1
                 sub
                 dup.0
                 neq.0

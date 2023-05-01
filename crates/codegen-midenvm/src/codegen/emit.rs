@@ -46,6 +46,7 @@ pub fn emit_inst(
             Inst::Swap { idx } => sink.push(b.swap(idx)),
             Inst::Call { func_idx } => sink.push(b.exec(func_index_to_label(func_idx, func_names))),
             Inst::I32Const { value } => sink.push(b.push_i64(value as i64)),
+            Inst::I64Const { value } => sink.push(b.push_i64(value)),
             Inst::I32Add => sink.push(b.add()),
             Inst::I32Sub => sink.push(b.sub()),
             Inst::I32Mul => sink.push(b.mul()),

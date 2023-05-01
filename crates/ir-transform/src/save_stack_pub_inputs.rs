@@ -229,9 +229,9 @@ fn store_pub_output_func(pub_outputs_addr_idx: GlobalIndex) -> Func {
         Inst::Swap { idx: 2 },        // put value on top
         Inst::I32Store { offset: 0 }, // store the stack value to public outputs memory region
         Inst::I32Const {
-            value: -Ty::I64.size(),
+            value: Ty::I64.size(),
         },
-        Inst::I32Add, // decrement the address
+        Inst::I32Sub, // decrement the address
         Inst::GlobalSet {
             global_idx: pub_outputs_addr_idx,
         },
@@ -253,15 +253,15 @@ fn load_pub_outputs_on_stack_func(
     pub_inputs_start_address: i32,
 ) -> Func {
     let ins = vec![
+        Inst::I32Const {
+            value: pub_inputs_start_address,
+        },
         // get the address
         Inst::GlobalGet {
             global_idx: pub_outputs_addr_idx,
         },
         Inst::LocalTee { local_idx: 0 },
         // get the original(start) address
-        Inst::I32Const {
-            value: pub_inputs_start_address,
-        },
         Inst::I32Sub, // get the number of public outputs * 8 (i64 type size)
         MidenExt::NeqImm(0).into(), // while.true condition
         MidenExt::While.into(),
@@ -278,6 +278,7 @@ fn load_pub_outputs_on_stack_func(
         Inst::I32Const {
             value: pub_inputs_start_address,
         },
+        Inst::Swap { idx: 1 }, // put the lower address on top
         // get the number of public outputs * type size for while to continue (if > 0)
         Inst::I32Sub,
         Inst::Dup { idx: 0 },

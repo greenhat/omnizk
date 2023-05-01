@@ -108,18 +108,18 @@ fn test_pub_inputs() {
             swap.2
             swap.1
             mem_store
-            push.18446744069414584313
-            add
+            push.8
+            sub
             push.1
             exec.globals_set
             end
 
             proc.load_pub_outputs_on_stack.1
+            push.2147483647
             push.1
             exec.globals_get
             dup.0
             loc_store.0
-            push.2147483647
             sub
             neq.0
             while.true
@@ -131,6 +131,7 @@ fn test_pub_inputs() {
             dup.0
             loc_store.0
             push.2147483647
+            swap.1
             sub
             dup.0
             neq.0
