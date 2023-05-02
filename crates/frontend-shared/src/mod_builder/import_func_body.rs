@@ -1,8 +1,11 @@
 use std::collections::HashMap;
 
+use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::Inst;
 use c2zk_ir::ir::Ty;
+
+use crate::FuncBuilder;
 
 #[derive(Debug, Eq, Hash, PartialEq)]
 pub struct ImportFunc {
@@ -13,7 +16,7 @@ pub struct ImportFunc {
 
 #[derive(Debug)]
 pub struct ImportFuncBody {
-    mapping: HashMap<ImportFunc, Vec<Inst>>,
+    mapping: HashMap<ImportFunc, Func>,
 }
 
 impl ImportFuncBody {
@@ -31,33 +34,29 @@ impl ImportFuncBody {
     pub fn new_stdlib() -> Self {
         Self {
             mapping: vec![
-                (
-                    ImportFunc {
-                        module: Self::PUB_INPUT_FUNC_MODULE.to_string(),
-                        name: Self::PUB_INPUT_FUNC_NAME.to_string(),
-                        ty: FuncType::new(vec![], vec![Ty::I64]),
-                    },
+                build_import_func(
+                    Self::PUB_INPUT_FUNC_MODULE,
+                    Self::PUB_INPUT_FUNC_NAME,
+                    FuncType::new(vec![], vec![Ty::I64]),
+                    Vec::new(),
                     vec![Self::PUB_INPUT_OP, Inst::Return],
                 ),
-                (
-                    ImportFunc {
-                        module: Self::PUB_OUTPUT_FUNC_MODULE.to_string(),
-                        name: Self::PUB_OUTPUT_FUNC_NAME.to_string(),
-                        ty: FuncType::new(vec![Ty::I64], vec![]),
-                    },
+                build_import_func(
+                    Self::PUB_OUTPUT_FUNC_MODULE,
+                    Self::PUB_OUTPUT_FUNC_NAME,
+                    FuncType::new(vec![Ty::I64], vec![]),
+                    vec![Ty::I64],
                     vec![
-                    todo!("declare locals (for miden)");
-                                    Inst::LocalGet { local_idx: 0 },
-                                    Inst::PubOutputWrite,
-                                    Inst::Return,
-                                ],
+                        Inst::LocalGet { local_idx: 0 },
+                        Inst::PubOutputWrite,
+                        Inst::Return,
+                    ],
                 ),
-                (
-                    ImportFunc {
-                        module: Self::SECRET_INPUT_FUNC_MODULE.to_string(),
-                        name: Self::SECRET_INPUT_FUNC_NAME.to_string(),
-                        ty: FuncType::new(vec![], vec![Ty::I64]),
-                    },
+                build_import_func(
+                    Self::SECRET_INPUT_FUNC_MODULE,
+                    Self::SECRET_INPUT_FUNC_NAME,
+                    FuncType::new(vec![], vec![Ty::I64]),
+                    Vec::new(),
                     vec![Self::SECRET_INPUT_OP, Inst::Return],
                 ),
             ]
@@ -66,7 +65,28 @@ impl ImportFuncBody {
         }
     }
 
-    pub fn body(&self, import_func: &ImportFunc) -> Option<&Vec<Inst>> {
+    pub fn func(&self, import_func: &ImportFunc) -> Option<&Func> {
         self.mapping.get(import_func)
     }
+}
+
+fn build_import_func(
+    module: &str,
+    name: &str,
+    ty: FuncType,
+    locals: Vec<Ty>,
+    body: Vec<Inst>,
+) -> (ImportFunc, Func) {
+    let import = ImportFunc {
+        module: module.to_string(),
+        name: name.to_string(),
+        ty: ty.clone(),
+    };
+    let mut func_builder = FuncBuilder::new(name.to_string());
+    func_builder.set_signature(ty);
+    func_builder.declare_locals(locals);
+    func_builder.push_insts(body);
+    #[allow(clippy::unwrap_used)] // we build the function manually and it's defined at compile time
+    let func = func_builder.build().unwrap();
+    (import, func)
 }

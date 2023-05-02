@@ -30,6 +30,10 @@ impl FuncBuilder {
         }
     }
 
+    pub fn declare_locals(&mut self, locals: Vec<Ty>) {
+        self.locals.extend(locals);
+    }
+
     pub fn build(self) -> Result<Func, FuncBuilderError> {
         let sig = self.sig.clone().ok_or_else(|| {
             FuncBuilderError::MissingSignature(format!("FuncBuilder: {:?}", &self))

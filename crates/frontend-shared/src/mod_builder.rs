@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::Inst;
@@ -21,7 +22,7 @@ pub struct ModuleBuilder {
     types: Vec<FuncType>,
     start_func_idx: Option<FuncIndex>,
     functions: Vec<FuncBuilder>,
-    import_functions: Vec<FuncBuilder>,
+    import_functions: Vec<Func>,
     import_func_body: ImportFuncBody,
     func_names: HashMap<FuncIndex, String>,
     func_types: HashMap<FuncIndex, TypeIndex>,
@@ -68,14 +69,11 @@ impl ModuleBuilder {
             name: name.to_string(),
             ty,
         };
-        let mut func_builder = FuncBuilder::new(name.to_string());
-        func_builder.set_signature(import_func.ty.clone());
-        let func_body = self
+        let func = self
             .import_func_body
-            .body(&import_func)
+            .func(&import_func)
             .ok_or(ModuleBuilderError::ImportFuncBodyNotFound(import_func))?;
-        func_builder.push_insts(func_body.clone());
-        self.import_functions.push(func_builder);
+        self.import_functions.push(func.clone());
         Ok(())
     }
 
@@ -111,7 +109,7 @@ impl ModuleBuilder {
         let mut funcs = Vec::new();
         // first, imported functions
         for import_func in self.import_functions {
-            funcs.push(import_func.build()?);
+            funcs.push(import_func);
         }
 
         // TODO: since func indices should be shifted by imported funcs count change the storage and make it obvious

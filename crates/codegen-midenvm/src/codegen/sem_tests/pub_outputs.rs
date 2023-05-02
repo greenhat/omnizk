@@ -140,7 +140,7 @@ fn test_pub_outputs() {
 
             end
 
-            proc.c2zk_stdlib_pub_output.0
+            proc.c2zk_stdlib_pub_output.1
             loc_load.0
             exec.omni_miden_pub_output
             end
