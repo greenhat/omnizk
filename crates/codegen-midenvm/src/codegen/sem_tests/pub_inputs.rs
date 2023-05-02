@@ -104,12 +104,12 @@ fn test_pub_inputs() {
             proc.omni_miden_pub_output.0
             push.1
             exec.globals_get
+            push.8
+            sub
             dup.0
             swap.2
             swap.1
             mem_store
-            push.8
-            sub
             push.1
             exec.globals_set
             end
@@ -124,16 +124,14 @@ fn test_pub_inputs() {
             neq.0
             while.true
             loc_load.0
-            dup.0
             mem_load
+            push.2147483647
+            loc_load.0
             push.8
             add
             dup.0
             loc_store.0
-            push.2147483647
-            swap.1
             sub
-            dup.0
             neq.0
             end
 

@@ -161,16 +161,14 @@ mod tests {
                 neq.0
                 while.true
                 loc_load.0
-                dup.0
                 mem_load
+                push.2147483647
+                loc_load.0
                 push.8
                 add
                 dup.0
                 loc_store.0
-                push.2147483647
-                swap.1
                 sub
-                dup.0
                 neq.0
                 end
 

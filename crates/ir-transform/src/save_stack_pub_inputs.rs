@@ -225,13 +225,13 @@ fn store_pub_output_func(pub_outputs_addr_idx: GlobalIndex) -> Func {
         Inst::GlobalGet {
             global_idx: pub_outputs_addr_idx,
         }, // get the address
-        Inst::Dup { idx: 0 },         // duplicate the address
-        Inst::Swap { idx: 2 },        // put value on top
-        Inst::I32Store { offset: 0 }, // store the stack value to public outputs memory region
         Inst::I32Const {
             value: Ty::I64.size(),
         },
-        Inst::I32Sub, // decrement the address
+        Inst::I32Sub,                 // decrement the address
+        Inst::Dup { idx: 0 },         // duplicate the address
+        Inst::Swap { idx: 2 },        // put value on top
+        Inst::I32Store { offset: 0 }, // store the stack value to public outputs memory region
         Inst::GlobalSet {
             global_idx: pub_outputs_addr_idx,
         },
@@ -252,6 +252,7 @@ fn load_pub_outputs_on_stack_func(
     pub_outputs_addr_idx: GlobalIndex,
     pub_inputs_start_address: i32,
 ) -> Func {
+    todo!("load in reverse order");
     let ins = vec![
         Inst::I32Const {
             value: pub_inputs_start_address,
@@ -266,22 +267,20 @@ fn load_pub_outputs_on_stack_func(
         MidenExt::NeqImm(0).into(), // while.true condition
         MidenExt::While.into(),
         Inst::LocalGet { local_idx: 0 }, // get the address
-        Inst::Dup { idx: 0 },            // duplicate the address
         Inst::I32Load { offset: 0 },     // load the public output on the stack
+        // get the original(start) address
+        Inst::I32Const {
+            value: pub_inputs_start_address,
+        },
+        Inst::LocalGet { local_idx: 0 }, // get the address
         Inst::I32Const {
             value: Ty::I64.size(),
         },
         Inst::I32Add, // increment the address
         // set the address
         Inst::LocalTee { local_idx: 0 },
-        // get the original(start) address
-        Inst::I32Const {
-            value: pub_inputs_start_address,
-        },
-        Inst::Swap { idx: 1 }, // put the lower address on top
         // get the number of public outputs * type size for while to continue (if > 0)
         Inst::I32Sub,
-        Inst::Dup { idx: 0 },
         MidenExt::NeqImm(0).into(), // while.true condition
         // While.true end
         Inst::End,
