@@ -151,23 +151,25 @@ mod tests {
                 exec.globals_set
                 end
 
-                proc.load_pub_outputs_on_stack.1
+                proc.load_pub_outputs_on_stack.2
                 push.2147483647
+                dup.0
+                loc_store.0
                 push.1
                 exec.globals_get
                 dup.0
-                loc_store.0
+                loc_store.1
                 sub
                 neq.0
                 while.true
                 loc_load.0
                 mem_load
-                push.2147483647
                 loc_load.0
                 push.8
-                add
+                sub
                 dup.0
                 loc_store.0
+                loc_load.1
                 sub
                 neq.0
                 end

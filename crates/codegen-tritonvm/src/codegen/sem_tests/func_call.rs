@@ -56,11 +56,6 @@ fn test_func_call() {
             pop
             push 0
             call globals_set
-            push 0
-            call globals_get
-            read_mem
-            swap 1
-            pop
             write_io
             push 0
             call globals_get
