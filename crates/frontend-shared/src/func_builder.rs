@@ -38,7 +38,18 @@ impl FuncBuilder {
         let sig = self.sig.clone().ok_or_else(|| {
             FuncBuilderError::MissingSignature(format!("FuncBuilder: {:?}", &self))
         })?;
-        Ok(Func::new(self.name, sig, self.locals, self.ins))
+        let mut locals_with_params = self.locals.clone();
+        let mut prepended_ins = self.ins.clone();
+        for (idx, param) in sig.params.iter().enumerate().rev() {
+            locals_with_params.insert(0, *param);
+            prepended_ins.insert(
+                0,
+                Inst::LocalSet {
+                    local_idx: idx as u32,
+                },
+            );
+        }
+        Ok(Func::new(self.name, sig, locals_with_params, prepended_ins))
     }
 
     pub fn ins(&mut self) -> InstBuilder {

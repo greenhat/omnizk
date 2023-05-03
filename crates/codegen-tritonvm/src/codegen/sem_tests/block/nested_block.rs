@@ -49,12 +49,18 @@ fn test_nested_block() {
             call globals_get
             push -4
             add
-            dup 0
-            swap 2
+            push 0
+            call globals_set
+            push 0
+            call globals_get
+            swap 1
             write_mem
             pop
             push 0
-            call globals_set
+            call globals_get
+            read_mem
+            swap 1
+            pop
             write_io
             push 0
             call globals_get

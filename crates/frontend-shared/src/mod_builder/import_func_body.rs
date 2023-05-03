@@ -46,7 +46,11 @@ impl ImportFuncBody {
                     Self::PUB_OUTPUT_FUNC_NAME,
                     FuncType::new(vec![Ty::I64], vec![]),
                     Vec::new(),
-                    vec![Inst::PubOutputWrite, Inst::Return],
+                    vec![
+                        Inst::LocalGet { local_idx: 0 },
+                        Inst::PubOutputWrite,
+                        Inst::Return,
+                    ],
                 ),
                 build_import_func(
                     Self::SECRET_INPUT_FUNC_MODULE,

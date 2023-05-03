@@ -32,28 +32,6 @@ impl IrPass for LocalsToMemPass {
                 Vec::new(),
             );
             // dbg!(&func);
-            if !func.sig().params.is_empty() {
-                new_func.push(Inst::GlobalGet {
-                    global_idx: global_idx_for_base_local_offset,
-                });
-                // store the function parameters to memory
-                for _ in func.sig().params.iter() {
-                    // decrease the pointer by the size of the param (4 bytes/i32 for now)
-                    new_func.push(Inst::I32Const {
-                        value: -Ty::I32.size(),
-                    });
-                    new_func.push(Inst::I32Add);
-                    new_func.push(Inst::Dup { idx: 0 });
-                    // put func param on top
-                    new_func.push(Inst::Swap { idx: 2 });
-                    // TODO: store op according to the param type
-                    new_func.push(Inst::I32Store { offset: 0 });
-                }
-                // store the pointer to the global
-                new_func.push(Inst::GlobalSet {
-                    global_idx: global_idx_for_base_local_offset,
-                });
-            }
             if !func.locals().is_empty() {
                 new_func.push(Inst::GlobalGet {
                     global_idx: global_idx_for_base_local_offset,
@@ -67,18 +45,16 @@ impl IrPass for LocalsToMemPass {
                 });
             }
 
-            let param_count = func.sig().params.len() as u32;
-            let local_count = func.locals().len() as u32;
             // TODO: get type of the local and use the appropriate load instruction.
-            let total_local_count = param_count + local_count;
+            let local_count = func.locals().len() as u32;
             // dbg!(&total_local_count);
-            let reverse_index_base = if total_local_count > 0 {
+            let reverse_index_base = if local_count > 0 {
                 // although it looks like here should be total_local_count - 1
                 // but the last pointer stored in global base_local_offset is NEXT address
                 // after the last stored local, so it's total_local_count - 1 + 1
                 // EDIT: now, since we decrease the start address by the size of the first local
                 // we need to shift the index by 1
-                total_local_count - 1
+                local_count - 1
             } else {
                 0
             };
@@ -119,7 +95,7 @@ impl IrPass for LocalsToMemPass {
                             inst,
                             &mut new_func,
                             global_idx_for_base_local_offset,
-                            total_local_count,
+                            local_count,
                         );
                     }
                     Inst::End if iter.peek().is_none() => {
@@ -127,7 +103,7 @@ impl IrPass for LocalsToMemPass {
                             inst,
                             &mut new_func,
                             global_idx_for_base_local_offset,
-                            total_local_count,
+                            local_count,
                         );
                     }
 

@@ -72,12 +72,18 @@ fn test_add() {
             call globals_get
             push -4
             add
-            dup 0
-            swap 2
+            push 0
+            call globals_set
+            push 0
+            call globals_get
+            swap 1
             write_mem
             pop
             push 0
-            call globals_set
+            call globals_get
+            read_mem
+            swap 1
+            pop
             write_io
             push 0
             call globals_get
@@ -96,20 +102,24 @@ fn test_add() {
             _ZN28c2zk_rust_wasm_tests_bundle13add3add17h7a1901b11eb2f166E:
             push 0
             call globals_get
-            push -4
+            push -8
             add
-            dup 0
-            swap 2
-            write_mem
-            pop
-            push -4
+            push 0
+            call globals_set
+            push 0
+            call globals_get
+            swap 1
+            swap 1
+            push 4
             add
-            dup 0
-            swap 2
+            swap 1
             write_mem
             pop
             push 0
-            call globals_set
+            call globals_get
+            swap 1
+            write_mem
+            pop
             push 0
             call globals_get
             read_mem
@@ -146,12 +156,13 @@ fn test_add() {
             call globals_get
             push -4
             add
-            dup 0
-            swap 2
-            write_mem
-            pop
             push 0
             call globals_set
+            push 0
+            call globals_get
+            swap 1
+            write_mem
+            pop
             push 0
             call globals_get
             read_mem
