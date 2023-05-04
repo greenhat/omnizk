@@ -9,7 +9,7 @@ mod smoke;
 
 // mod block;
 // mod fib;
-// mod func_call;
+mod func_call;
 // mod locals;
 
 use std::ops::RangeFrom;
