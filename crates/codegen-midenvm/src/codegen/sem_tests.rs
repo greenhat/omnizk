@@ -7,7 +7,7 @@ mod pub_inputs;
 mod pub_outputs;
 mod smoke;
 
-// mod block;
+mod block;
 // mod fib;
 mod func_call;
 // mod locals;

@@ -1,6 +1,6 @@
 use c2zk_ir::pass::IrPass;
+use c2zk_ir_transform::triton::BlocksToFuncPass;
 use c2zk_ir_transform::AndMinus8Pass;
-use c2zk_ir_transform::BlocksToFuncPass;
 use c2zk_ir_transform::DceUnusedFunctionsPass;
 use c2zk_ir_transform::GlobalsToMemPass;
 use c2zk_ir_transform::LocalsToMemPass;
