@@ -47,29 +47,12 @@ impl IrPass for BlocksToFuncPass {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-struct CaptureState {
-    levels: Vec<BlockKind>,
-}
-
-impl CaptureState {
-    fn inc_nested_level(&mut self, block_kind: BlockKind) {
-        self.levels.push(block_kind);
-    }
-
-    fn nested_level(&self) -> usize {
-        self.levels.len()
-    }
-}
-
 fn run(
     func: Func,
     module: &mut Module,
     traversed_blocks: Vec<BlockKind>,
     br_propagation_global_idx: GlobalIndex,
 ) -> Func {
-    // dbg!(&block_nested_level);
-    // TODO: exit early if there are no blocks
     let mut new_func = Func::new(
         func.name().to_string(),
         func.sig().clone(),
@@ -77,9 +60,8 @@ fn run(
         Vec::new(),
     );
     let block_nested_level = traversed_blocks.len();
-    let mut capture_state = CaptureState::default();
+    let mut levels: Vec<BlockKind> = Vec::new();
     let mut extracted_func_count = 0;
-    // TODO: extract into a closure (use in "reset" below)
     let mut extracted_func_builder = FuncBuilder::new(format!(
         "{}_l{block_nested_level}_b{extracted_func_count}",
         func.name()
@@ -91,24 +73,23 @@ fn run(
         #[allow(clippy::panic)]
         match inst {
             Inst::Block { blockty: _ } => {
-                if capture_state.nested_level() > 0 {
+                if !levels.is_empty() {
                     // nested block, keep extracting
                     extracted_func_builder.push(inst.clone());
                 }
-                capture_state.inc_nested_level(BlockKind::Block);
+                levels.push(BlockKind::Block);
             }
             Inst::Loop { block_type: _ } => {
-                if capture_state.nested_level() > 0 {
+                if !levels.is_empty() {
                     // nested block, keep extracting
                     extracted_func_builder.push(inst.clone());
                 }
-                capture_state.inc_nested_level(BlockKind::Loop);
+                levels.push(BlockKind::Loop);
             }
             Inst::End => {
-                // dbg!(&capture_state);
-                match capture_state.levels.pop() {
+                match levels.pop() {
                     Some(block_kind) => {
-                        if capture_state.nested_level() == 0 {
+                        if levels.is_empty() {
                             // end of the root block, stop extracting
 
                             // the signature should be set in Block/Loop above
@@ -184,10 +165,7 @@ fn run(
                 };
             }
             Inst::Br { relative_depth } => {
-                // dbg!(&capture_state);
-                // dbg!(&traversed_blocks);
-                if capture_state.nested_level() == 1 {
-                    // dbg!(&extracted_func_builder);
+                if levels.len() == 1 {
                     if *relative_depth > 0 {
                         extracted_func_builder.push(Inst::I32Const {
                             value: (relative_depth + 1) as i32,
@@ -197,7 +175,7 @@ fn run(
                         });
                         extracted_func_builder.push(Inst::Return);
                     } else {
-                        match capture_state.levels.first() {
+                        match levels.first() {
                             Some(BlockKind::Block) => {
                                 extracted_func_builder.push(Inst::Return);
                             }
@@ -214,7 +192,7 @@ fn run(
                 }
             }
             Inst::BrIf { relative_depth } => {
-                if capture_state.nested_level() == 1 {
+                if levels.len() == 1 {
                     if *relative_depth > 0 {
                         // we are in the nested block so put relative_depth in the global for Br propagation
                         extracted_func_builder.push(Inst::I32Const {
@@ -231,7 +209,7 @@ fn run(
                             global_idx: br_propagation_global_idx,
                         });
                     } else {
-                        match capture_state.levels.first() {
+                        match levels.first() {
                             Some(BlockKind::Block) => {
                                 extracted_func_builder.push(TritonExt::Skiz.into());
                                 extracted_func_builder.push(Inst::Return);
@@ -250,7 +228,7 @@ fn run(
                 }
             }
             _ => {
-                if capture_state.nested_level() > 0 {
+                if !levels.is_empty() {
                     extracted_func_builder.push(inst.clone());
                 } else {
                     new_func.push(inst.clone())
