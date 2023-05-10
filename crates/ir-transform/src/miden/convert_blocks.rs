@@ -10,7 +10,6 @@ use c2zk_ir::ir::Module;
 use c2zk_ir::ir::Ty;
 use c2zk_ir::pass::IrPass;
 
-// TODO: since it's Triton specific, rename and/or move it to c2zk_ir_transform_tritonvm?
 pub struct BlocksToFuncPass;
 
 impl Default for BlocksToFuncPass {
@@ -102,7 +101,7 @@ fn run(
                                 func_idx: extracted_func_idx,
                             });
 
-                            // handle Br* op
+                            // decide what todo with the rest of the block
                             match traversed_blocks.last() {
                                 Some(BlockKind::Block) => {
                                     new_func.push(Inst::Call {
@@ -114,8 +113,8 @@ fn run(
                                                 ))
                                             }),
                                     });
-                                    // if not zero then return to the parent func(block), keep bailing out
-                                    // zero is expected when we exited the targeted by Br op block
+                                    // TODO: wrap the rest of the block with if.not.true,
+                                    // i.e. keep exiting(skipping to the end of the block) if > 0
                                     new_func.push(TritonExt::Skiz.into());
                                     new_func.push(Inst::Return);
                                 }
@@ -129,8 +128,8 @@ fn run(
                                                 ))
                                             }),
                                     });
-                                    // if not zero then return to the parent func(block), keep bailing out
-                                    // zero is expected when we exited into the targeted by Br op loop
+                                    // TODO: if > 0 then go to the next while loop iteration
+                                    // TODO: wrap func instructions for extracted loop in while.true
                                     new_func.push(TritonExt::Skiz.into());
                                     new_func.push(TritonExt::Recurse.into());
                                 }
@@ -165,6 +164,7 @@ fn run(
                 };
             }
             Inst::Br { relative_depth } => {
+                // TODO: why go deeper than the top level?
                 if levels.len() == 1 {
                     if *relative_depth > 0 {
                         extracted_func_builder.push(Inst::I32Const {
@@ -173,13 +173,17 @@ fn run(
                         extracted_func_builder.push(Inst::GlobalSet {
                             global_idx: br_propagation_global_idx,
                         });
+                        // TODO: throw away the rest of the intructions in this block?
                         extracted_func_builder.push(Inst::Return);
                     } else {
                         match levels.first() {
                             Some(BlockKind::Block) => {
+                                // TODO: throw away the rest of the intructions in this block/func?
                                 extracted_func_builder.push(Inst::Return);
                             }
                             Some(BlockKind::Loop) => {
+                                // TODO: go to the next while loop iteration
+                                // TODO: wrap func instructions for extracted loop in while.true
                                 extracted_func_builder.push(TritonExt::Recurse.into());
                             }
                             None => {
@@ -201,6 +205,7 @@ fn run(
                         extracted_func_builder.push(Inst::GlobalSet {
                             global_idx: br_propagation_global_idx,
                         });
+                        // TODO: wrap the rest of the block with if.not.true,
                         extracted_func_builder.push(TritonExt::Skiz.into());
                         extracted_func_builder.push(Inst::Return);
                         // br_if did not exit so clean up the global
@@ -211,10 +216,13 @@ fn run(
                     } else {
                         match levels.first() {
                             Some(BlockKind::Block) => {
+                                // TODO: wrap the rest of the block with if.not.true
                                 extracted_func_builder.push(TritonExt::Skiz.into());
                                 extracted_func_builder.push(Inst::Return);
                             }
                             Some(BlockKind::Loop) => {
+                                // TODO: go to the next while loop iteration
+                                // TODO: wrap func instructions for extracted loop in while.true
                                 extracted_func_builder.push(TritonExt::Skiz.into());
                                 extracted_func_builder.push(TritonExt::Recurse.into());
                             }
@@ -272,3 +280,28 @@ fn next_br_propagation(global_index_br_propagation: GlobalIndex) -> Func {
         ins,
     )
 }
+
+/*
+
+
+Block:
+  ...
+  BrIf 0
+  ...
+  Block:
+    ...
+    BrIf 1 // to the top block
+    ...
+    Block:
+      ...
+      BrIf 1 // to the below-top block
+      ...
+      BrIf 2 // to the top block
+      ...
+    End
+    ...
+  End
+  ...
+End
+
+ */
