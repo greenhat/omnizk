@@ -4,6 +4,7 @@ members = [
   "crates/codegen-tritonvm",
   "crates/codegen-midenvm",
   "crates/ir",
+  "crates/dialects/ozk",
   "crates/ir-transform",
   "crates/frontend",
   "crates/codegen",
@@ -29,6 +30,7 @@ categories = ["wasm", "no-std", "virtualization"]
 
 [workspace.dependencies]
 c2zk-wasm = { path = "crates/wasm" }
+ozk-dialect = { path = "crates/dialects/ozk" }
 c2zk-ir = { path = "crates/ir" }
 c2zk-ir-transform = { path = "crates/ir-transform" }
 c2zk-frontend = { path = "crates/frontend" }

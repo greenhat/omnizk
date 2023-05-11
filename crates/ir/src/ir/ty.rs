@@ -1,15 +1,6 @@
 use derive_more::Add;
 use derive_more::From;
 use derive_more::Into;
-use pliron::common_traits::DisplayWithContext;
-use pliron::common_traits::Verify;
-use pliron::context::Context;
-use pliron::context::Ptr;
-use pliron::error::CompilerError;
-use pliron::impl_type;
-use pliron::r#type::Type;
-use pliron::r#type::TypeObj;
-use pliron::storage_uniquer::TypeValueHash;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Ty {
@@ -98,39 +89,4 @@ pub enum Field {
     /// all values that the VM operates with are field elements in this field (
     /// i.e., values between 0 and 2^64 −2^32 , both inclusive).
     Oxfoi,
-}
-
-/// Field element type
-#[derive(Hash, PartialEq, Eq)]
-pub struct FieldElementType {
-    field: Field,
-}
-impl_type!(FieldElementType, "felt", "ozk");
-
-impl FieldElementType {
-    /// Get or create a new felt type.
-    pub fn get(ctx: &mut Context, field: Field) -> Ptr<TypeObj> {
-        Type::register_instance(FieldElementType { field }, ctx)
-    }
-    /// Get, if it already exists, an felt type.
-    pub fn get_existing(ctx: &Context, field: Field) -> Option<Ptr<TypeObj>> {
-        Type::get_instance(FieldElementType { field }, ctx)
-    }
-
-    /// Get width.
-    pub fn get_field(&self) -> Field {
-        self.field
-    }
-}
-
-impl DisplayWithContext for FieldElementType {
-    fn fmt(&self, _ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "felt")
-    }
-}
-
-impl Verify for FieldElementType {
-    fn verify(&self, _ctx: &Context) -> Result<(), CompilerError> {
-        todo!()
-    }
 }

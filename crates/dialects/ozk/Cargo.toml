@@ -1,7 +1,7 @@
 [package]
-name = "c2zk-ir"
+name = "ozk-dialect"
 version = "0.1.0"
-description = "IR for c2zk"
+description = "Dialect(IR) for OmniZK"
 authors.workspace = true
 repository.workspace = true
 edition.workspace = true
@@ -12,8 +12,11 @@ categories.workspace = true
 
 [dependencies]
 derive_more = { workspace = true }
-indexmap = { workspace = true }
 thiserror = { workspace = true }
-topological-sort = { workspace = true }
+pliron = { git = "https://github.com/greenhat/pliron" , rev = "56d39b8d1dc780d42dd03ae5e22bd3839843057c" }
+intertrait = "0.2.2"
+# Required by intertrait
+linkme = "0.2"
+winter-math = { version = "0.6", default-features = false }
 
 [dev-dependencies]
