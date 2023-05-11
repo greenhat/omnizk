@@ -7,6 +7,7 @@ use pliron::common_traits::Verify;
 use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::declare_op;
+use pliron::dialect::Dialect;
 use pliron::dialects::builtin::attr_interfaces::TypedAttrInterface;
 use pliron::dialects::builtin::attributes::IntegerAttr;
 use pliron::dialects::builtin::op_interfaces::OneResultInterface;
@@ -129,4 +130,8 @@ impl OneResultInterface for ConstantOp {
             .get_type(0)
             .expect("ConstantOp must have one result")
     }
+}
+
+pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
+    ConstantOp::register(ctx, dialect);
 }

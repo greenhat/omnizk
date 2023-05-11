@@ -5,6 +5,7 @@ use pliron::common_traits::Verify;
 use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::dialects::builtin::attr_interfaces::TypedAttrInterface;
+use pliron::dialects::builtin::attributes::IntegerAttr;
 use pliron::error::CompilerError;
 use pliron::impl_attr;
 use pliron::r#type::TypeObj;
@@ -53,4 +54,9 @@ impl TypedAttrInterface for FieldElemAttr {
     fn get_type(&self) -> Ptr<TypeObj> {
         self.ty
     }
+}
+
+pub(crate) fn register(dialect: &mut pliron::dialect::Dialect) {
+    IntegerAttr::register_attr_in_dialect(dialect);
+    FieldElemAttr::register_attr_in_dialect(dialect);
 }
