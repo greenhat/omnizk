@@ -5,6 +5,7 @@ members = [
   "crates/codegen-midenvm",
   "crates/ir",
   "crates/dialects/ozk",
+  "crates/dialects/wasm",
   "crates/ir-transform",
   "crates/frontend",
   "crates/codegen",
