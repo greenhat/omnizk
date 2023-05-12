@@ -37,7 +37,7 @@ impl Verify for FieldElemAttr {
 }
 
 impl FieldElemAttr {
-    /// Create a new [IntegerAttr].
+    /// Create a new [FieldElemAttr].
     pub fn create(ty: Ptr<TypeObj>, val: FieldElem) -> AttrObj {
         Box::new(FieldElemAttr { ty, val })
     }
