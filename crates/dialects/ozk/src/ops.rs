@@ -15,7 +15,6 @@ use crate::attributes::FieldElemAttr;
 
 declare_op!(
     /// Pushes numeric constant on the stack.
-    /// See MLIR's [arith.constant](https://mlir.llvm.org/docs/Dialects/ArithOps/#arithconstant-mlirarithconstantop).
     ///
     /// Attributes:
     ///

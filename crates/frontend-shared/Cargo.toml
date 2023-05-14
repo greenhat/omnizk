@@ -12,6 +12,7 @@ categories.workspace = true
 
 [dependencies]
 c2zk-ir = { workspace = true }
+# ozk-dialect = { workspace = true }
 thiserror = { workspace = true }
 c2zk-stdlib = { workspace = true }
 

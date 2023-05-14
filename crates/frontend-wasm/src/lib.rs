@@ -8,7 +8,7 @@
 #![deny(unused_mut)]
 // #![deny(dead_code)]
 #![allow(dead_code)]
-#![deny(unused_imports)]
+// #![deny(unused_imports)]
 #![deny(missing_docs)]
 #![deny(trivial_numeric_casts)]
 #![deny(unused_extern_crates)]
@@ -25,6 +25,9 @@
 mod code_translator;
 mod config;
 mod error;
+mod func_builder;
+mod inst_builder;
+mod mod_builder;
 mod module_translator;
 mod types;
 
@@ -35,4 +38,4 @@ pub use crate::module_translator::translate_module;
 // Convenience reexport of the wasmparser crate that we're linking against,
 // since a number of types in `wasmparser` show up in the public API of
 // `c2zk-wasm`.
-pub use wasmparser;
+// pub use wasmparser;

@@ -16,7 +16,7 @@ c2zk-codegen-shared = { workspace = true }
 c2zk-frontend = { workspace = true }
 c2zk-frontend-shared = { workspace = true }
 c2zk-ir = { workspace = true }
-c2zk-wasm = { workspace = true }
+ozk-frontend-wasm = { workspace = true }
 derive_more = { workspace = true }
 
 [dev-dependencies]

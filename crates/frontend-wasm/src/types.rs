@@ -3,7 +3,6 @@
 //! Internal dependency of Wasmtime and c2zk that defines types for
 //! WebAssembly.
 
-use c2zk_ir::ir;
 use derive_more::From;
 pub use wasmparser;
 use wasmparser::{BlockType, RefType, ValType};
@@ -236,38 +235,38 @@ pub(crate) trait IntoIr<T> {
     fn into_ir(self) -> T;
 }
 
-impl IntoIr<ir::FuncType> for wasmparser::FuncType {
-    fn into_ir(self) -> ir::FuncType {
-        let params = self.params().iter().copied().map(IntoIr::into_ir).collect();
-        let results = self
-            .results()
-            .iter()
-            .copied()
-            .map(IntoIr::into_ir)
-            .collect();
-        ir::FuncType { params, results }
-    }
-}
+// impl IntoIr<ir::FuncType> for wasmparser::FuncType {
+//     fn into_ir(self) -> ir::FuncType {
+//         let params = self.params().iter().copied().map(IntoIr::into_ir).collect();
+//         let results = self
+//             .results()
+//             .iter()
+//             .copied()
+//             .map(IntoIr::into_ir)
+//             .collect();
+//         ir::FuncType { params, results }
+//     }
+// }
 
-impl IntoIr<ir::Ty> for wasmparser::ValType {
-    fn into_ir(self) -> ir::Ty {
-        match self {
-            wasmparser::ValType::I32 => ir::Ty::I32,
-            wasmparser::ValType::I64 => ir::Ty::I64,
-            wasmparser::ValType::F32 => ir::Ty::F32,
-            wasmparser::ValType::F64 => ir::Ty::F64,
-            wasmparser::ValType::V128 => ir::Ty::V128,
-            wasmparser::ValType::Ref(_) => todo!(),
-        }
-    }
-}
+// impl IntoIr<ir::Ty> for wasmparser::ValType {
+//     fn into_ir(self) -> ir::Ty {
+//         match self {
+//             wasmparser::ValType::I32 => ir::Ty::I32,
+//             wasmparser::ValType::I64 => ir::Ty::I64,
+//             wasmparser::ValType::F32 => ir::Ty::F32,
+//             wasmparser::ValType::F64 => ir::Ty::F64,
+//             wasmparser::ValType::V128 => ir::Ty::V128,
+//             wasmparser::ValType::Ref(_) => todo!(),
+//         }
+//     }
+// }
 
-impl IntoIr<ir::BlockType> for &BlockType {
-    fn into_ir(self) -> ir::BlockType {
-        match self {
-            BlockType::Empty => ir::BlockType::Empty,
-            BlockType::Type(ty) => ir::BlockType::Type(ty.into_ir()),
-            BlockType::FuncType(_) => todo!(),
-        }
-    }
-}
+// impl IntoIr<ir::BlockType> for &BlockType {
+//     fn into_ir(self) -> ir::BlockType {
+//         match self {
+//             BlockType::Empty => ir::BlockType::Empty,
+//             BlockType::Type(ty) => ir::BlockType::Type(ty.into_ir()),
+//             BlockType::FuncType(_) => todo!(),
+//         }
+//     }
+// }

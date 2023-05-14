@@ -1,6 +1,5 @@
 [workspace]
 members = [
-  "crates/wasm",
   "crates/codegen-tritonvm",
   "crates/codegen-midenvm",
   "crates/ir",
@@ -8,6 +7,8 @@ members = [
   "crates/dialects/wasm",
   "crates/ir-transform",
   "crates/frontend",
+  "crates/frontend-shared",
+  "crates/frontend-wasm",
   "crates/codegen",
   "crates/codegen-shared",
   "crates/compiler",
@@ -15,13 +16,11 @@ members = [
   "crates/rust-wasm-tests/bundle1",
   "crates/rust-wasm-tests-helper",
 ]
-exclude = [ "crates/rust-wasm-tests/bundle1-bin"]
+exclude = ["crates/rust-wasm-tests/bundle1-bin"]
 resolver = "2"
 
 [workspace.package]
-authors = [
-    "Denys Zadorozhny <denys@zadorozhnyi.com>"
-]
+authors = ["Denys Zadorozhny <denys@zadorozhnyi.com>"]
 repository = "https://github.com/greenhat/c2zk"
 edition = "2021"
 readme = "README.md"
@@ -30,12 +29,13 @@ keywords = ["wasm", "webassembly", "zk", "proof", "verification"]
 categories = ["wasm", "no-std", "virtualization"]
 
 [workspace.dependencies]
-c2zk-wasm = { path = "crates/wasm" }
 ozk-dialect = { path = "crates/dialects/ozk" }
+ozk-wasm-dialect = { path = "crates/dialects/wasm" }
 c2zk-ir = { path = "crates/ir" }
 c2zk-ir-transform = { path = "crates/ir-transform" }
 c2zk-frontend = { path = "crates/frontend" }
 c2zk-frontend-shared = { path = "crates/frontend-shared" }
+ozk-frontend-wasm = { path = "crates/frontend-wasm" }
 c2zk-codegen = { path = "crates/codegen" }
 c2zk-codegen-shared = { path = "crates/codegen-shared" }
 c2zk-codegen-tritonvm = { path = "crates/codegen-tritonvm" }
@@ -55,3 +55,4 @@ spin = "0.9.4"
 itertools = "0.10.5"
 indexmap = "1.9"
 topological-sort = "0.2"
+pliron = { git = "https://github.com/greenhat/pliron", rev = "56d39b8d1dc780d42dd03ae5e22bd3839843057c" }
