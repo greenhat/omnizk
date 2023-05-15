@@ -55,4 +55,4 @@ spin = "0.9.4"
 itertools = "0.10.5"
 indexmap = "1.9"
 topological-sort = "0.2"
-pliron = { git = "https://github.com/greenhat/pliron", rev = "56d39b8d1dc780d42dd03ae5e22bd3839843057c" }
+pliron = { git = "https://github.com/greenhat/pliron", rev = "17c0b44680751b363ada355b74482d3532c9f91f" }

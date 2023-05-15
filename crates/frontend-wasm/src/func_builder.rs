@@ -3,6 +3,7 @@ use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::dialects::builtin::ops::FuncOp;
 use pliron::dialects::builtin::types::FunctionType;
+use pliron::r#type::Type;
 use pliron::r#type::TypeObj;
 use thiserror::Error;
 
@@ -52,7 +53,12 @@ impl<'a> FuncBuilder<'a> {
         //         },
         //     );
         // }
-        Ok(FuncOp::new_unlinked(self.ctx, self.name, self.sig))
+        // TODO: make wasm FuncOp
+        Ok(FuncOp::new_unlinked(
+            self.ctx,
+            &self.name,
+            Type::register_instance(sig, self.ctx),
+        ))
     }
 
     // pub fn ins(&mut self) -> InstBuilder {
