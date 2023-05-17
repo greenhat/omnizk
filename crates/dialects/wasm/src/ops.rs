@@ -52,7 +52,7 @@ impl ConstOp {
     /// Create a new [ConstOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
     pub fn new_unlinked(ctx: &mut Context, value: AttrObj) -> ConstOp {
-        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![]);
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_VALUE, value);
@@ -118,7 +118,7 @@ impl AddOp {
     /// [BasicBlock](crate::basic_block::BasicBlock).
     pub fn new_unlinked(ctx: &mut Context, ty: Ptr<TypeObj>) -> ConstOp {
         let ty_attr = TypeAttr::create(ty);
-        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![]);
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_OP_TYPE, ty_attr);

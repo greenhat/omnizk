@@ -16,7 +16,6 @@ use pliron::linked_list::ContainsLinkedList;
 use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::r#type::TypeObj;
-use pliron::region::Region;
 use pliron::with_context::AttachContext;
 
 declare_op!(
@@ -42,15 +41,15 @@ impl FuncOp {
     /// The returned function has a single region with an empty `entry` block.
     pub fn new_unlinked(ctx: &mut Context, name: &str, ty: Ptr<TypeObj>) -> FuncOp {
         let ty_attr = TypeAttr::create(ty);
-        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![]);
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
 
         // Create a body region with an empty entry block.
-        let region = Region::new(ctx, op);
+        #[allow(clippy::expect_used)]
+        let region = op.deref(ctx).get_region(0).expect("no region found");
         let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
         body.insert_at_front(region, ctx);
         {
             let opref = &mut *op.deref_mut(ctx);
-            opref.push_back_region(region);
             // Set function type attributes.
             opref.attributes.insert(Self::ATTR_KEY_FUNC_TYPE, ty_attr);
         }
@@ -108,6 +107,7 @@ impl DisplayWithContext for FuncOp {
 impl Verify for FuncOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
         let ty = self.get_type(ctx);
+
         if !(ty.deref(ctx).is::<FunctionType>()) {
             return Err(CompilerError::VerificationError {
                 msg: "Unexpected Func type".to_string(),
