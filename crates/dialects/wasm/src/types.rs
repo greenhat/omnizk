@@ -42,18 +42,18 @@ impl FuncOp {
     pub fn new_unlinked(ctx: &mut Context, name: &str, ty: Ptr<TypeObj>) -> FuncOp {
         let ty_attr = TypeAttr::create(ty);
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
-
-        // Create a body region with an empty entry block.
-        #[allow(clippy::expect_used)]
-        let region = op.deref(ctx).get_region(0).expect("no region found");
-        let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
-        body.insert_at_front(region, ctx);
         {
             let opref = &mut *op.deref_mut(ctx);
             // Set function type attributes.
             opref.attributes.insert(Self::ATTR_KEY_FUNC_TYPE, ty_attr);
         }
         let opop = FuncOp { op };
+        // Create an empty entry block.
+        #[allow(clippy::expect_used)]
+        let region = opop.get_region(ctx);
+        let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
+        body.insert_at_front(region, ctx);
+
         opop.set_symbol_name(ctx, name);
 
         opop
