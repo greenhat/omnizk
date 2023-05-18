@@ -275,6 +275,8 @@ impl Verify for FuncOp {
                 msg: "Incorrect number of results or operands".to_string(),
             });
         }
+        self.verify_one_region(ctx)?;
+        self.get_entry_block(ctx).verify(ctx)?;
         Ok(())
     }
 }
