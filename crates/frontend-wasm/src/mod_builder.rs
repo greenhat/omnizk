@@ -1,8 +1,12 @@
 use std::collections::HashMap;
 
+use ozk_wasm_dialect::ops::CallOp;
+use pliron::context::Context;
+use pliron::dialects::builtin::attributes::StringAttr;
 use pliron::dialects::builtin::ops::FuncOp;
 use pliron::dialects::builtin::ops::ModuleOp;
 use pliron::dialects::builtin::types::FunctionType;
+use pliron::op::Op;
 use thiserror::Error;
 
 mod import_func_body;
@@ -10,22 +14,23 @@ mod import_func_body;
 pub use import_func_body::ImportFuncBody;
 
 use crate::func_builder::FuncBuilder;
+use crate::func_builder::FuncBuilderError;
 use crate::types::FuncIndex;
 use crate::types::TypeIndex;
 
 use self::import_func_body::ImportFunc;
 
-pub struct ModuleBuilder {
+pub struct ModuleBuilder<'a> {
     types: Vec<FunctionType>,
     start_func_idx: Option<FuncIndex>,
-    functions: Vec<FuncBuilder>,
+    functions: Vec<FuncBuilder<'a>>,
     import_functions: Vec<FuncOp>,
     import_func_body: ImportFuncBody,
     func_names: HashMap<FuncIndex, String>,
     func_types: HashMap<FuncIndex, TypeIndex>,
 }
 
-impl ModuleBuilder {
+impl ModuleBuilder<'_> {
     pub fn new() -> Self {
         Self {
             types: Vec::new(),
@@ -52,12 +57,7 @@ impl ModuleBuilder {
         let ty = self
             .types
             .get(type_idx as usize)
-            .ok_or_else(|| {
-                ModuleBuilderError::InvalidTypeIndex(format!(
-                    "type_idx: {}, types: {:?}",
-                    type_idx, self.types
-                ))
-            })?
+            .ok_or_else(|| ModuleBuilderError::InvalidTypeIndex(format!("type_idx: {}", type_idx)))?
             .clone();
         // dbg!(name);
         // dbg!(&ty);
@@ -94,11 +94,11 @@ impl ModuleBuilder {
     //     }])
     // }
 
-    pub fn build(mut self) -> Result<ModuleOp, ModuleBuilderError> {
+    pub fn build(mut self, ctx: &mut Context) -> Result<ModuleOp, ModuleBuilderError> {
         let mut func_sigs: Vec<FunctionType> = Vec::new();
         for func_idx in 0..self.functions.len() {
             // TODO: and here we use "raw" func index without imported functions
-            let func_type = self.get_func_type(func_idx.into())?;
+            let func_type = self.get_func_type((func_idx as u32).into())?;
             func_sigs.push(*func_type);
         }
         let imported_funcs_count = self.import_functions.len() as u32;
@@ -125,14 +125,22 @@ impl ModuleBuilder {
 
         // dbg!(&funcs);
         if let Some(start_func_idx) = self.start_func_idx {
-            Ok(ModuleOp::new(funcs, start_func_idx, Vec::new()))
+            let module_op = ModuleOp::new(ctx, "module_name");
+            for func in funcs {
+                module_op.add_operation(ctx, func.get_operation());
+            }
+            let start_func_name = self.get_func_name(start_func_idx).unwrap();
+            let start_func_sym = StringAttr::create(start_func_name);
+            let call_op = CallOp::new_unlinked(ctx, start_func_sym).get_operation();
+            module_op.add_operation(ctx, call_op);
+            Ok(module_op)
         } else {
             Err(ModuleBuilderError::StartFuncUndefined)
         }
     }
 
     pub fn next_func_idx(&self) -> FuncIndex {
-        self.functions.len().into()
+        (self.functions.len() as u32).into()
     }
 
     pub fn declare_func_name(&mut self, func_idx: FuncIndex, name: String) {
@@ -149,7 +157,7 @@ impl ModuleBuilder {
         let type_idx = self
             .func_types
             .get(&func_idx)
-            .ok_or_else(|| ModuleBuilderError::TypeIndexNotFound(usize::from(func_idx) as u32))?;
+            .ok_or_else(|| ModuleBuilderError::TypeIndexNotFound(u32::from(func_idx)))?;
 
         self.types
             .get(u32::from(*type_idx) as usize)
@@ -157,7 +165,7 @@ impl ModuleBuilder {
     }
 }
 
-impl Default for ModuleBuilder {
+impl Default for ModuleBuilder<'_> {
     fn default() -> Self {
         Self::new()
     }

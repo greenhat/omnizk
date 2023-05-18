@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 use intertrait::cast_to;
 use pliron::attribute;
 use pliron::attribute::attr_cast;
@@ -12,6 +14,7 @@ use pliron::dialect::Dialect;
 use pliron::dialects::builtin::attr_interfaces::TypedAttrInterface;
 use pliron::dialects::builtin::attributes::FloatAttr;
 use pliron::dialects::builtin::attributes::IntegerAttr;
+use pliron::dialects::builtin::attributes::StringAttr;
 use pliron::dialects::builtin::attributes::TypeAttr;
 use pliron::dialects::builtin::op_interfaces::OneRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SymbolOpInterface;
@@ -101,7 +104,7 @@ impl Verify for ConstOp {
     }
 }
 
-// TODO: store expected operand types (poped from stack)
+// TODO: store expected operand types (poped from stack)?
 
 declare_op!(
     /// Push two top stack items, sums them and push result on stack
@@ -169,99 +172,176 @@ impl Verify for AddOp {
     }
 }
 
+// declare_op!(
+//     /// An operation with a name containing a single region.
+//     ///
+//     /// Attributes:
+//     ///
+//     /// | key | value |
+//     /// |-----|-------|
+//     /// | [ATTR_KEY_SYM_NAME](super::ATTR_KEY_SYM_NAME) | [StringAttr](super::attributes::StringAttr) |
+//     /// | [ATTR_KEY_FUNC_TYPE](FuncOp::ATTR_KEY_FUNC_TYPE) | [TypeAttr](super::attributes::TypeAttr) |
+//     FuncOp,
+//     "func",
+//     "wasm"
+// );
+
+// impl FuncOp {
+//     /// Attribute key for the constant value.
+//     pub const ATTR_KEY_FUNC_TYPE: &str = "func.type";
+
+//     /// Create a new [FuncOp].
+//     /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
+//     /// The returned function has a single region with an empty `entry` block.
+//     pub fn new_unlinked(ctx: &mut Context, name: &str, ty: Ptr<TypeObj>) -> FuncOp {
+//         let ty_attr = TypeAttr::create(ty);
+//         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
+//         {
+//             let opref = &mut *op.deref_mut(ctx);
+//             // Set function type attributes.
+//             opref.attributes.insert(Self::ATTR_KEY_FUNC_TYPE, ty_attr);
+//         }
+//         let opop = FuncOp { op };
+//         // Create an empty entry block.
+//         #[allow(clippy::expect_used)]
+//         let region = opop.get_region(ctx);
+//         let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
+//         body.insert_at_front(region, ctx);
+
+//         opop.set_symbol_name(ctx, name);
+
+//         opop
+//     }
+
+//     /// Get the function signature (type).
+//     pub fn get_type(&self, ctx: &Context) -> Ptr<TypeObj> {
+//         let opref = self.get_operation().deref(ctx);
+//         #[allow(clippy::unwrap_used)]
+//         let ty_attr = opref.attributes.get(Self::ATTR_KEY_FUNC_TYPE).unwrap();
+//         #[allow(clippy::unwrap_used)]
+//         attr_cast::<dyn TypedAttrInterface>(&**ty_attr)
+//             .unwrap()
+//             .get_type()
+//     }
+
+//     /// Get the entry block of this function.
+//     pub fn get_entry_block(&self, ctx: &Context) -> Ptr<BasicBlock> {
+//         #[allow(clippy::unwrap_used)]
+//         self.get_region(ctx).deref(ctx).get_head().unwrap()
+//     }
+
+//     /// Get an iterator over all operations.
+//     pub fn op_iter<'a>(&self, ctx: &'a Context) -> impl Iterator<Item = Ptr<Operation>> + 'a {
+//         self.get_region(ctx)
+//             .deref(ctx)
+//             .iter(ctx)
+//             .flat_map(|bb| bb.deref(ctx).iter(ctx))
+//     }
+// }
+
+// impl OneRegionInterface for FuncOp {}
+// #[cast_to]
+// impl SymbolOpInterface for FuncOp {}
+
+// impl AttachContext for FuncOp {}
+// impl DisplayWithContext for FuncOp {
+//     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+//         let region = self.get_region(ctx).with_ctx(ctx).to_string();
+//         write!(
+//             f,
+//             "{} @{}{} {{\n{}}}",
+//             self.get_opid().with_ctx(ctx),
+//             self.get_symbol_name(ctx),
+//             self.get_type(ctx).with_ctx(ctx),
+//             indent::indent_all_by(2, region),
+//         )
+//     }
+// }
+
+// impl Verify for FuncOp {
+//     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+//         let ty = self.get_type(ctx);
+
+//         if !(ty.deref(ctx).is::<FunctionType>()) {
+//             return Err(CompilerError::VerificationError {
+//                 msg: "Unexpected Func type".to_string(),
+//             });
+//         }
+//         let op = &*self.get_operation().deref(ctx);
+//         if op.get_opid() != Self::get_opid_static() {
+//             return Err(CompilerError::VerificationError {
+//                 msg: "Incorrect OpId".to_string(),
+//             });
+//         }
+//         if op.get_num_results() != 0 || op.get_num_operands() != 0 {
+//             return Err(CompilerError::VerificationError {
+//                 msg: "Incorrect number of results or operands".to_string(),
+//             });
+//         }
+//         self.verify_one_region(ctx)?;
+//         self.get_entry_block(ctx).verify(ctx)?;
+//         Ok(())
+//     }
+// }
+
 declare_op!(
-    /// An operation with a name containing a single region.
+    /// Call a function.
     ///
     /// Attributes:
     ///
     /// | key | value |
     /// |-----|-------|
     /// | [ATTR_KEY_SYM_NAME](super::ATTR_KEY_SYM_NAME) | [StringAttr](super::attributes::StringAttr) |
-    /// | [ATTR_KEY_FUNC_TYPE](FuncOp::ATTR_KEY_FUNC_TYPE) | [TypeAttr](super::attributes::TypeAttr) |
-    FuncOp,
-    "func",
+    ///
+    CallOp,
+    "call",
     "wasm"
 );
 
-impl FuncOp {
-    /// Attribute key for the constant value.
-    pub const ATTR_KEY_FUNC_TYPE: &str = "func.type";
+impl CallOp {
+    /// Attribute key for the callee symbol name.
+    pub const ATTR_KEY_CALLEE_SYM: &str = "call.callee_sym";
 
-    /// Create a new [FuncOp].
-    /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
-    /// The returned function has a single region with an empty `entry` block.
-    pub fn new_unlinked(ctx: &mut Context, name: &str, ty: Ptr<TypeObj>) -> FuncOp {
-        let ty_attr = TypeAttr::create(ty);
-        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
-        {
-            let opref = &mut *op.deref_mut(ctx);
-            // Set function type attributes.
-            opref.attributes.insert(Self::ATTR_KEY_FUNC_TYPE, ty_attr);
-        }
-        let opop = FuncOp { op };
-        // Create an empty entry block.
+    /// Get the callee symbol name.
+    pub fn get_callee_sym(&self, ctx: &Context) -> AttrObj {
+        let op = self.get_operation().deref(ctx);
         #[allow(clippy::expect_used)]
-        let region = opop.get_region(ctx);
-        let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
-        body.insert_at_front(region, ctx);
-
-        opop.set_symbol_name(ctx, name);
-
-        opop
+        let callee_sym = op
+            .attributes
+            .get(Self::ATTR_KEY_CALLEE_SYM)
+            .expect("no attribute found");
+        attribute::clone::<StringAttr>(callee_sym)
     }
 
-    /// Get the function signature (type).
-    pub fn get_type(&self, ctx: &Context) -> Ptr<TypeObj> {
-        let opref = self.get_operation().deref(ctx);
-        #[allow(clippy::unwrap_used)]
-        let ty_attr = opref.attributes.get(Self::ATTR_KEY_FUNC_TYPE).unwrap();
-        #[allow(clippy::unwrap_used)]
-        attr_cast::<dyn TypedAttrInterface>(&**ty_attr)
-            .unwrap()
-            .get_type()
-    }
-
-    /// Get the entry block of this function.
-    pub fn get_entry_block(&self, ctx: &Context) -> Ptr<BasicBlock> {
-        #[allow(clippy::unwrap_used)]
-        self.get_region(ctx).deref(ctx).get_head().unwrap()
-    }
-
-    /// Get an iterator over all operations.
-    pub fn op_iter<'a>(&self, ctx: &'a Context) -> impl Iterator<Item = Ptr<Operation>> + 'a {
-        self.get_region(ctx)
-            .deref(ctx)
-            .iter(ctx)
-            .flat_map(|bb| bb.deref(ctx).iter(ctx))
+    /// Create a new [CallOp]. The underlying [Operation] is not linked to a
+    /// [BasicBlock](crate::basic_block::BasicBlock).
+    pub fn new_unlinked(ctx: &mut Context, callee_sym: AttrObj) -> CallOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_CALLEE_SYM, callee_sym);
+        CallOp { op }
     }
 }
 
-impl OneRegionInterface for FuncOp {}
-#[cast_to]
-impl SymbolOpInterface for FuncOp {}
-
-impl AttachContext for FuncOp {}
-impl DisplayWithContext for FuncOp {
+impl AttachContext for CallOp {}
+impl DisplayWithContext for CallOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        let region = self.get_region(ctx).with_ctx(ctx).to_string();
         write!(
             f,
-            "{} @{}{} {{\n{}}}",
+            "{} {}",
             self.get_opid().with_ctx(ctx),
-            self.get_symbol_name(ctx),
-            self.get_type(ctx).with_ctx(ctx),
-            indent::indent_all_by(2, region),
+            self.get_callee_sym(ctx).with_ctx(ctx)
         )
     }
 }
 
-impl Verify for FuncOp {
+impl Verify for CallOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
-        let ty = self.get_type(ctx);
-
-        if !(ty.deref(ctx).is::<FunctionType>()) {
+        let callee_sym = self.get_callee_sym(ctx);
+        if !callee_sym.is::<StringAttr>() {
             return Err(CompilerError::VerificationError {
-                msg: "Unexpected Func type".to_string(),
+                msg: "Unexpected callee symbol type".to_string(),
             });
         }
         let op = &*self.get_operation().deref(ctx);
@@ -275,8 +355,6 @@ impl Verify for FuncOp {
                 msg: "Incorrect number of results or operands".to_string(),
             });
         }
-        self.verify_one_region(ctx)?;
-        self.get_entry_block(ctx).verify(ctx)?;
         Ok(())
     }
 }
@@ -284,5 +362,5 @@ impl Verify for FuncOp {
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ConstOp::register(ctx, dialect);
     AddOp::register(ctx, dialect);
-    FuncOp::register(ctx, dialect);
+    CallOp::register(ctx, dialect);
 }

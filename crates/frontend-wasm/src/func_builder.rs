@@ -11,7 +11,6 @@ pub struct FuncBuilder<'a> {
     ctx: &'a mut Context,
     name: String,
     sig: Option<FunctionType>,
-    // ins: Vec<Inst>,
     entry_block: Ptr<BasicBlock>,
     locals: Vec<Ptr<TypeObj>>,
 }
@@ -39,7 +38,7 @@ impl<'a> FuncBuilder<'a> {
 
     pub fn build(self) -> Result<FuncOp, FuncBuilderError> {
         let sig = self.sig.ok_or_else(|| {
-            FuncBuilderError::MissingSignature(format!("FuncBuilder: {:?}", &self))
+            FuncBuilderError::MissingSignature(format!("FuncBuilder for {}", self.name))
         })?;
         // TODO: should be a separate lowering pass
         // let mut locals_with_params = self.locals.clone();
