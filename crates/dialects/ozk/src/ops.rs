@@ -49,7 +49,7 @@ impl ConstantOp {
     /// [BasicBlock](crate::basic_block::BasicBlock).
     pub fn new_unlinked(ctx: &mut Context, value: AttrObj) -> ConstantOp {
         #[allow(clippy::expect_used)]
-        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![]);
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_VALUE, value);
