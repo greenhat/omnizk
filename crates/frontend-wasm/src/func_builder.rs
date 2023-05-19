@@ -1,8 +1,8 @@
 use ozk_wasm_dialect::ops::ConstOp;
+use ozk_wasm_dialect::ops::FuncOp;
 use pliron::basic_block::BasicBlock;
 use pliron::context::Context;
 use pliron::context::Ptr;
-use pliron::dialects::builtin::ops::FuncOp;
 use pliron::dialects::builtin::types::FunctionType;
 use pliron::operation::Operation;
 use pliron::r#type::Type;
@@ -56,7 +56,6 @@ impl<'a> FuncBuilder<'a> {
         //         },
         //     );
         // }
-        // TODO: make wasm FuncOp(locals declaration)
         Ok(FuncOp::new_unlinked(
             self.ctx,
             &self.name,

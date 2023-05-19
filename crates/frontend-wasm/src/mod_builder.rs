@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
-use ozk_wasm_dialect::ops::CallOp;
+use ozk_wasm_dialect::ops::FuncOp;
+use ozk_wasm_dialect::ops::ModuleOp;
 use pliron::context::Context;
-use pliron::dialects::builtin::attributes::StringAttr;
-use pliron::dialects::builtin::ops::FuncOp;
-use pliron::dialects::builtin::ops::ModuleOp;
 use pliron::dialects::builtin::types::FunctionType;
 use pliron::op::Op;
 use thiserror::Error;
@@ -125,14 +123,11 @@ impl ModuleBuilder<'_> {
 
         // dbg!(&funcs);
         if let Some(start_func_idx) = self.start_func_idx {
-            let module_op = ModuleOp::new(ctx, "module_name");
+            let start_func_name = self.get_func_name(start_func_idx).unwrap();
+            let module_op = ModuleOp::new(ctx, "module_name", start_func_name);
             for func in funcs {
                 module_op.add_operation(ctx, func.get_operation());
             }
-            let start_func_name = self.get_func_name(start_func_idx).unwrap();
-            let start_func_sym = StringAttr::create(start_func_name);
-            let call_op = CallOp::new_unlinked(ctx, start_func_sym).get_operation();
-            module_op.add_operation(ctx, call_op);
             Ok(module_op)
         } else {
             Err(ModuleBuilderError::StartFuncUndefined)
