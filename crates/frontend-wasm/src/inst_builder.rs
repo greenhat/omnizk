@@ -1,7 +1,8 @@
+use ozk_wasm_dialect::ops::ConstOp;
+use pliron::attribute::AttrObj;
 use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::dialects::builtin::attributes::IntegerAttr;
-use pliron::dialects::builtin::ops::ConstantOp;
 use pliron::dialects::builtin::types::IntegerType;
 use pliron::dialects::builtin::types::Signedness;
 use pliron::op::Op;
@@ -12,7 +13,6 @@ use crate::func_builder::FuncBuilder;
 pub struct InstBuilder<'a> {
     ctx: &'a mut Context,
     fbuilder: &'a mut FuncBuilder<'a>,
-    i32_type: Ptr<TypeObj>,
 }
 
 impl<'a> InstBuilder<'a> {
@@ -20,19 +20,17 @@ impl<'a> InstBuilder<'a> {
         IntegerType::get(ctx, 32, Signedness::Signed)
     }
 
+    fn i32_attr(&self, value: i32) -> AttrObj {
+        IntegerAttr::create(Self::i32_type(self.ctx), value.into())
+    }
+
     pub fn new(ctx: &mut Context, fbuilder: &mut FuncBuilder) -> InstBuilder<'a> {
-        InstBuilder {
-            fbuilder,
-            ctx,
-            i32_type: Self::i32_type(ctx),
-        }
+        InstBuilder { fbuilder, ctx }
     }
 
     pub fn i32const(&mut self, value: i32) {
-        let op =
-            ConstantOp::new_unlinked(self.ctx, IntegerAttr::create(self.i32_type, value.into()));
-        op.get_operation()
-            .insert_at_back(self.fbuilder.get_entry_block(), self.ctx);
+        self.fbuilder
+            .push(ConstOp::new_unlinked(self.ctx, self.i32_attr(value)).get_operation());
     }
 
     pub fn i64const(&mut self, value: i64) {

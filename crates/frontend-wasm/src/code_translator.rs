@@ -1,7 +1,6 @@
-use c2zk_frontend_shared::{FuncBuilder, ModuleBuilder};
 use wasmparser::{FuncValidator, Operator, WasmModuleResources};
 
-use crate::{types::IntoIr, WasmError};
+use crate::{func_builder::FuncBuilder, mod_builder::ModuleBuilder, types::IntoIr, WasmError};
 
 /// Translates wasm operators into c2zk IR instructions.
 #[allow(unused_variables)]

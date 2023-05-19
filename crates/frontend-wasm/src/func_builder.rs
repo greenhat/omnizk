@@ -1,17 +1,21 @@
+use ozk_wasm_dialect::ops::ConstOp;
 use pliron::basic_block::BasicBlock;
 use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::dialects::builtin::ops::FuncOp;
 use pliron::dialects::builtin::types::FunctionType;
+use pliron::operation::Operation;
 use pliron::r#type::Type;
 use pliron::r#type::TypeObj;
 use thiserror::Error;
+
+use crate::inst_builder::InstBuilder;
 
 pub struct FuncBuilder<'a> {
     ctx: &'a mut Context,
     name: String,
     sig: Option<FunctionType>,
-    entry_block: Ptr<BasicBlock>,
+    blocks: Vec<Ptr<BasicBlock>>,
     locals: Vec<Ptr<TypeObj>>,
 }
 
@@ -21,7 +25,7 @@ impl<'a> FuncBuilder<'a> {
             name,
             sig: None,
             locals: Vec::new(),
-            entry_block: BasicBlock::new(ctx, None, Vec::new()),
+            blocks: vec![BasicBlock::new(ctx, None, Vec::new())],
             ctx,
         }
     }
@@ -52,7 +56,7 @@ impl<'a> FuncBuilder<'a> {
         //         },
         //     );
         // }
-        // TODO: make wasm FuncOp
+        // TODO: make wasm FuncOp(locals declaration)
         Ok(FuncOp::new_unlinked(
             self.ctx,
             &self.name,
@@ -60,17 +64,26 @@ impl<'a> FuncBuilder<'a> {
         ))
     }
 
-    // pub fn ins(&mut self) -> InstBuilder {
-    //     InstBuilder::new(self)
-    // }
-
-    pub fn get_entry_block(&self) -> Ptr<BasicBlock> {
-        self.entry_block
+    pub fn ins(&mut self) -> InstBuilder {
+        InstBuilder::new(self.ctx, self)
     }
 
-    // pub fn push(&mut self, inst: Inst) {
-    //     self.ins.push(inst);
-    // }
+    pub fn push(&mut self, op: Ptr<Operation>) {
+        // TODO: handle nested blocks
+        // Store blocks in a stack and push the op to the top block,
+        // when block ends, pop the block from the stack
+        // and push it as BlockOp op to the parent block - now the top block on the stack
+
+        if let Some(block) = op
+            .deref(self.ctx)
+            .get_op(self.ctx)
+            .downcast_ref::<ConstOp>()
+        {
+            todo!("use BlockOp above and push a new block onto the self.blocks");
+        } else {
+            op.insert_at_back(*self.blocks.last().unwrap(), self.ctx);
+        }
+    }
 
     // pub fn push_insts(&mut self, insts: Vec<Inst>) {
     //     self.ins.extend(insts);

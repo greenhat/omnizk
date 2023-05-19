@@ -60,11 +60,11 @@ impl ConstOp {
 
     /// Create a new [ConstOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, value: AttrObj) -> ConstOp {
+    pub fn new_unlinked(ctx: &mut Context, val: AttrObj) -> ConstOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
-            .insert(Self::ATTR_KEY_VALUE, value);
+            .insert(Self::ATTR_KEY_VALUE, val);
         ConstOp { op }
     }
 }
