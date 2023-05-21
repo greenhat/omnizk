@@ -384,6 +384,8 @@ impl Verify for AddOp {
 declare_op!(
     /// Call a function.
     ///
+    /// https://webassembly.github.io/spec/core/syntax/instructions.html#syntax-instr-control
+    ///
     /// Attributes:
     ///
     /// | key | value |
@@ -457,8 +459,49 @@ impl Verify for CallOp {
     }
 }
 
+declare_op!(
+    /// Return (branch to the outermost block)
+    /// https://webassembly.github.io/spec/core/syntax/instructions.html#syntax-instr-control
+    ReturnOp,
+    "return",
+    "wasm"
+);
+
+impl ReturnOp {
+    /// Create a new op
+    pub fn new_unlinked(ctx: &mut Context) -> ReturnOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        ReturnOp { op }
+    }
+}
+
+impl AttachContext for ReturnOp {}
+impl DisplayWithContext for ReturnOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.get_opid().with_ctx(ctx),)
+    }
+}
+
+impl Verify for ReturnOp {
+    fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+        let op = &*self.get_operation().deref(ctx);
+        if op.get_opid() != Self::get_opid_static() {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect OpId".to_string(),
+            });
+        }
+        if op.get_num_results() != 0 || op.get_num_operands() != 0 {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect number of results or operands".to_string(),
+            });
+        }
+        Ok(())
+    }
+}
+
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ConstOp::register(ctx, dialect);
     AddOp::register(ctx, dialect);
     CallOp::register(ctx, dialect);
+    ReturnOp::register(ctx, dialect);
 }

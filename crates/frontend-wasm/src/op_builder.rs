@@ -1,5 +1,6 @@
 use ozk_wasm_dialect::ops::CallOp;
 use ozk_wasm_dialect::ops::ConstOp;
+use ozk_wasm_dialect::ops::ReturnOp;
 use pliron::attribute::AttrObj;
 use pliron::context::Context;
 use pliron::context::Ptr;
@@ -54,7 +55,8 @@ impl<'a> OpBuilder<'a> {
     }
 
     pub fn ret(&mut self) {
-        self.fbuilder.push(Inst::Return);
+        self.fbuilder
+            .push(ReturnOp::new_unlinked(self.ctx).get_operation());
     }
 
     pub fn end(&mut self) {
