@@ -1,3 +1,5 @@
+use ozk_wasm_dialect::ops::CallOp;
+use ozk_wasm_dialect::ops::ConstOp;
 use pliron::attribute::AttrObj;
 use pliron::context::Context;
 use pliron::context::Ptr;
@@ -6,6 +8,7 @@ use pliron::dialects::builtin::types::IntegerType;
 use pliron::dialects::builtin::types::Signedness;
 use pliron::op::Op;
 use pliron::r#type::TypeObj;
+use wasmparser::BlockType;
 
 use crate::func_builder::FuncBuilder;
 
