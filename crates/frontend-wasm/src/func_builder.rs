@@ -1,10 +1,11 @@
 use ozk_wasm_dialect::ops::BlockOp;
-use ozk_wasm_dialect::ops::ConstOp;
 use ozk_wasm_dialect::ops::FuncOp;
+use ozk_wasm_dialect::ops::LoopOp;
 use pliron::basic_block::BasicBlock;
 use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::dialects::builtin::types::FunctionType;
+use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::r#type::Type;
 use pliron::r#type::TypeObj;
@@ -16,7 +17,7 @@ pub struct FuncBuilder<'a> {
     ctx: &'a mut Context,
     name: String,
     sig: Option<FunctionType>,
-    blocks: Vec<Ptr<BasicBlock>>,
+    blocks: Vec<(Option<Ptr<Operation>>, Ptr<BasicBlock>)>,
     locals: Vec<Ptr<TypeObj>>,
 }
 
@@ -26,7 +27,7 @@ impl<'a> FuncBuilder<'a> {
             name,
             sig: None,
             locals: Vec::new(),
-            blocks: vec![BasicBlock::new(ctx, None, Vec::new())],
+            blocks: vec![(None, BasicBlock::new(ctx, None, Vec::new()))],
             ctx,
         }
     }
@@ -69,27 +70,30 @@ impl<'a> FuncBuilder<'a> {
     }
 
     pub fn push(&mut self, op: Ptr<Operation>) {
-        // TODO: handle nested blocks
-        // Store blocks in a stack and push the op to the top block,
-        // when block ends, pop the block from the stack
-        // and push it as BlockOp op to the parent block - now the top block on the stack
-
-        if let Some(block) = op
-            .deref(self.ctx)
-            .get_op(self.ctx)
-            .downcast_ref::<BlockOp>()
-        {
-            // TODO: how is this legal? block is not a bb
-            self.blocks.push(block);
+        let opop = &op.deref(self.ctx).get_op(self.ctx);
+        if let Some(block) = opop.downcast_ref::<BlockOp>() {
+            self.blocks
+                .push((Some(block.get_operation()), block.get_block(&self.ctx)));
+        } else if let Some(block) = opop.downcast_ref::<LoopOp>() {
+            self.blocks
+                .push((Some(block.get_operation()), block.get_block(&self.ctx)));
         } else {
-            op.insert_at_back(*self.blocks.last().unwrap(), self.ctx);
+            let current_bb = self.blocks.last_mut().unwrap().1;
+            op.insert_at_back(current_bb, self.ctx);
         }
     }
 
     pub fn push_end(&mut self) {
-        // TODO: handle function end, if end
-        let ending_block = self.blocks.pop().unwrap();
-        ending_block.insert_at_back(*self.blocks.last().unwrap(), self.ctx);
+        let (ending_block_op_opt, ending_bb) = self.blocks.pop().unwrap();
+        let current_bb = self.blocks.last().unwrap().1;
+        match ending_block_op_opt {
+            Some(ending_block_op) => {
+                ending_block_op.insert_at_back(current_bb, self.ctx);
+            }
+            None => {
+                todo!("function end");
+            }
+        }
     }
 
     // pub fn push_insts(&mut self, insts: Vec<Inst>) {

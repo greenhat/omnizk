@@ -602,10 +602,114 @@ impl Verify for BlockOp {
     }
 }
 
+declare_op!(
+    /// A loop block operation containing a single region.
+    ///
+    /// Attributes:
+    ///
+    /// | key | value |
+    /// |-----|-------|
+    /// | [ATTR_KEY_BLOCK_TYPE](Self::ATTR_KEY_BLOCK_TYPE) | [TypeAttr](super::attributes::TypeAttr) |
+    LoopOp,
+    "loop",
+    "wasm"
+);
+
+impl LoopOp {
+    /// Attribute key for the function type
+    pub const ATTR_KEY_BLOCK_TYPE: &str = "block.type";
+
+    /// Create a new [LoopOp].
+    pub fn new_unlinked(ctx: &mut Context, ty: Ptr<TypeObj>) -> LoopOp {
+        let ty_attr = TypeAttr::create(ty);
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
+        {
+            let opref = &mut *op.deref_mut(ctx);
+            // Set function type attributes.
+            opref.attributes.insert(Self::ATTR_KEY_BLOCK_TYPE, ty_attr);
+        }
+        let opop = LoopOp { op };
+        // Create an empty block.
+        #[allow(clippy::expect_used)]
+        let region = opop.get_region(ctx);
+        let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
+        body.insert_at_front(region, ctx);
+
+        opop
+    }
+
+    /// Get the signature (type).
+    pub fn get_type(&self, ctx: &Context) -> Ptr<TypeObj> {
+        let opref = self.get_operation().deref(ctx);
+        #[allow(clippy::unwrap_used)]
+        let ty_attr = opref.attributes.get(Self::ATTR_KEY_BLOCK_TYPE).unwrap();
+        #[allow(clippy::unwrap_used)]
+        attr_cast::<dyn TypedAttrInterface>(&**ty_attr)
+            .unwrap()
+            .get_type()
+    }
+
+    /// Get the bb of this block.
+    pub fn get_block(&self, ctx: &Context) -> Ptr<BasicBlock> {
+        #[allow(clippy::unwrap_used)]
+        self.get_region(ctx).deref(ctx).get_head().unwrap()
+    }
+
+    /// Get an iterator over all operations.
+    pub fn op_iter<'a>(&self, ctx: &'a Context) -> impl Iterator<Item = Ptr<Operation>> + 'a {
+        self.get_region(ctx)
+            .deref(ctx)
+            .iter(ctx)
+            .flat_map(|bb| bb.deref(ctx).iter(ctx))
+    }
+}
+
+impl OneRegionInterface for LoopOp {}
+impl AttachContext for LoopOp {}
+impl DisplayWithContext for LoopOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let region = self.get_region(ctx).with_ctx(ctx).to_string();
+        write!(
+            f,
+            "{} {} {{\n{}}}",
+            self.get_opid().with_ctx(ctx),
+            self.get_type(ctx).with_ctx(ctx),
+            indent::indent_all_by(2, region),
+        )
+    }
+}
+
+impl Verify for LoopOp {
+    fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+        let ty = self.get_type(ctx);
+
+        if !(ty.deref(ctx).is::<FunctionType>()) {
+            return Err(CompilerError::VerificationError {
+                msg: "Unexpected Block type".to_string(),
+            });
+        }
+        let op = &*self.get_operation().deref(ctx);
+        if op.get_opid() != Self::get_opid_static() {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect OpId".to_string(),
+            });
+        }
+        if op.get_num_results() != 0 || op.get_num_operands() != 0 {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect number of results or operands".to_string(),
+            });
+        }
+        self.verify_one_region(ctx)?;
+        self.get_block(ctx).verify(ctx)?;
+        Ok(())
+    }
+}
+
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ConstOp::register(ctx, dialect);
     AddOp::register(ctx, dialect);
     CallOp::register(ctx, dialect);
     ReturnOp::register(ctx, dialect);
     BlockOp::register(ctx, dialect);
+    LoopOp::register(ctx, dialect);
 }

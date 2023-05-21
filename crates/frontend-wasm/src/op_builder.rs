@@ -1,6 +1,7 @@
 use ozk_wasm_dialect::ops::BlockOp;
 use ozk_wasm_dialect::ops::CallOp;
 use ozk_wasm_dialect::ops::ConstOp;
+use ozk_wasm_dialect::ops::LoopOp;
 use ozk_wasm_dialect::ops::ReturnOp;
 use pliron::attribute::AttrObj;
 use pliron::context::Context;
@@ -61,7 +62,8 @@ impl<'a> OpBuilder<'a> {
     }
 
     pub fn bloop(&mut self, block_type: BlockType) {
-        self.fbuilder.push(Inst::Loop { block_type });
+        self.fbuilder
+            .push(LoopOp::new_unlinked(self.ctx, block_type).get_operation());
     }
 
     pub fn block(&mut self, blockty: BlockType) {
@@ -139,11 +141,11 @@ impl<'a> OpBuilder<'a> {
         self.fbuilder.push(Inst::I64ExtendI32U);
     }
 
-    pub fn call(&mut self, func_index: u32) {
-        self.fbuilder.push(Inst::Call {
-            func_idx: func_index.into(),
-        });
-    }
+    // pub fn call(&mut self, func_index: u32) {
+    //     self.fbuilder.push(Inst::Call {
+    //         func_idx: func_index.into(),
+    //     });
+    // }
 
     pub fn nop(&mut self) {
         self.fbuilder.push(Inst::Nop);
