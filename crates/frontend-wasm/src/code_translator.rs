@@ -20,7 +20,8 @@ pub fn translate_operator(
         Operator::End => func_builder.ins().end(),
         Operator::Return => func_builder.ins().ret(),
         Operator::Call { function_index } => {
-            func_builder.push_insts(mod_builder.build_func_call(*function_index)?)
+            let callee_name = mod_builder.get_func_name(*function_index)?;
+            func_builder.ins().call(callee_name);
         }
         Operator::Loop { blockty } => {
             func_builder.ins().bloop(blockty.into_ir());

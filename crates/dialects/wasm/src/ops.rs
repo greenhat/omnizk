@@ -412,8 +412,9 @@ impl CallOp {
 
     /// Create a new [CallOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, callee_sym: AttrObj) -> CallOp {
+    pub fn new_unlinked(ctx: &mut Context, callee_name: String) -> CallOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        let callee_sym = StringAttr::create(callee_name);
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_CALLEE_SYM, callee_sym);

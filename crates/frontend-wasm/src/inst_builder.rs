@@ -1,3 +1,4 @@
+use ozk_wasm_dialect::ops::CallOp;
 use ozk_wasm_dialect::ops::ConstOp;
 use pliron::attribute::AttrObj;
 use pliron::context::Context;
@@ -20,8 +21,16 @@ impl<'a> InstBuilder<'a> {
         IntegerType::get(ctx, 32, Signedness::Signed)
     }
 
+    fn i64_type(ctx: &mut Context) -> Ptr<TypeObj> {
+        IntegerType::get(ctx, 64, Signedness::Signed)
+    }
+
     fn i32_attr(&self, value: i32) -> AttrObj {
         IntegerAttr::create(Self::i32_type(self.ctx), value.into())
+    }
+
+    fn i64_attr(&self, value: i64) -> AttrObj {
+        IntegerAttr::create(Self::i64_type(self.ctx), value.into())
     }
 
     pub fn new(ctx: &mut Context, fbuilder: &mut FuncBuilder) -> InstBuilder<'a> {
@@ -34,7 +43,13 @@ impl<'a> InstBuilder<'a> {
     }
 
     pub fn i64const(&mut self, value: i64) {
-        self.fbuilder.push(Inst::I64Const { value });
+        self.fbuilder
+            .push(ConstOp::new_unlinked(self.ctx, self.i64_attr(value)).get_operation());
+    }
+
+    pub fn call(&mut self, callee_name: String) {
+        self.fbuilder
+            .push(CallOp::new_unlinked(self.ctx, callee_name).get_operation());
     }
 
     pub fn ret(&mut self) {
