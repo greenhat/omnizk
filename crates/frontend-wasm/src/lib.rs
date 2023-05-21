@@ -26,9 +26,9 @@ mod code_translator;
 mod config;
 mod error;
 mod func_builder;
-mod inst_builder;
 mod mod_builder;
 mod module_translator;
+mod op_builder;
 mod types;
 
 pub use crate::config::WasmFrontendConfig;

@@ -1,5 +1,3 @@
-use ozk_wasm_dialect::ops::CallOp;
-use ozk_wasm_dialect::ops::ConstOp;
 use pliron::attribute::AttrObj;
 use pliron::context::Context;
 use pliron::context::Ptr;
@@ -11,12 +9,12 @@ use pliron::r#type::TypeObj;
 
 use crate::func_builder::FuncBuilder;
 
-pub struct InstBuilder<'a> {
+pub struct OpBuilder<'a> {
     ctx: &'a mut Context,
     fbuilder: &'a mut FuncBuilder<'a>,
 }
 
-impl<'a> InstBuilder<'a> {
+impl<'a> OpBuilder<'a> {
     fn i32_type(ctx: &mut Context) -> Ptr<TypeObj> {
         IntegerType::get(ctx, 32, Signedness::Signed)
     }
@@ -33,8 +31,8 @@ impl<'a> InstBuilder<'a> {
         IntegerAttr::create(Self::i64_type(self.ctx), value.into())
     }
 
-    pub fn new(ctx: &mut Context, fbuilder: &mut FuncBuilder) -> InstBuilder<'a> {
-        InstBuilder { fbuilder, ctx }
+    pub fn new(ctx: &mut Context, fbuilder: &mut FuncBuilder) -> OpBuilder<'a> {
+        OpBuilder { fbuilder, ctx }
     }
 
     pub fn i32const(&mut self, value: i32) {

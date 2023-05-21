@@ -9,7 +9,7 @@ use pliron::r#type::Type;
 use pliron::r#type::TypeObj;
 use thiserror::Error;
 
-use crate::inst_builder::InstBuilder;
+use crate::op_builder::OpBuilder;
 
 pub struct FuncBuilder<'a> {
     ctx: &'a mut Context,
@@ -63,8 +63,8 @@ impl<'a> FuncBuilder<'a> {
         ))
     }
 
-    pub fn ins(&mut self) -> InstBuilder {
-        InstBuilder::new(self.ctx, self)
+    pub fn op(&mut self) -> OpBuilder {
+        OpBuilder::new(self.ctx, self)
     }
 
     pub fn push(&mut self, op: Ptr<Operation>) {
