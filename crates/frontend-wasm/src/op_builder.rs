@@ -1,3 +1,4 @@
+use ozk_wasm_dialect::ops::BlockOp;
 use ozk_wasm_dialect::ops::CallOp;
 use ozk_wasm_dialect::ops::ConstOp;
 use ozk_wasm_dialect::ops::ReturnOp;
@@ -59,8 +60,17 @@ impl<'a> OpBuilder<'a> {
             .push(ReturnOp::new_unlinked(self.ctx).get_operation());
     }
 
+    pub fn bloop(&mut self, block_type: BlockType) {
+        self.fbuilder.push(Inst::Loop { block_type });
+    }
+
+    pub fn block(&mut self, blockty: BlockType) {
+        self.fbuilder
+            .push(BlockOp::new_unlinked(self.ctx, blockty).get_operation());
+    }
+
     pub fn end(&mut self) {
-        self.fbuilder.push(Inst::End);
+        self.fbuilder.push_end();
     }
 
     pub fn local_get(&mut self, local_index: u32) {
@@ -141,14 +151,6 @@ impl<'a> OpBuilder<'a> {
 
     pub fn unreachable(&mut self) {
         self.fbuilder.push(Inst::Unreachable);
-    }
-
-    pub fn bloop(&mut self, block_type: BlockType) {
-        self.fbuilder.push(Inst::Loop { block_type });
-    }
-
-    pub fn block(&mut self, blockty: BlockType) {
-        self.fbuilder.push(Inst::Block { blockty });
     }
 
     pub fn br_if(&mut self, relative_depth: u32) {

@@ -1,3 +1,4 @@
+use ozk_wasm_dialect::ops::BlockOp;
 use ozk_wasm_dialect::ops::ConstOp;
 use ozk_wasm_dialect::ops::FuncOp;
 use pliron::basic_block::BasicBlock;
@@ -76,12 +77,19 @@ impl<'a> FuncBuilder<'a> {
         if let Some(block) = op
             .deref(self.ctx)
             .get_op(self.ctx)
-            .downcast_ref::<ConstOp>()
+            .downcast_ref::<BlockOp>()
         {
-            todo!("use BlockOp above and push a new block onto the self.blocks");
+            // TODO: how is this legal? block is not a bb
+            self.blocks.push(block);
         } else {
             op.insert_at_back(*self.blocks.last().unwrap(), self.ctx);
         }
+    }
+
+    pub fn push_end(&mut self) {
+        // TODO: handle function end, if end
+        let ending_block = self.blocks.pop().unwrap();
+        ending_block.insert_at_back(*self.blocks.last().unwrap(), self.ctx);
     }
 
     // pub fn push_insts(&mut self, insts: Vec<Inst>) {
