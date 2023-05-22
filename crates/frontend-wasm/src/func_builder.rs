@@ -17,7 +17,7 @@ pub struct FuncBuilder<'a> {
     ctx: &'a mut Context,
     name: String,
     sig: Option<FunctionType>,
-    blocks: Vec<(Option<Ptr<Operation>>, Ptr<BasicBlock>)>,
+    blocks: Vec<BlockBuilder>,
     locals: Vec<Ptr<TypeObj>>,
 }
 
@@ -27,7 +27,11 @@ impl<'a> FuncBuilder<'a> {
             name,
             sig: None,
             locals: Vec::new(),
-            blocks: vec![(None, BasicBlock::new(ctx, None, Vec::new()))],
+            blocks: vec![BlockBuilder::FuncEntryBlock(BasicBlock::new(
+                ctx,
+                None,
+                Vec::new(),
+            ))],
             ctx,
         }
     }
@@ -72,27 +76,30 @@ impl<'a> FuncBuilder<'a> {
     pub fn push(&mut self, op: Ptr<Operation>) {
         let opop = &op.deref(self.ctx).get_op(self.ctx);
         if let Some(block) = opop.downcast_ref::<BlockOp>() {
-            self.blocks
-                .push((Some(block.get_operation()), block.get_block(&self.ctx)));
-        } else if let Some(block) = opop.downcast_ref::<LoopOp>() {
-            self.blocks
-                .push((Some(block.get_operation()), block.get_block(&self.ctx)));
+            self.blocks.push(BlockBuilder::Block(*block));
+        } else if let Some(loopop) = opop.downcast_ref::<LoopOp>() {
+            self.blocks.push(BlockBuilder::Loop(*loopop));
         } else {
-            let current_bb = self.blocks.last_mut().unwrap().1;
+            let current_bb = self.blocks.last_mut().unwrap().get_bb(self.ctx);
             op.insert_at_back(current_bb, self.ctx);
         }
     }
 
     pub fn push_end(&mut self) {
-        let (ending_block_op_opt, ending_bb) = self.blocks.pop().unwrap();
-        let current_bb = self.blocks.last().unwrap().1;
-        match ending_block_op_opt {
-            Some(ending_block_op) => {
-                ending_block_op.insert_at_back(current_bb, self.ctx);
+        if let Some(ending_block_builder) = self.blocks.pop() {
+            match ending_block_builder {
+                BlockBuilder::FuncEntryBlock(bb) => (), // do nothing, it's function end
+                BlockBuilder::Block(block) => {
+                    let current_bb = self.blocks.last().unwrap().get_bb(self.ctx);
+                    block.get_operation().insert_at_back(current_bb, self.ctx)
+                }
+                BlockBuilder::Loop(loopop) => {
+                    let current_bb = self.blocks.last().unwrap().get_bb(self.ctx);
+                    loopop.get_operation().insert_at_back(current_bb, self.ctx)
+                }
             }
-            None => {
-                todo!("function end");
-            }
+        } else {
+            panic!("push_end called on empty block stack")
         }
     }
 
@@ -113,4 +120,20 @@ impl<'a> FuncBuilder<'a> {
 pub enum FuncBuilderError {
     #[error("missing function signature")]
     MissingSignature(String),
+}
+
+pub enum BlockBuilder {
+    FuncEntryBlock(Ptr<BasicBlock>),
+    Block(BlockOp),
+    Loop(LoopOp),
+}
+
+impl BlockBuilder {
+    pub fn get_bb(&self, ctx: &Context) -> Ptr<BasicBlock> {
+        match self {
+            BlockBuilder::FuncEntryBlock(bb) => *bb,
+            BlockBuilder::Block(block) => block.get_block(ctx),
+            BlockBuilder::Loop(loopop) => loopop.get_block(ctx),
+        }
+    }
 }
