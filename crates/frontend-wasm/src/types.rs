@@ -271,11 +271,3 @@ pub fn from_val_type(val_type: ValType, ctx: &mut Context) -> Ptr<TypeObj> {
         ValType::Ref(_) => todo!(),
     }
 }
-
-pub fn i32_type(ctx: &mut Context) -> Ptr<TypeObj> {
-    IntegerType::get(ctx, 32, Signedness::Signed)
-}
-
-pub fn i64_type(ctx: &mut Context) -> Ptr<TypeObj> {
-    IntegerType::get(ctx, 64, Signedness::Signed)
-}

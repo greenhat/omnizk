@@ -20,12 +20,17 @@ use pliron::dialects::builtin::op_interfaces::OneRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SymbolOpInterface;
 use pliron::dialects::builtin::types::FunctionType;
+use pliron::dialects::builtin::types::IntegerType;
+use pliron::dialects::builtin::types::Signedness;
 use pliron::error::CompilerError;
 use pliron::linked_list::ContainsLinkedList;
 use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::r#type::TypeObj;
 use pliron::with_context::AttachContext;
+
+use crate::types::u32_type;
+use crate::types::u32_type_unwrapped;
 
 declare_op!(
     /// Represents a Wasm module, a top level container operation.
@@ -705,6 +710,87 @@ impl Verify for LoopOp {
     }
 }
 
+declare_op!(
+    /// Push local variable with the given index onto the stack.
+    ///
+    /// Attributes:
+    ///
+    /// | key | value |
+    /// |-----|-------|
+    /// |[ATTR_KEY_INDEX](Self::ATTR_KEY_INDEX) | [IntegerAttr] |
+    ///
+    LocalGetOp,
+    "local.get",
+    "wasm"
+);
+
+impl LocalGetOp {
+    /// Attribute key for the index
+    pub const ATTR_KEY_INDEX: &str = "local.get.index";
+
+    /// Get the index of the local variable.
+    pub fn get_index(&self, ctx: &Context) -> AttrObj {
+        let op = self.get_operation().deref(ctx);
+        #[allow(clippy::expect_used)]
+        let value = op
+            .attributes
+            .get(Self::ATTR_KEY_INDEX)
+            .expect("no attribute found");
+        attribute::clone::<IntegerAttr>(value)
+    }
+
+    /// Create a new [LocalGetOp].
+    pub fn new_unlinked(ctx: &mut Context, index: AttrObj) -> LocalGetOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_INDEX, index);
+        LocalGetOp { op }
+    }
+}
+
+impl AttachContext for LocalGetOp {}
+impl DisplayWithContext for LocalGetOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "{} {}",
+            self.get_opid().with_ctx(ctx),
+            self.get_index(ctx).with_ctx(ctx)
+        )
+    }
+}
+
+impl Verify for LocalGetOp {
+    fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+        let index = self.get_index(ctx);
+        if let Ok(index_attr) = index.downcast::<IntegerAttr>() {
+            #[allow(clippy::unwrap_used)]
+            if index_attr.get_type() != u32_type_unwrapped(ctx) {
+                return Err(CompilerError::VerificationError {
+                    msg: "Expected u32 for index".to_string(),
+                });
+            }
+        } else {
+            return Err(CompilerError::VerificationError {
+                msg: "Unexpected index type".to_string(),
+            });
+        };
+        let op = &*self.get_operation().deref(ctx);
+        if op.get_opid() != Self::get_opid_static() {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect OpId".to_string(),
+            });
+        }
+        if op.get_num_results() != 0 || op.get_num_operands() != 0 {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect number of results or operands".to_string(),
+            });
+        }
+        Ok(())
+    }
+}
+
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ConstOp::register(ctx, dialect);
     AddOp::register(ctx, dialect);
@@ -712,4 +798,5 @@ pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ReturnOp::register(ctx, dialect);
     BlockOp::register(ctx, dialect);
     LoopOp::register(ctx, dialect);
+    LocalGetOp::register(ctx, dialect);
 }
