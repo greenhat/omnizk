@@ -5,15 +5,14 @@ use ozk_wasm_dialect::ops::LoopOp;
 use ozk_wasm_dialect::ops::ReturnOp;
 use pliron::attribute::AttrObj;
 use pliron::context::Context;
-use pliron::context::Ptr;
 use pliron::dialects::builtin::attributes::IntegerAttr;
-use pliron::dialects::builtin::types::IntegerType;
-use pliron::dialects::builtin::types::Signedness;
 use pliron::op::Op;
-use pliron::r#type::TypeObj;
 use wasmparser::BlockType;
 
 use crate::func_builder::FuncBuilder;
+use crate::types::from_block_type;
+use crate::types::i32_type;
+use crate::types::i64_type;
 
 pub struct OpBuilder<'a> {
     ctx: &'a mut Context,
@@ -21,20 +20,12 @@ pub struct OpBuilder<'a> {
 }
 
 impl<'a> OpBuilder<'a> {
-    fn i32_type(ctx: &mut Context) -> Ptr<TypeObj> {
-        IntegerType::get(ctx, 32, Signedness::Signed)
-    }
-
-    fn i64_type(ctx: &mut Context) -> Ptr<TypeObj> {
-        IntegerType::get(ctx, 64, Signedness::Signed)
-    }
-
     fn i32_attr(&self, value: i32) -> AttrObj {
-        IntegerAttr::create(Self::i32_type(self.ctx), value.into())
+        IntegerAttr::create(i32_type(self.ctx), value.into())
     }
 
     fn i64_attr(&self, value: i64) -> AttrObj {
-        IntegerAttr::create(Self::i64_type(self.ctx), value.into())
+        IntegerAttr::create(i64_type(self.ctx), value.into())
     }
 
     pub fn new(ctx: &mut Context, fbuilder: &mut FuncBuilder) -> OpBuilder<'a> {
@@ -62,13 +53,15 @@ impl<'a> OpBuilder<'a> {
     }
 
     pub fn bloop(&mut self, block_type: BlockType) {
-        self.fbuilder
-            .push(LoopOp::new_unlinked(self.ctx, block_type).get_operation());
+        self.fbuilder.push(
+            LoopOp::new_unlinked(self.ctx, from_block_type(block_type, self.ctx)).get_operation(),
+        );
     }
 
-    pub fn block(&mut self, blockty: BlockType) {
-        self.fbuilder
-            .push(BlockOp::new_unlinked(self.ctx, blockty).get_operation());
+    pub fn block(&mut self, block_type: BlockType) {
+        self.fbuilder.push(
+            BlockOp::new_unlinked(self.ctx, from_block_type(block_type, self.ctx)).get_operation(),
+        );
     }
 
     pub fn end(&mut self) {

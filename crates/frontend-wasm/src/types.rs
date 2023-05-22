@@ -4,6 +4,11 @@
 //! WebAssembly.
 
 use derive_more::{From, Into};
+use pliron::{
+    context::{Context, Ptr},
+    dialects::builtin::types::{FunctionType, IntegerType, Signedness},
+    r#type::TypeObj,
+};
 pub use wasmparser;
 use wasmparser::{BlockType, RefType, ValType};
 
@@ -231,9 +236,9 @@ impl From<wasmparser::TagType> for Tag {
     }
 }
 
-pub(crate) trait IntoIr<T> {
-    fn into_ir(self) -> T;
-}
+// pub(crate) trait IntoIr<T> {
+//     fn into_ir(self) -> T;
+// }
 
 // impl IntoIr<ir::FuncType> for wasmparser::FuncType {
 //     fn into_ir(self) -> ir::FuncType {
@@ -248,25 +253,29 @@ pub(crate) trait IntoIr<T> {
 //     }
 // }
 
-// impl IntoIr<ir::Ty> for wasmparser::ValType {
-//     fn into_ir(self) -> ir::Ty {
-//         match self {
-//             wasmparser::ValType::I32 => ir::Ty::I32,
-//             wasmparser::ValType::I64 => ir::Ty::I64,
-//             wasmparser::ValType::F32 => ir::Ty::F32,
-//             wasmparser::ValType::F64 => ir::Ty::F64,
-//             wasmparser::ValType::V128 => ir::Ty::V128,
-//             wasmparser::ValType::Ref(_) => todo!(),
-//         }
-//     }
-// }
+pub fn from_block_type(block_type: BlockType, ctx: &mut Context) -> Ptr<TypeObj> {
+    match block_type {
+        BlockType::Empty => FunctionType::get(ctx, Vec::new(), Vec::new()),
+        BlockType::Type(ty) => FunctionType::get(ctx, Vec::new(), vec![from_val_type(ty, ctx)]),
+        BlockType::FuncType(_) => todo!(),
+    }
+}
 
-// impl IntoIr<ir::BlockType> for &BlockType {
-//     fn into_ir(self) -> ir::BlockType {
-//         match self {
-//             BlockType::Empty => ir::BlockType::Empty,
-//             BlockType::Type(ty) => ir::BlockType::Type(ty.into_ir()),
-//             BlockType::FuncType(_) => todo!(),
-//         }
-//     }
-// }
+pub fn from_val_type(val_type: ValType, ctx: &mut Context) -> Ptr<TypeObj> {
+    match val_type {
+        ValType::I32 => i32_type(ctx),
+        ValType::I64 => i64_type(ctx),
+        ValType::F32 => unimplemented!("not support for floating types"),
+        ValType::F64 => unimplemented!("not support for floating types"),
+        ValType::V128 => todo!(),
+        ValType::Ref(_) => todo!(),
+    }
+}
+
+pub fn i32_type(ctx: &mut Context) -> Ptr<TypeObj> {
+    IntegerType::get(ctx, 32, Signedness::Signed)
+}
+
+pub fn i64_type(ctx: &mut Context) -> Ptr<TypeObj> {
+    IntegerType::get(ctx, 64, Signedness::Signed)
+}
