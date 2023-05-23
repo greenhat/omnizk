@@ -6,6 +6,7 @@ use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::dialects::builtin::types::FunctionType;
 use pliron::op::Op;
+use pliron::r#type::Type;
 use pliron::r#type::TypeObj;
 use thiserror::Error;
 
@@ -21,6 +22,7 @@ use crate::types::TypeIndex;
 use self::import_func_body::ImportFunc;
 
 pub struct ModuleBuilder<'a> {
+    ctx: &'a mut Context,
     types: Vec<Ptr<TypeObj>>,
     start_func_idx: Option<FuncIndex>,
     functions: Vec<FuncBuilder<'a>>,
@@ -31,8 +33,9 @@ pub struct ModuleBuilder<'a> {
 }
 
 impl ModuleBuilder<'_> {
-    pub fn new() -> Self {
+    pub fn new(ctx: &mut Context) -> Self {
         Self {
+            ctx,
             types: Vec::new(),
             start_func_idx: None,
             functions: Vec::new(),
@@ -94,12 +97,12 @@ impl ModuleBuilder<'_> {
     //     }])
     // }
 
-    pub fn build(mut self, ctx: &mut Context) -> Result<ModuleOp, ModuleBuilderError> {
+    pub fn build(mut self) -> Result<ModuleOp, ModuleBuilderError> {
         let mut func_sigs: Vec<Ptr<TypeObj>> = Vec::new();
         for func_idx in 0..self.functions.len() {
             // TODO: and here we use "raw" func index without imported functions
-            let func_type = self.get_func_type((func_idx as u32).into())?;
-            func_sigs.push(func_type);
+            let func_type = *self.get_func_type_typed((func_idx as u32).into())?;
+            func_sigs.push(Type::get_instance(func_type, self.ctx).unwrap());
         }
         let imported_funcs_count = self.import_functions.len() as u32;
 
@@ -126,9 +129,9 @@ impl ModuleBuilder<'_> {
         // dbg!(&funcs);
         if let Some(start_func_idx) = self.start_func_idx {
             let start_func_name = self.get_func_name(start_func_idx).unwrap();
-            let module_op = ModuleOp::new(ctx, "module_name", start_func_name);
+            let module_op = ModuleOp::new(self.ctx, "module_name", start_func_name);
             for func in funcs {
-                module_op.add_operation(ctx, func.get_operation());
+                module_op.add_operation(self.ctx, func.get_operation());
             }
             Ok(module_op)
         } else {
@@ -161,11 +164,16 @@ impl ModuleBuilder<'_> {
             .cloned()
             .ok_or_else(|| ModuleBuilderError::TypeNotFound(u32::from(*type_idx)))
     }
-}
 
-impl Default for ModuleBuilder<'_> {
-    fn default() -> Self {
-        Self::new()
+    pub fn get_func_type_typed(
+        &self,
+        func_idx: FuncIndex,
+    ) -> Result<&FunctionType, ModuleBuilderError> {
+        Ok(self
+            .get_func_type(func_idx)?
+            .deref(self.ctx)
+            .downcast_ref::<FunctionType>()
+            .unwrap())
     }
 }
 

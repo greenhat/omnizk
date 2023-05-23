@@ -17,7 +17,7 @@ use wasmparser::{
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
 pub fn translate_module(ctx: &mut Context, data: &[u8]) -> Result<ModuleOp, WasmError> {
     let mut validator = Validator::new();
-    let mut mod_builder = ModuleBuilder::new();
+    let mut mod_builder = ModuleBuilder::new(ctx);
 
     for payload in Parser::new(0).parse_all(data) {
         // dbg!(&mod_builder);
@@ -133,7 +133,7 @@ pub fn translate_module(ctx: &mut Context, data: &[u8]) -> Result<ModuleOp, Wasm
             }
         }
     }
-    Ok(mod_builder.build(ctx)?)
+    Ok(mod_builder.build()?)
 }
 
 fn parse_export_section(
@@ -188,7 +188,7 @@ fn parse_code_section_entry(
     let mut builder = FuncBuilder::new(ctx, func_name);
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters and pass the next local as num_params
-    let num_params = mod_builder.get_func_type(func_idx)?.params.len();
+    let num_params = mod_builder.get_func_type_typed(func_idx)?.get_inputs().len();
     // dbg!(&num_params);
     parse_local_decls(ctx, &mut reader, &mut builder, num_params, validator)?;
     while !reader.eof() {
