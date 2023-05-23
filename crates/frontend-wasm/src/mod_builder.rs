@@ -3,8 +3,10 @@ use std::collections::HashMap;
 use ozk_wasm_dialect::ops::FuncOp;
 use ozk_wasm_dialect::ops::ModuleOp;
 use pliron::context::Context;
+use pliron::context::Ptr;
 use pliron::dialects::builtin::types::FunctionType;
 use pliron::op::Op;
+use pliron::r#type::TypeObj;
 use thiserror::Error;
 
 mod import_func_body;
@@ -19,7 +21,7 @@ use crate::types::TypeIndex;
 use self::import_func_body::ImportFunc;
 
 pub struct ModuleBuilder<'a> {
-    types: Vec<FunctionType>,
+    types: Vec<Ptr<TypeObj>>,
     start_func_idx: Option<FuncIndex>,
     functions: Vec<FuncBuilder<'a>>,
     import_functions: Vec<FuncOp>,
@@ -41,7 +43,7 @@ impl ModuleBuilder<'_> {
         }
     }
 
-    pub fn push_type(&mut self, ty: FunctionType) {
+    pub fn push_type(&mut self, ty: Ptr<TypeObj>) {
         self.types.push(ty);
     }
 
@@ -93,11 +95,11 @@ impl ModuleBuilder<'_> {
     // }
 
     pub fn build(mut self, ctx: &mut Context) -> Result<ModuleOp, ModuleBuilderError> {
-        let mut func_sigs: Vec<FunctionType> = Vec::new();
+        let mut func_sigs: Vec<Ptr<TypeObj>> = Vec::new();
         for func_idx in 0..self.functions.len() {
             // TODO: and here we use "raw" func index without imported functions
             let func_type = self.get_func_type((func_idx as u32).into())?;
-            func_sigs.push(*func_type);
+            func_sigs.push(func_type);
         }
         let imported_funcs_count = self.import_functions.len() as u32;
 
@@ -148,7 +150,7 @@ impl ModuleBuilder<'_> {
         self.func_names.get(&func_idx).cloned()
     }
 
-    pub fn get_func_type(&self, func_idx: FuncIndex) -> Result<&FunctionType, ModuleBuilderError> {
+    pub fn get_func_type(&self, func_idx: FuncIndex) -> Result<Ptr<TypeObj>, ModuleBuilderError> {
         let type_idx = self
             .func_types
             .get(&func_idx)
@@ -156,6 +158,7 @@ impl ModuleBuilder<'_> {
 
         self.types
             .get(u32::from(*type_idx) as usize)
+            .cloned()
             .ok_or_else(|| ModuleBuilderError::TypeNotFound(u32::from(*type_idx)))
     }
 }

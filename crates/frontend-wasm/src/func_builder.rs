@@ -4,10 +4,8 @@ use ozk_wasm_dialect::ops::LoopOp;
 use pliron::basic_block::BasicBlock;
 use pliron::context::Context;
 use pliron::context::Ptr;
-use pliron::dialects::builtin::types::FunctionType;
 use pliron::op::Op;
 use pliron::operation::Operation;
-use pliron::r#type::Type;
 use pliron::r#type::TypeObj;
 use thiserror::Error;
 
@@ -16,7 +14,7 @@ use crate::op_builder::OpBuilder;
 pub struct FuncBuilder<'a> {
     ctx: &'a mut Context,
     name: String,
-    sig: Option<FunctionType>,
+    sig: Option<Ptr<TypeObj>>,
     blocks: Vec<BlockBuilder>,
     locals: Vec<Ptr<TypeObj>>,
 }
@@ -62,11 +60,7 @@ impl<'a> FuncBuilder<'a> {
         //         },
         //     );
         // }
-        Ok(FuncOp::new_unlinked(
-            self.ctx,
-            &self.name,
-            Type::register_instance(sig, self.ctx),
-        ))
+        Ok(FuncOp::new_unlinked(self.ctx, &self.name, sig))
     }
 
     pub fn op(&mut self) -> OpBuilder {
@@ -107,7 +101,7 @@ impl<'a> FuncBuilder<'a> {
     //     self.ins.extend(insts);
     // }
 
-    pub fn set_signature(&mut self, signature: FunctionType) {
+    pub fn set_signature(&mut self, signature: Ptr<TypeObj>) {
         self.sig = Some(signature);
     }
 

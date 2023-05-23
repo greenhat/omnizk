@@ -3,19 +3,19 @@
 //! Translation skeleton that traverses the whole WebAssembly module and call helper functions
 //! to deal with each part of it.
 
-use c2zk_frontend_shared::{FuncBuilder, ModuleBuilder};
-use c2zk_ir::ir::{self, FuncIndex};
-
-use crate::code_translator::translate_operator;
 use crate::error::WasmError;
-use crate::types::IntoIr;
+use crate::func_builder::FuncBuilder;
+use crate::types::{from_func_type, from_val_type, FuncIndex};
+use crate::{code_translator::translate_operator, mod_builder::ModuleBuilder};
+use ozk_wasm_dialect::ops::ModuleOp;
+use pliron::context::Context;
 use wasmparser::{
     BinaryReader, ExternalKind, FuncValidator, FunctionBody, NameSectionReader, Naming, Parser,
     Payload, Type, TypeRef, Validator, ValidatorResources, WasmModuleResources,
 };
 
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
-pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
+pub fn translate_module(ctx: &mut Context, data: &[u8]) -> Result<ModuleOp, WasmError> {
     let mut validator = Validator::new();
     let mut mod_builder = ModuleBuilder::new();
 
@@ -35,7 +35,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
 
             Payload::TypeSection(types) => {
                 validator.type_section(&types)?;
-                parse_type_section(types, &mut mod_builder)?;
+                parse_type_section(ctx, types, &mut mod_builder)?;
             }
 
             Payload::ImportSection(imports) => {
@@ -102,7 +102,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
                 let mut func_validator = validator
                     .code_section_entry(&body)?
                     .into_validator(Default::default());
-                parse_code_section_entry(&mut mod_builder, &mut func_validator, body)?;
+                parse_code_section_entry(ctx, &mut mod_builder, &mut func_validator, body)?;
             }
 
             Payload::DataSection(data) => {
@@ -133,7 +133,7 @@ pub fn translate_module(data: &[u8]) -> Result<ir::Module, WasmError> {
             }
         }
     }
-    Ok(mod_builder.build()?)
+    Ok(mod_builder.build(ctx)?)
 }
 
 fn parse_export_section(
@@ -160,13 +160,14 @@ fn parse_export_section(
 }
 
 fn parse_type_section(
+    ctx: &mut Context,
     types: wasmparser::TypeSectionReader,
     mod_builder: &mut ModuleBuilder,
 ) -> Result<(), WasmError> {
     for entry in types {
         match entry? {
             Type::Func(wasm_func_ty) => {
-                mod_builder.push_type(wasm_func_ty.into_ir());
+                mod_builder.push_type(from_func_type(ctx, &wasm_func_ty));
             }
         }
     }
@@ -174,6 +175,7 @@ fn parse_type_section(
 }
 
 fn parse_code_section_entry(
+    ctx: &mut Context,
     mod_builder: &mut ModuleBuilder,
     validator: &mut FuncValidator<ValidatorResources>,
     body: FunctionBody,
@@ -183,12 +185,12 @@ fn parse_code_section_entry(
         .get_func_name(func_idx)
         .unwrap_or(format!("f{}", u32::from(func_idx)));
     // dbg!(&func_name);
-    let mut builder = FuncBuilder::new(func_name);
+    let mut builder = FuncBuilder::new(ctx, func_name);
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters and pass the next local as num_params
     let num_params = mod_builder.get_func_type(func_idx)?.params.len();
     // dbg!(&num_params);
-    parse_local_decls(&mut reader, &mut builder, num_params, validator)?;
+    parse_local_decls(ctx, &mut reader, &mut builder, num_params, validator)?;
     while !reader.eof() {
         // dbg!(&builder);
         let pos = reader.original_position();
@@ -203,6 +205,7 @@ fn parse_code_section_entry(
 
 /// Parse the local variable declarations that precede the function body.
 fn parse_local_decls(
+    ctx: &mut Context,
     reader: &mut BinaryReader,
     builder: &mut FuncBuilder,
     _num_params: usize,
@@ -214,7 +217,7 @@ fn parse_local_decls(
         let count = reader.read_var_u32()?;
         let ty = reader.read::<wasmparser::ValType>()?;
         validator.define_locals(pos, count, ty)?;
-        builder.declare_local(count, ty.into_ir());
+        builder.declare_local(count, from_val_type(ctx, &ty));
     }
     Ok(())
 }

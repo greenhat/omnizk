@@ -4,13 +4,14 @@
 //! WebAssembly.
 
 use derive_more::{From, Into};
+use ozk_wasm_dialect::types::{i32_type, i64_type};
 use pliron::{
     context::{Context, Ptr},
-    dialects::builtin::types::{FunctionType, IntegerType, Signedness},
+    dialects::builtin::types::FunctionType,
     r#type::TypeObj,
 };
 pub use wasmparser;
-use wasmparser::{BlockType, RefType, ValType};
+use wasmparser::{BlockType, FuncType, RefType, ValType};
 
 use std::convert::TryFrom;
 
@@ -253,15 +254,15 @@ impl From<wasmparser::TagType> for Tag {
 //     }
 // }
 
-pub fn from_block_type(block_type: &BlockType, ctx: &mut Context) -> Ptr<TypeObj> {
+pub fn from_block_type(ctx: &mut Context, block_type: &BlockType) -> Ptr<TypeObj> {
     match block_type {
         BlockType::Empty => FunctionType::get(ctx, Vec::new(), Vec::new()),
-        BlockType::Type(ty) => FunctionType::get(ctx, Vec::new(), vec![from_val_type(ty, ctx)]),
+        BlockType::Type(ty) => FunctionType::get(ctx, Vec::new(), vec![from_val_type(ctx, ty)]),
         BlockType::FuncType(_) => todo!(),
     }
 }
 
-pub fn from_val_type(val_type: ValType, ctx: &mut Context) -> Ptr<TypeObj> {
+pub fn from_val_type(ctx: &mut Context, val_type: &ValType) -> Ptr<TypeObj> {
     match val_type {
         ValType::I32 => i32_type(ctx),
         ValType::I64 => i64_type(ctx),
@@ -270,4 +271,18 @@ pub fn from_val_type(val_type: ValType, ctx: &mut Context) -> Ptr<TypeObj> {
         ValType::V128 => todo!(),
         ValType::Ref(_) => todo!(),
     }
+}
+
+pub fn from_func_type(ctx: &mut Context, func_type: &FuncType) -> Ptr<TypeObj> {
+    let params = func_type
+        .params()
+        .iter()
+        .map(|ty| from_val_type(ctx, ty))
+        .collect();
+    let results = func_type
+        .results()
+        .iter()
+        .map(|ty| from_val_type(ctx, ty))
+        .collect();
+    FunctionType::get(ctx, params, results)
 }

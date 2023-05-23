@@ -17,5 +17,6 @@ thiserror = { workspace = true }
 c2zk-stdlib = { workspace = true }
 wasmparser = { workspace = true }
 derive_more = { workspace = true }
+log = { workspace = true }
 
 [dev-dependencies]

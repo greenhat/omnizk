@@ -1,4 +1,4 @@
-use c2zk_frontend_shared::ModuleBuilderError;
+use crate::mod_builder::ModuleBuilderError;
 use thiserror::Error;
 
 /// A WebAssembly translation error.
