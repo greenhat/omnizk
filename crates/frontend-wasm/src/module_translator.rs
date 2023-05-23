@@ -9,6 +9,7 @@ use crate::types::{from_func_type, from_val_type, FuncIndex};
 use crate::{code_translator::translate_operator, mod_builder::ModuleBuilder};
 use ozk_wasm_dialect::ops::ModuleOp;
 use pliron::context::Context;
+use pliron::dialects::builtin::types::FunctionType;
 use wasmparser::{
     BinaryReader, ExternalKind, FuncValidator, FunctionBody, NameSectionReader, Naming, Parser,
     Payload, Type, TypeRef, Validator, ValidatorResources, WasmModuleResources,
@@ -17,7 +18,7 @@ use wasmparser::{
 /// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
 pub fn translate_module(ctx: &mut Context, data: &[u8]) -> Result<ModuleOp, WasmError> {
     let mut validator = Validator::new();
-    let mut mod_builder = ModuleBuilder::new(ctx);
+    let mut mod_builder = ModuleBuilder::new();
 
     for payload in Parser::new(0).parse_all(data) {
         // dbg!(&mod_builder);
@@ -133,7 +134,7 @@ pub fn translate_module(ctx: &mut Context, data: &[u8]) -> Result<ModuleOp, Wasm
             }
         }
     }
-    Ok(mod_builder.build()?)
+    Ok(mod_builder.build(ctx)?)
 }
 
 fn parse_export_section(
@@ -188,7 +189,14 @@ fn parse_code_section_entry(
     let mut builder = FuncBuilder::new(ctx, func_name);
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters and pass the next local as num_params
-    let num_params = mod_builder.get_func_type_typed(func_idx)?.get_inputs().len();
+    let num_params = mod_builder
+        .get_func_type(func_idx)?
+        .deref(ctx)
+        .downcast_ref::<FunctionType>()
+        .unwrap()
+        .get_inputs()
+        .len();
+
     // dbg!(&num_params);
     parse_local_decls(ctx, &mut reader, &mut builder, num_params, validator)?;
     while !reader.eof() {
@@ -197,7 +205,7 @@ fn parse_code_section_entry(
         let op = reader.read_operator()?;
         // dbg!(&op);
         validator.op(pos, &op)?;
-        translate_operator(validator, &op, &mut builder, mod_builder)?;
+        translate_operator(ctx, validator, &op, &mut builder, mod_builder)?;
     }
     mod_builder.push_func_builder(builder);
     Ok(())

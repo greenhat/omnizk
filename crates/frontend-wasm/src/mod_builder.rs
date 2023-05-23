@@ -4,42 +4,38 @@ use ozk_wasm_dialect::ops::FuncOp;
 use ozk_wasm_dialect::ops::ModuleOp;
 use pliron::context::Context;
 use pliron::context::Ptr;
-use pliron::dialects::builtin::types::FunctionType;
 use pliron::op::Op;
-use pliron::r#type::Type;
 use pliron::r#type::TypeObj;
 use thiserror::Error;
 
-mod import_func_body;
+// mod import_func_body;
 
-pub use import_func_body::ImportFuncBody;
+// pub use import_func_body::ImportFuncBody;
 
 use crate::func_builder::FuncBuilder;
 use crate::func_builder::FuncBuilderError;
 use crate::types::FuncIndex;
 use crate::types::TypeIndex;
 
-use self::import_func_body::ImportFunc;
+// use self::import_func_body::ImportFunc;
 
-pub struct ModuleBuilder<'a> {
-    ctx: &'a mut Context,
+pub struct ModuleBuilder {
     types: Vec<Ptr<TypeObj>>,
     start_func_idx: Option<FuncIndex>,
-    functions: Vec<FuncBuilder<'a>>,
+    functions: Vec<FuncBuilder>,
     import_functions: Vec<FuncOp>,
-    import_func_body: ImportFuncBody,
+    // import_func_body: ImportFuncBody,
     func_names: HashMap<FuncIndex, String>,
     func_types: HashMap<FuncIndex, TypeIndex>,
 }
 
-impl ModuleBuilder<'_> {
-    pub fn new(ctx: &mut Context) -> Self {
+impl ModuleBuilder {
+    pub fn new() -> Self {
         Self {
-            ctx,
             types: Vec::new(),
             start_func_idx: None,
             functions: Vec::new(),
-            import_func_body: ImportFuncBody::new_stdlib(),
+            // import_func_body: ImportFuncBody::new_stdlib(),
             func_names: HashMap::new(),
             func_types: HashMap::new(),
             import_functions: Vec::new(),
@@ -56,25 +52,26 @@ impl ModuleBuilder<'_> {
         module: &str,
         name: &str,
     ) -> Result<(), ModuleBuilderError> {
-        // dbg!(&self.types);
-        let ty = self
-            .types
-            .get(type_idx as usize)
-            .ok_or_else(|| ModuleBuilderError::InvalidTypeIndex(format!("type_idx: {}", type_idx)))?
-            .clone();
-        // dbg!(name);
-        // dbg!(&ty);
-        let import_func = ImportFunc {
-            module: module.to_string(),
-            name: name.to_string(),
-            ty,
-        };
-        let func = self
-            .import_func_body
-            .func(&import_func)
-            .ok_or(ModuleBuilderError::ImportFuncBodyNotFound(import_func))?;
-        self.import_functions.push(func.clone());
-        Ok(())
+        todo!();
+        // // dbg!(&self.types);
+        // let ty = self
+        //     .types
+        //     .get(type_idx as usize)
+        //     .ok_or_else(|| ModuleBuilderError::InvalidTypeIndex(format!("type_idx: {}", type_idx)))?
+        //     .clone();
+        // // dbg!(name);
+        // // dbg!(&ty);
+        // let import_func = ImportFunc {
+        //     module: module.to_string(),
+        //     name: name.to_string(),
+        //     ty,
+        // };
+        // let func = self
+        //     .import_func_body
+        //     .func(&import_func)
+        //     .ok_or(ModuleBuilderError::ImportFuncBodyNotFound(import_func))?;
+        // self.import_functions.push(func.clone());
+        // Ok(())
     }
 
     pub fn push_func_type(&mut self, func_idx: u32, type_idx: u32) {
@@ -97,12 +94,12 @@ impl ModuleBuilder<'_> {
     //     }])
     // }
 
-    pub fn build(mut self) -> Result<ModuleOp, ModuleBuilderError> {
+    pub fn build(mut self, ctx: &mut Context) -> Result<ModuleOp, ModuleBuilderError> {
         let mut func_sigs: Vec<Ptr<TypeObj>> = Vec::new();
         for func_idx in 0..self.functions.len() {
             // TODO: and here we use "raw" func index without imported functions
-            let func_type = *self.get_func_type_typed((func_idx as u32).into())?;
-            func_sigs.push(Type::get_instance(func_type, self.ctx).unwrap());
+            let func_type = self.get_func_type((func_idx as u32).into())?;
+            func_sigs.push(func_type);
         }
         let imported_funcs_count = self.import_functions.len() as u32;
 
@@ -123,15 +120,15 @@ impl ModuleBuilder<'_> {
             func_builder.set_signature(func_sigs[func_idx]);
         }
         for func_builder in self.functions {
-            funcs.push(func_builder.build()?);
+            funcs.push(func_builder.build(ctx)?);
         }
 
         // dbg!(&funcs);
         if let Some(start_func_idx) = self.start_func_idx {
             let start_func_name = self.get_func_name(start_func_idx).unwrap();
-            let module_op = ModuleOp::new(self.ctx, "module_name", start_func_name);
+            let module_op = ModuleOp::new(ctx, "module_name", start_func_name);
             for func in funcs {
-                module_op.add_operation(self.ctx, func.get_operation());
+                module_op.add_operation(ctx, func.get_operation());
             }
             Ok(module_op)
         } else {
@@ -165,24 +162,25 @@ impl ModuleBuilder<'_> {
             .ok_or_else(|| ModuleBuilderError::TypeNotFound(u32::from(*type_idx)))
     }
 
-    pub fn get_func_type_typed(
-        &self,
-        func_idx: FuncIndex,
-    ) -> Result<&FunctionType, ModuleBuilderError> {
-        Ok(self
-            .get_func_type(func_idx)?
-            .deref(self.ctx)
-            .downcast_ref::<FunctionType>()
-            .unwrap())
-    }
+    // pub fn get_func_type_typed(
+    //     &self,
+    //     ctx: &'a mut Context,
+    //     func_idx: FuncIndex,
+    // ) -> Result<&FunctionType, ModuleBuilderError> {
+    //     Ok(self
+    //         .get_func_type(func_idx)?
+    //         .deref(ctx)
+    //         .downcast_ref::<FunctionType>()
+    //         .unwrap())
+    // }
 }
 
 #[derive(Error, Debug)]
 pub enum ModuleBuilderError {
     #[error("start function is undefined")]
     StartFuncUndefined,
-    #[error("cannot find a body for import function `{0:?}`")]
-    ImportFuncBodyNotFound(ImportFunc),
+    // #[error("cannot find a body for import function `{0:?}`")]
+    // ImportFuncBodyNotFound(ImportFunc),
     #[error("type index for func index `{0}` not found")]
     TypeIndexNotFound(u32),
     #[error("type with index {0} not found")]

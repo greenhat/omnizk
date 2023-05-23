@@ -11,15 +11,15 @@ use thiserror::Error;
 
 use crate::op_builder::OpBuilder;
 
-pub struct FuncBuilder<'a> {
-    ctx: &'a mut Context,
+pub struct FuncBuilder {
+    // ctx: &'a mut Context,
     name: String,
     sig: Option<Ptr<TypeObj>>,
     blocks: Vec<BlockBuilder>,
     locals: Vec<Ptr<TypeObj>>,
 }
 
-impl<'a> FuncBuilder<'a> {
+impl FuncBuilder {
     pub fn new(ctx: &mut Context, name: String) -> FuncBuilder {
         FuncBuilder {
             name,
@@ -30,7 +30,6 @@ impl<'a> FuncBuilder<'a> {
                 None,
                 Vec::new(),
             ))],
-            ctx,
         }
     }
 
@@ -44,7 +43,7 @@ impl<'a> FuncBuilder<'a> {
         self.locals.extend(locals);
     }
 
-    pub fn build(self) -> Result<FuncOp, FuncBuilderError> {
+    pub fn build(self, ctx: &mut Context) -> Result<FuncOp, FuncBuilderError> {
         let sig = self.sig.ok_or_else(|| {
             FuncBuilderError::MissingSignature(format!("FuncBuilder for {}", self.name))
         })?;
@@ -60,36 +59,36 @@ impl<'a> FuncBuilder<'a> {
         //         },
         //     );
         // }
-        Ok(FuncOp::new_unlinked(self.ctx, &self.name, sig))
+        Ok(FuncOp::new_unlinked(ctx, &self.name, sig))
     }
 
     pub fn op(&mut self) -> OpBuilder {
-        OpBuilder::new(self.ctx, self)
+        OpBuilder::new(self)
     }
 
-    pub fn push(&mut self, op: Ptr<Operation>) {
-        let opop = &op.deref(self.ctx).get_op(self.ctx);
+    pub fn push(&mut self, ctx: &mut Context, op: Ptr<Operation>) {
+        let opop = &op.deref(ctx).get_op(ctx);
         if let Some(block) = opop.downcast_ref::<BlockOp>() {
             self.blocks.push(BlockBuilder::Block(*block));
         } else if let Some(loopop) = opop.downcast_ref::<LoopOp>() {
             self.blocks.push(BlockBuilder::Loop(*loopop));
         } else {
-            let current_bb = self.blocks.last_mut().unwrap().get_bb(self.ctx);
-            op.insert_at_back(current_bb, self.ctx);
+            let current_bb = self.blocks.last_mut().unwrap().get_bb(ctx);
+            op.insert_at_back(current_bb, ctx);
         }
     }
 
-    pub fn push_end(&mut self) {
+    pub fn push_end(&mut self, ctx: &mut Context) {
         if let Some(ending_block_builder) = self.blocks.pop() {
             match ending_block_builder {
                 BlockBuilder::FuncEntryBlock(bb) => (), // do nothing, it's function end
                 BlockBuilder::Block(block) => {
-                    let current_bb = self.blocks.last().unwrap().get_bb(self.ctx);
-                    block.get_operation().insert_at_back(current_bb, self.ctx)
+                    let current_bb = self.blocks.last().unwrap().get_bb(ctx);
+                    block.get_operation().insert_at_back(current_bb, ctx)
                 }
                 BlockBuilder::Loop(loopop) => {
-                    let current_bb = self.blocks.last().unwrap().get_bb(self.ctx);
-                    loopop.get_operation().insert_at_back(current_bb, self.ctx)
+                    let current_bb = self.blocks.last().unwrap().get_bb(ctx);
+                    loopop.get_operation().insert_at_back(current_bb, ctx)
                 }
             }
         } else {

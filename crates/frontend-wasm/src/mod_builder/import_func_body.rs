@@ -1,12 +1,5 @@
 use std::collections::HashMap;
 
-use c2zk_ir::ir::Func;
-use c2zk_ir::ir::FuncType;
-use c2zk_ir::ir::Inst;
-use c2zk_ir::ir::Ty;
-
-use crate::FuncBuilder;
-
 #[derive(Debug, Eq, Hash, PartialEq)]
 pub struct ImportFunc {
     pub module: String,

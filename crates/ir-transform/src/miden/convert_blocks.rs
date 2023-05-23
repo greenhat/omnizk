@@ -1,4 +1,3 @@
-use c2zk_frontend_shared::FuncBuilder;
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::BlockKind;
 use c2zk_ir::ir::Func;
