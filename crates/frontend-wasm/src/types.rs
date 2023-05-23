@@ -253,7 +253,7 @@ impl From<wasmparser::TagType> for Tag {
 //     }
 // }
 
-pub fn from_block_type(block_type: BlockType, ctx: &mut Context) -> Ptr<TypeObj> {
+pub fn from_block_type(block_type: &BlockType, ctx: &mut Context) -> Ptr<TypeObj> {
     match block_type {
         BlockType::Empty => FunctionType::get(ctx, Vec::new(), Vec::new()),
         BlockType::Type(ty) => FunctionType::get(ctx, Vec::new(), vec![from_val_type(ty, ctx)]),

@@ -52,13 +52,13 @@ impl<'a> OpBuilder<'a> {
             .push(ReturnOp::new_unlinked(self.ctx).get_operation());
     }
 
-    pub fn bloop(&mut self, block_type: BlockType) {
+    pub fn bloop(&mut self, block_type: &BlockType) {
         self.fbuilder.push(
             LoopOp::new_unlinked(self.ctx, from_block_type(block_type, self.ctx)).get_operation(),
         );
     }
 
-    pub fn block(&mut self, block_type: BlockType) {
+    pub fn block(&mut self, block_type: &BlockType) {
         self.fbuilder.push(
             BlockOp::new_unlinked(self.ctx, from_block_type(block_type, self.ctx)).get_operation(),
         );

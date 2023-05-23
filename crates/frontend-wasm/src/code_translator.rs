@@ -1,6 +1,6 @@
 use wasmparser::{FuncValidator, Operator, WasmModuleResources};
 
-use crate::{func_builder::FuncBuilder, mod_builder::ModuleBuilder, types::IntoIr, WasmError};
+use crate::{func_builder::FuncBuilder, mod_builder::ModuleBuilder, WasmError};
 
 /// Translates wasm operators into c2zk IR instructions.
 #[allow(unused_variables)]
@@ -20,14 +20,16 @@ pub fn translate_operator(
         Operator::End => func_builder.op().end(),
         Operator::Return => func_builder.op().ret(),
         Operator::Call { function_index } => {
-            let callee_name = mod_builder.get_func_name(*function_index)?;
+            let callee_name = mod_builder
+                .get_func_name((*function_index).into())
+                .ok_or_else(|| WasmError::User("Call index is not found".to_string()))?;
             func_builder.op().call(callee_name);
         }
         Operator::Loop { blockty } => {
-            func_builder.op().bloop(blockty.into_ir());
+            func_builder.op().bloop(blockty);
         }
         Operator::Block { blockty } => {
-            func_builder.op().block(blockty.into_ir());
+            func_builder.op().block(blockty);
         }
         Operator::BrIf { relative_depth } => {
             func_builder.op().br_if(*relative_depth);
