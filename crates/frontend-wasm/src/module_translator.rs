@@ -189,6 +189,7 @@ fn parse_code_section_entry(
     let mut builder = FuncBuilder::new(ctx, func_name);
     let mut reader = body.get_binary_reader();
     // take care of wasm parameters and pass the next local as num_params
+    #[allow(clippy::unwrap_used)]
     let num_params = mod_builder
         .get_func_type(func_idx)?
         .deref(ctx)

@@ -48,9 +48,9 @@ impl ModuleBuilder {
 
     pub fn push_import_func(
         &mut self,
-        type_idx: u32,
-        module: &str,
-        name: &str,
+        _type_idx: u32,
+        _module: &str,
+        _name: &str,
     ) -> Result<(), ModuleBuilderError> {
         todo!();
         // // dbg!(&self.types);
@@ -103,30 +103,31 @@ impl ModuleBuilder {
         }
         let imported_funcs_count = self.import_functions.len() as u32;
 
-        let mut funcs = Vec::new();
-        // first, imported functions
-        for import_func in self.import_functions {
-            funcs.push(import_func);
-        }
-
-        // TODO: since func indices should be shifted by imported funcs count change the storage and make it obvious
-        for (func_idx, func_builder) in self.functions.iter_mut().enumerate() {
-            if let Some(func_name) = self
-                .func_names
-                .get(&(func_idx as u32 + imported_funcs_count).into())
-            {
-                func_builder.set_name(func_name.clone());
-            }
-            func_builder.set_signature(func_sigs[func_idx]);
-        }
-        for func_builder in self.functions {
-            funcs.push(func_builder.build(ctx)?);
-        }
-
-        // dbg!(&funcs);
         if let Some(start_func_idx) = self.start_func_idx {
-            let start_func_name = self.get_func_name(start_func_idx).unwrap();
+            let start_func_name = self
+                .get_func_name(start_func_idx)
+                .ok_or(ModuleBuilderError::FuncNameNotFound(start_func_idx))?;
             let module_op = ModuleOp::new(ctx, "module_name", start_func_name);
+            let mut funcs = Vec::new();
+            // first, imported functions
+            for import_func in self.import_functions {
+                funcs.push(import_func);
+            }
+
+            // TODO: since func indices should be shifted by imported funcs count change the storage and make it obvious
+            for (func_idx, func_builder) in self.functions.iter_mut().enumerate() {
+                if let Some(func_name) = self
+                    .func_names
+                    .get(&(func_idx as u32 + imported_funcs_count).into())
+                {
+                    func_builder.set_name(func_name.clone());
+                }
+                func_builder.set_signature(func_sigs[func_idx]);
+            }
+            for func_builder in self.functions {
+                funcs.push(func_builder.build(ctx)?);
+            }
+
             for func in funcs {
                 module_op.add_operation(ctx, func.get_operation());
             }
@@ -189,4 +190,6 @@ pub enum ModuleBuilderError {
     FuncBuilderError(#[from] FuncBuilderError),
     #[error("invalid type index: {0}")]
     InvalidTypeIndex(String),
+    #[error("func name not found for func index: {0:?}")]
+    FuncNameNotFound(FuncIndex),
 }

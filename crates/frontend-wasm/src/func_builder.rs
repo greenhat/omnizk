@@ -81,7 +81,7 @@ impl FuncBuilder {
     pub fn push_end(&mut self, ctx: &mut Context) {
         if let Some(ending_block_builder) = self.blocks.pop() {
             match ending_block_builder {
-                BlockBuilder::FuncEntryBlock(bb) => (), // do nothing, it's function end
+                BlockBuilder::FuncEntryBlock(_) => (), // do nothing, it's function end
                 BlockBuilder::Block(block) => {
                     let current_bb = self.blocks.last().unwrap().get_bb(ctx);
                     block.get_operation().insert_at_back(current_bb, ctx)

@@ -257,17 +257,21 @@ impl From<wasmparser::TagType> for Tag {
 pub fn from_block_type(ctx: &mut Context, block_type: &BlockType) -> Ptr<TypeObj> {
     match block_type {
         BlockType::Empty => FunctionType::get(ctx, Vec::new(), Vec::new()),
-        BlockType::Type(ty) => FunctionType::get(ctx, Vec::new(), vec![from_val_type(ctx, ty)]),
+        BlockType::Type(ty) => {
+            let res_ty = from_val_type(ctx, ty);
+            FunctionType::get(ctx, Vec::new(), vec![res_ty])
+        }
         BlockType::FuncType(_) => todo!(),
     }
 }
 
+#[allow(clippy::unimplemented)]
 pub fn from_val_type(ctx: &mut Context, val_type: &ValType) -> Ptr<TypeObj> {
     match val_type {
         ValType::I32 => i32_type(ctx),
         ValType::I64 => i64_type(ctx),
-        ValType::F32 => unimplemented!("not support for floating types"),
-        ValType::F64 => unimplemented!("not support for floating types"),
+        ValType::F32 => unimplemented!("no support for floating types"),
+        ValType::F64 => unimplemented!("no support for floating types"),
         ValType::V128 => todo!(),
         ValType::Ref(_) => todo!(),
     }
