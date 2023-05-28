@@ -50,4 +50,4 @@ pub fn fib_seq() {
 }
 ```
 
-Is compiled to the following fully executable [Triton VM code](https://github.com/greenhat/omnizk/blob/main/crates/codegen-tritonvm/src/codegen/sem_tests/fib.rs).
+Is compiled to the following fully executable [Triton VM code](https://github.com/greenhat/omnizk/blob/main/crates/codegen-tritonvm/src/codegen/sem_tests/fib.rs#L146).
