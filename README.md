@@ -21,7 +21,7 @@ OmniZK is highly modular, so you can use only crates needed for your use case - 
 
 ### Work in progress:
 
-- Wasm -> Miden VM transformations;
+- Wasm -> Miden VM transformations (see [PR](https://github.com/greenhat/omnizk/pull/5));
 
 ### Next:
 - complete Wasm instructions support;
