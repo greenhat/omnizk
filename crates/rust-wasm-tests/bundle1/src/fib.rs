@@ -1,7 +1,7 @@
 use c2zk_stdlib::*;
 
 pub fn fib_seq() {
-    let n: u32 = pub_input() as u32;
+    let n = pub_input() as u32;
     let mut a: u32 = 0;
     let mut b: u32 = 1;
     for _ in 0..n {
