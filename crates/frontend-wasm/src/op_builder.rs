@@ -18,6 +18,7 @@ pub struct OpBuilder<'a> {
     fbuilder: &'a mut FuncBuilder,
 }
 
+#[allow(unused_variables)]
 impl<'a> OpBuilder<'a> {
     fn i32_attr(ctx: &mut Context, value: i32) -> AttrObj {
         IntegerAttr::create(i32_type(ctx), value.into())
