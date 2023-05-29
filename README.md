@@ -1,6 +1,6 @@
 ## OmniZK: Compiler Framework for Zero-Knowledge VMs.
 
-OmniZK transforms code from various sources to various ZK VMs backends. Its design resembles the [MLIR](https://mlir.llvm.org/)(LLVM) architecture, where IR transformations are implemented generically and reused with different custom IR dialects. 
+OmniZK transforms code from various sources to various ZK VM's backends. Its design resembles the [MLIR](https://mlir.llvm.org/)(LLVM) architecture, where IR transformations are implemented generically and reused with different custom IR dialects. 
 
 ### Features:
 
