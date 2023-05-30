@@ -7,6 +7,7 @@ use pliron::context::Ptr;
 use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::r#type::TypeObj;
+use pliron::with_context::AttachContext;
 use thiserror::Error;
 
 use crate::op_builder::OpBuilder;
@@ -66,33 +67,56 @@ impl FuncBuilder {
         OpBuilder::new(self)
     }
 
-    pub fn push(&mut self, ctx: &mut Context, op: Ptr<Operation>) {
+    pub fn push(&mut self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), FuncBuilderError> {
         let opop = &op.deref(ctx).get_op(ctx);
         if let Some(block) = opop.downcast_ref::<BlockOp>() {
             self.blocks.push(BlockBuilder::Block(*block));
         } else if let Some(loopop) = opop.downcast_ref::<LoopOp>() {
             self.blocks.push(BlockBuilder::Loop(*loopop));
         } else {
-            let current_bb = self.blocks.last_mut().unwrap().get_bb(ctx);
+            let current_bb = self
+                .blocks
+                .last()
+                .ok_or(FuncBuilderError::PushOnEmptyBlocks(
+                    op.with_ctx(ctx).to_string(),
+                ))?
+                .get_bb(ctx);
             op.insert_at_back(current_bb, ctx);
         }
+        Ok(())
     }
 
-    pub fn push_end(&mut self, ctx: &mut Context) {
+    pub fn push_end(&mut self, ctx: &mut Context) -> Result<(), FuncBuilderError> {
         if let Some(ending_block_builder) = self.blocks.pop() {
             match ending_block_builder {
-                BlockBuilder::FuncEntryBlock(_) => (), // do nothing, it's function end
+                BlockBuilder::FuncEntryBlock(_) => Ok(()), // do nothing, it's function end
                 BlockBuilder::Block(block) => {
-                    let current_bb = self.blocks.last().unwrap().get_bb(ctx);
-                    block.get_operation().insert_at_back(current_bb, ctx)
+                    let current_bb = self
+                        .blocks
+                        .last()
+                        .ok_or(FuncBuilderError::PushOnEmptyBlocks(
+                            block.with_ctx(ctx).to_string(),
+                        ))?
+                        .get_bb(ctx);
+                    block.get_operation().insert_at_back(current_bb, ctx);
+                    Ok(())
                 }
                 BlockBuilder::Loop(loopop) => {
-                    let current_bb = self.blocks.last().unwrap().get_bb(ctx);
-                    loopop.get_operation().insert_at_back(current_bb, ctx)
+                    let current_bb = self
+                        .blocks
+                        .last()
+                        .ok_or(FuncBuilderError::PushOnEmptyBlocks(
+                            loopop.with_ctx(ctx).to_string(),
+                        ))?
+                        .get_bb(ctx);
+                    loopop.get_operation().insert_at_back(current_bb, ctx);
+                    Ok(())
                 }
             }
         } else {
-            panic!("push_end called on empty block stack")
+            Err(FuncBuilderError::PushOnEmptyBlocks(
+                "push_end called on empty blocks".into(),
+            ))
         }
     }
 
@@ -113,6 +137,8 @@ impl FuncBuilder {
 pub enum FuncBuilderError {
     #[error("missing function signature")]
     MissingSignature(String),
+    #[error("pushing {0} to empty block stack")]
+    PushOnEmptyBlocks(String),
 }
 
 pub enum BlockBuilder {

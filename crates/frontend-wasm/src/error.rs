@@ -1,3 +1,4 @@
+use crate::func_builder::FuncBuilderError;
 use crate::mod_builder::ModuleBuilderError;
 use thiserror::Error;
 
@@ -32,6 +33,10 @@ pub enum WasmError {
     /// Error in module builder
     #[error("ModuleBuilderError: {0:?}")]
     ModuleBuilderError(#[from] ModuleBuilderError),
+
+    /// Error in function builder
+    #[error("FuncBuilderError: {0:?}")]
+    FuncBuilderError(#[from] FuncBuilderError),
 }
 
 /// Return an `Err(WasmError::Unsupported(msg))` where `msg` the string built by calling `format!`

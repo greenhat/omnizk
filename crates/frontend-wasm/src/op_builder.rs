@@ -12,6 +12,7 @@ use pliron::op::Op;
 use wasmparser::BlockType;
 
 use crate::func_builder::FuncBuilder;
+use crate::func_builder::FuncBuilderError;
 use crate::types::from_block_type;
 
 pub struct OpBuilder<'a> {
@@ -32,42 +33,57 @@ impl<'a> OpBuilder<'a> {
         OpBuilder { fbuilder }
     }
 
-    pub fn i32const(&mut self, ctx: &mut Context, value: i32) {
+    pub fn i32const(&mut self, ctx: &mut Context, value: i32) -> Result<(), FuncBuilderError> {
         let val = OpBuilder::i32_attr(ctx, value);
         let op = ConstOp::new_unlinked(ctx, val).get_operation();
-        self.fbuilder.push(ctx, op);
+        self.fbuilder.push(ctx, op)?;
+        Ok(())
     }
 
-    pub fn i64const(&mut self, ctx: &mut Context, value: i64) {
+    pub fn i64const(&mut self, ctx: &mut Context, value: i64) -> Result<(), FuncBuilderError> {
         let val = OpBuilder::i64_attr(ctx, value);
         let op = ConstOp::new_unlinked(ctx, val).get_operation();
-        self.fbuilder.push(ctx, op);
+        self.fbuilder.push(ctx, op)?;
+        Ok(())
     }
 
-    pub fn call(&mut self, ctx: &mut Context, callee_name: String) {
+    pub fn call(&mut self, ctx: &mut Context, callee_name: String) -> Result<(), FuncBuilderError> {
         let op = CallOp::new_unlinked(ctx, callee_name).get_operation();
-        self.fbuilder.push(ctx, op);
+        self.fbuilder.push(ctx, op)?;
+        Ok(())
     }
 
-    pub fn ret(&mut self, ctx: &mut Context) {
+    pub fn ret(&mut self, ctx: &mut Context) -> Result<(), FuncBuilderError> {
         let op = ReturnOp::new_unlinked(ctx).get_operation();
-        self.fbuilder.push(ctx, op);
+        self.fbuilder.push(ctx, op)?;
+        Ok(())
     }
 
-    pub fn bloop(&mut self, ctx: &mut Context, block_type: &BlockType) {
+    pub fn bloop(
+        &mut self,
+        ctx: &mut Context,
+        block_type: &BlockType,
+    ) -> Result<(), FuncBuilderError> {
         let ty = from_block_type(ctx, block_type);
         let op = LoopOp::new_unlinked(ctx, ty).get_operation();
-        self.fbuilder.push(ctx, op);
+        self.fbuilder.push(ctx, op)?;
+        Ok(())
     }
 
-    pub fn block(&mut self, ctx: &mut Context, block_type: &BlockType) {
+    pub fn block(
+        &mut self,
+        ctx: &mut Context,
+        block_type: &BlockType,
+    ) -> Result<(), FuncBuilderError> {
         let ty = from_block_type(ctx, block_type);
         let op = BlockOp::new_unlinked(ctx, ty).get_operation();
-        self.fbuilder.push(ctx, op);
+        self.fbuilder.push(ctx, op)?;
+        Ok(())
     }
 
-    pub fn end(&mut self, ctx: &mut Context) {
-        self.fbuilder.push_end(ctx);
+    pub fn end(&mut self, ctx: &mut Context) -> Result<(), FuncBuilderError> {
+        self.fbuilder.push_end(ctx)?;
+        Ok(())
     }
 
     pub fn local_get(&mut self, ctx: &mut Context, local_index: u32) {
