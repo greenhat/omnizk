@@ -1,6 +1,7 @@
 //! Semantic equivalence tests for the MidenVM codegen.
 
 #![allow(clippy::unwrap_used)]
+#![allow(unused_variables)]
 
 // mod add;
 mod pub_inputs;
@@ -14,7 +15,6 @@ mod func_call;
 
 use std::ops::RangeFrom;
 
-use c2zk_ir::pass::run_ir_passes;
 use miden_assembly::Assembler;
 use miden_processor::math::Felt;
 use miden_processor::AdviceInputs;
@@ -23,10 +23,12 @@ use miden_processor::StackInputs;
 use miden_processor::VmState;
 use miden_processor::VmStateIterator;
 use miden_stdlib::StdLibrary;
+use ozk_frontend_wasm::WasmFrontendConfig;
+use pliron::context::Context;
 use wasmtime::*;
 use winter_math::StarkField;
 
-use crate::compile_module;
+use crate::InstBuffer;
 use crate::MidenTargetConfig;
 
 fn check_wasm(
@@ -52,14 +54,15 @@ fn check_miden(
 ) {
     use c2zk_frontend::translate;
     use c2zk_frontend::FrontendConfig;
-    use c2zk_frontend::WasmFrontendConfig;
 
     let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
     let target_config = MidenTargetConfig::default();
     let wasm = wat::parse_str(source).unwrap();
-    let mut module = translate(&wasm, frontend).unwrap();
-    run_ir_passes(&mut module, &target_config.ir_passes);
-    let inst_buf = compile_module(module, &target_config).unwrap();
+    let mut ctx = Context::new();
+    let module = translate(&mut ctx, &wasm, frontend).unwrap();
+    // run_ir_passes(&mut module, &target_config.ir_passes);
+    // let inst_buf = compile_module(module, &target_config).unwrap();
+    let inst_buf: InstBuffer = todo!("compile_module");
     let out_source = inst_buf.pretty_print();
     expected_miden.assert_eq(&out_source);
     let program = inst_buf.pretty_print();

@@ -60,14 +60,14 @@ mod tests {
 
     #[cfg(test)]
     fn check(input: &str, expected_tree: expect_test::Expect) {
-        use c2zk_frontend::translate;
+        use c2zk_frontend::translate_old;
         use c2zk_frontend::FrontendConfig;
-        use c2zk_frontend::WasmFrontendConfig;
         use c2zk_ir::pass::run_ir_passes;
+        use ozk_frontend_wasm::WasmFrontendConfig;
 
         let source = wat::parse_str(input).unwrap();
         let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
-        let mut module = translate(&source, frontend).unwrap();
+        let mut module = translate_old(&source, frontend).unwrap();
         let triton_target_config = TritonTargetConfig::default();
         run_ir_passes(&mut module, &triton_target_config.ir_passes);
         let triton_target_config = TritonTargetConfig::default();

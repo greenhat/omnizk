@@ -1,4 +1,4 @@
-pub use c2zk_wasm::WasmFrontendConfig;
+use ozk_frontend_wasm::WasmFrontendConfig;
 
 pub enum FrontendConfig {
     Wasm(WasmFrontendConfig),

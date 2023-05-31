@@ -10,7 +10,9 @@ mod locals;
 
 use std::collections::HashMap;
 
+use c2zk_frontend::translate_old;
 use c2zk_ir::pass::run_ir_passes;
+use ozk_frontend_wasm::WasmFrontendConfig;
 use triton_vm::op_stack::OpStack;
 use triton_vm::vm::VMState;
 use twenty_first::shared_math::b_field_element::BFieldElement;
@@ -46,13 +48,11 @@ fn check_triton(
     expected_output: Vec<u64>,
     expected_triton: expect_test::Expect,
 ) {
-    use c2zk_frontend::translate;
     use c2zk_frontend::FrontendConfig;
-    use c2zk_frontend::WasmFrontendConfig;
 
     let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
     let triton_target_config = TritonTargetConfig::default();
-    let mut module = translate(wasm, frontend).unwrap();
+    let mut module = translate_old(wasm, frontend).unwrap();
     run_ir_passes(&mut module, &triton_target_config.ir_passes);
     let inst_buf = compile_module(module, &triton_target_config).unwrap();
     let out_source = inst_buf.pretty_print();

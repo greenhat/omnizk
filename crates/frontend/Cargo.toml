@@ -13,7 +13,9 @@ categories.workspace = true
 [dependencies]
 c2zk-ir = { workspace = true }
 ozk-frontend-wasm = { workspace = true }
+ozk-wasm-dialect = { workspace = true }
 c2zk-frontend-shared = { workspace = true }
+pliron = { workspace = true }
 derive_more = { workspace = true }
 
 [dev-dependencies]

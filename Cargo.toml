@@ -29,7 +29,7 @@ keywords = ["wasm", "webassembly", "zk", "proof", "verification"]
 categories = ["wasm", "no-std", "virtualization"]
 
 [workspace.dependencies]
-ozk-dialect = { path = "crates/dialects/ozk" }
+ozk-ozk-dialect = { path = "crates/dialects/ozk" }
 ozk-wasm-dialect = { path = "crates/dialects/wasm" }
 c2zk-ir = { path = "crates/ir" }
 c2zk-ir-transform = { path = "crates/ir-transform" }

@@ -22,6 +22,7 @@ twenty-first = { version = "0.19" }
 
 [dev-dependencies]
 c2zk-frontend = { workspace = true }
+ozk-frontend-wasm = { workspace = true }
 c2zk-rust-wasm-tests-helper = { workspace = true }
 c2zk-rust-wasm-tests-bundle1 = { workspace = true }
 wat = { workspace = true }

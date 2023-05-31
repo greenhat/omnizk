@@ -17,6 +17,7 @@ c2zk-frontend = { workspace = true }
 c2zk-frontend-shared = { workspace = true }
 c2zk-ir = { workspace = true }
 ozk-frontend-wasm = { workspace = true }
+pliron = { workspace = true }
 derive_more = { workspace = true }
 
 [dev-dependencies]
