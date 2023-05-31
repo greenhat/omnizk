@@ -52,6 +52,7 @@ pub fn compile_function(
 }
 
 #[allow(clippy::unwrap_used)]
+#[allow(unused_variables)]
 #[cfg(test)]
 mod tests {
 

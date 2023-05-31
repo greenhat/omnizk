@@ -45,6 +45,7 @@ fn check_wasm(
     check_miden(wat, input, secret_input, expected_output, expected_miden);
 }
 
+#[allow(unreachable_code)]
 fn check_miden(
     source: String,
     input: Vec<u64>,
@@ -62,7 +63,8 @@ fn check_miden(
     let module = translate(&mut ctx, &wasm, frontend).unwrap();
     // run_ir_passes(&mut module, &target_config.ir_passes);
     // let inst_buf = compile_module(module, &target_config).unwrap();
-    let inst_buf: InstBuffer = todo!("compile_module");
+    todo!("compile_module");
+    let inst_buf: InstBuffer = InstBuffer::new(&target_config);
     let out_source = inst_buf.pretty_print();
     expected_miden.assert_eq(&out_source);
     let program = inst_buf.pretty_print();
