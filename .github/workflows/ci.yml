@@ -49,6 +49,9 @@ jobs:
     steps:
       - name:                   Checkout repository
         uses:                   actions/checkout@v2
+      - name:                   Install dependencies
+        run: |
+          rustup target add wasm32-unknown-unknown
       - name:                   Generate code coverage
         run: |
           cargo tarpaulin --verbose --all-features --workspace --timeout=360 --out Lcov
