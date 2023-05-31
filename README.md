@@ -33,7 +33,7 @@ OmniZK is highly modular, so you can use only crates needed for your use case - 
 
 ### Compile Rust to Triton VM via Wasm
 
-The following [Fibonacci example](https://github.com/greenhat/omnizk/blob/main/crates/rust-wasm-tests/bundle1/src/fib.rs) in Rust:
+The following [Fibonacci example](https://github.com/greenhat/omnizk/blob/main/crates/rust-wasm-tests/fib/src/fib.rs) in Rust:
 ```rust
 use ozk_stdlib::*;
 

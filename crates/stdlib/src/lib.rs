@@ -53,6 +53,7 @@ macro_rules! entry {
     };
 }
 
+#[no_mangle]
 pub fn pub_input() -> u64 {
     #[cfg(feature = "std")]
     #[cfg(not(target_arch = "wasm32"))]
@@ -62,6 +63,7 @@ pub fn pub_input() -> u64 {
     return io_wasm::pub_input();
 }
 
+#[no_mangle]
 pub fn pub_output(x: u64) {
     #[cfg(feature = "std")]
     #[cfg(not(target_arch = "wasm32"))]
@@ -71,6 +73,7 @@ pub fn pub_output(x: u64) {
     return io_wasm::pub_output(x);
 }
 
+#[no_mangle]
 pub fn secret_input() -> u64 {
     #[cfg(feature = "std")]
     #[cfg(not(target_arch = "wasm32"))]

@@ -1,5 +1,6 @@
 use c2zk_stdlib::*;
 
+#[no_mangle]
 pub fn fib_seq() {
     let n = pub_input() as u32;
     let mut a: u32 = 0;
