@@ -8,10 +8,10 @@ fn test_add() {
     let secret_input = vec![3];
     let expected_output = vec![21];
     let native_output = c2zk_rust_wasm_tests_helper::wrap_main_with_io(
-        &c2zk_rust_wasm_tests_bundle1::add::main,
+        &c2zk_rust_wasm_tests_add::add::main_add,
     )(input.clone(), secret_input.clone());
     assert_eq!(native_output, expected_output);
-    let wasm_bytes = c2zk_rust_wasm_tests_helper::compile_rust_wasm_tests_bundle1_bin("add");
+    let wasm_bytes = c2zk_rust_wasm_tests_helper::compile_rust_wasm_tests("add-bin", "add");
     check_wasm(
         &wasm_bytes,
         input,
@@ -27,29 +27,29 @@ fn test_add() {
               (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
               (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
               (func $__main (;3;) (type 2)
-                call $_ZN28c2zk_rust_wasm_tests_bundle13add4main17hc047b7630b61d543E
+                call $main_add
               )
-              (func $_ZN28c2zk_rust_wasm_tests_bundle13add3add17h8212e59c2be7580eE (;4;) (type 3) (param i64 i64) (result i64)
+              (func $add (;4;) (type 3) (param i64 i64) (result i64)
                 local.get 1
                 local.get 0
                 i64.add
               )
-              (func $_ZN28c2zk_rust_wasm_tests_bundle13add4main17hc047b7630b61d543E (;5;) (type 2)
-                call $_ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E
-                call $_ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E
-                call $_ZN28c2zk_rust_wasm_tests_bundle13add3add17h8212e59c2be7580eE
-                call $_ZN11c2zk_stdlib12secret_input17h461ee9797344b4dcE
-                call $_ZN28c2zk_rust_wasm_tests_bundle13add3add17h8212e59c2be7580eE
-                call $_ZN11c2zk_stdlib10pub_output17h88275f26ad69ad8bE
+              (func $main_add (;5;) (type 2)
+                call $pub_input
+                call $pub_input
+                call $add
+                call $secret_input
+                call $add
+                call $pub_output
               )
-              (func $_ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E (;6;) (type 0) (result i64)
+              (func $pub_input (;6;) (type 0) (result i64)
                 call $c2zk_stdlib_pub_input
               )
-              (func $_ZN11c2zk_stdlib10pub_output17h88275f26ad69ad8bE (;7;) (type 1) (param i64)
+              (func $pub_output (;7;) (type 1) (param i64)
                 local.get 0
                 call $c2zk_stdlib_pub_output
               )
-              (func $_ZN11c2zk_stdlib12secret_input17h461ee9797344b4dcE (;8;) (type 0) (result i64)
+              (func $secret_input (;8;) (type 0) (result i64)
                 call $c2zk_stdlib_secret_input
               )
               (memory (;0;) 16)
@@ -58,6 +58,11 @@ fn test_add() {
               (global (;2;) i32 i32.const 1048576)
               (export "memory" (memory 0))
               (export "__main" (func $__main))
+              (export "main_add" (func $main_add))
+              (export "add" (func $add))
+              (export "pub_input" (func $pub_input))
+              (export "secret_input" (func $secret_input))
+              (export "pub_output" (func $pub_output))
               (export "__data_end" (global 1))
               (export "__heap_base" (global 2))
             )"#]],
@@ -100,9 +105,9 @@ fn test_add() {
             return
             __main:
             call init_mem_for_locals
-            call _ZN28c2zk_rust_wasm_tests_bundle13add4main17hc047b7630b61d543E
+            call main_add
             return
-            _ZN28c2zk_rust_wasm_tests_bundle13add3add17h8212e59c2be7580eE:
+            add:
             push -1
             call globals_get
             dup0
@@ -145,18 +150,18 @@ fn test_add() {
             push -1
             call globals_set
             return
-            _ZN28c2zk_rust_wasm_tests_bundle13add4main17hc047b7630b61d543E:
-            call _ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E
-            call _ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E
-            call _ZN28c2zk_rust_wasm_tests_bundle13add3add17h8212e59c2be7580eE
-            call _ZN11c2zk_stdlib12secret_input17h461ee9797344b4dcE
-            call _ZN28c2zk_rust_wasm_tests_bundle13add3add17h8212e59c2be7580eE
-            call _ZN11c2zk_stdlib10pub_output17h88275f26ad69ad8bE
+            main_add:
+            call pub_input
+            call pub_input
+            call add
+            call secret_input
+            call add
+            call pub_output
             return
-            _ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E:
+            pub_input:
             call c2zk_stdlib_pub_input
             return
-            _ZN11c2zk_stdlib10pub_output17h88275f26ad69ad8bE:
+            pub_output:
             push -1
             call globals_get
             dup0
@@ -184,7 +189,7 @@ fn test_add() {
             push -1
             call globals_set
             return
-            _ZN11c2zk_stdlib12secret_input17h461ee9797344b4dcE:
+            secret_input:
             call c2zk_stdlib_secret_input
             return
             init_mem_for_locals:

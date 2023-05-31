@@ -1,0 +1,8 @@
+[package]
+name = "c2zk-rust-wasm-tests-fib-bin"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+c2zk-stdlib = { path = "../../stdlib", features = [] }
+c2zk-rust-wasm-tests-fib = { path = "../fib" }

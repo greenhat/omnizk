@@ -33,7 +33,7 @@ OmniZK is highly modular, so you can use only crates needed for your use case - 
 
 ### Compile Rust to Triton VM via Wasm
 
-The following [Fibonacci example](https://github.com/greenhat/omnizk/blob/main/crates/rust-wasm-tests/bundle1/src/fib.rs) in Rust:
+The following [Fibonacci example](https://github.com/greenhat/omnizk/blob/main/crates/rust-wasm-tests/fib/src/fib.rs) in Rust:
 ```rust
 use ozk_stdlib::*;
 
@@ -51,3 +51,12 @@ pub fn fib_seq() {
 ```
 
 Is compiled to the following fully executable [Triton VM code](https://github.com/greenhat/omnizk/blob/main/crates/codegen-tritonvm/src/codegen/sem_tests/fib.rs#L146).
+
+
+## How to build and run tests
+
+Add rust Wasm target:
+```bash
+rustup target add wasm32-unknown-unknown
+```
+and 'cargo build` and 'cargo test' should work fine.

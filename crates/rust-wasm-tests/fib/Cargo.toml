@@ -1,5 +1,5 @@
 [package]
-name = "c2zk-rust-wasm-tests-bundle1"
+name = "c2zk-rust-wasm-tests-fib"
 version = "0.1.0"
 edition = "2021"
 

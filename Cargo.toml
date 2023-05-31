@@ -9,16 +9,15 @@ members = [
   "crates/codegen-shared",
   "crates/compiler",
   "crates/stdlib",
-  "crates/rust-wasm-tests/bundle1",
+  "crates/rust-wasm-tests/fib",
+  "crates/rust-wasm-tests/add",
   "crates/rust-wasm-tests-helper",
 ]
-exclude = [ "crates/rust-wasm-tests/bundle1-bin"]
+exclude = ["crates/rust-wasm-tests/fib-bin", "crates/rust-wasm-tests/add-bin"]
 resolver = "2"
 
 [workspace.package]
-authors = [
-    "Denys Zadorozhny <denys@zadorozhnyi.com>"
-]
+authors = ["Denys Zadorozhny <denys@zadorozhnyi.com>"]
 repository = "https://github.com/greenhat/c2zk"
 edition = "2021"
 readme = "README.md"
@@ -36,7 +35,8 @@ c2zk-codegen = { path = "crates/codegen" }
 c2zk-codegen-shared = { path = "crates/codegen-shared" }
 c2zk-codegen-tritonvm = { path = "crates/codegen-tritonvm" }
 c2zk-stdlib = { path = "crates/stdlib" }
-c2zk-rust-wasm-tests-bundle1 = { path = "crates/rust-wasm-tests/bundle1" }
+c2zk-rust-wasm-tests-fib = { path = "crates/rust-wasm-tests/fib" }
+c2zk-rust-wasm-tests-add = { path = "crates/rust-wasm-tests/add" }
 c2zk-rust-wasm-tests-helper = { path = "crates/rust-wasm-tests-helper" }
 wasmparser = { version = "0.94", features = ["deterministic"] }
 log = { version = "0.4.8", default-features = false }
