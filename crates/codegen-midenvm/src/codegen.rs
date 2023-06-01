@@ -58,21 +58,30 @@ mod tests {
 
     use super::*;
     use expect_test::expect;
+    use pliron::context::Context;
+    use pliron::dialects;
+
+    pub(crate) fn setup_context_dialects() -> Context {
+        let mut ctx = Context::new();
+        ozk_wasm_dialect::register(&mut ctx);
+        ozk_ozk_dialect::register(&mut ctx);
+        dialects::builtin::register(&mut ctx);
+        ctx
+    }
 
     #[cfg(test)]
     fn check(input: &str, expected_tree: expect_test::Expect) {
         use c2zk_frontend::translate;
         use c2zk_frontend::FrontendConfig;
         use ozk_frontend_wasm::WasmFrontendConfig;
-        use pliron::context::Context;
 
         let source = wat::parse_str(input).unwrap();
         let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
-        let mut ctx = Context::new();
+        let mut ctx = setup_context_dialects();
         let module = translate(&mut ctx, &source, frontend).unwrap();
         let triton_target_config = MidenTargetConfig::default();
         // run_ir_passes(&mut module, &triton_target_config.ir_passes);
-        // let triton_target_config = MidenTargetConfig::default();
+        let triton_target_config = MidenTargetConfig::default();
         // dbg!(&module);
         // let inst_buf = compile_module(module, &triton_target_config).unwrap();
         // let out_source = inst_buf.pretty_print();

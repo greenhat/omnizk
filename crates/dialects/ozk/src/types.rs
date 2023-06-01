@@ -2,7 +2,6 @@ use pliron::common_traits::DisplayWithContext;
 use pliron::common_traits::Verify;
 use pliron::context::Context;
 use pliron::context::Ptr;
-use pliron::dialects::builtin::types::IntegerType;
 use pliron::error::CompilerError;
 use pliron::impl_type;
 use pliron::r#type::Type;
@@ -54,6 +53,5 @@ impl Verify for FieldElemType {
 }
 
 pub(crate) fn register(dialect: &mut pliron::dialect::Dialect) {
-    IntegerType::register_type_in_dialect(dialect);
     FieldElemType::register_type_in_dialect(dialect);
 }

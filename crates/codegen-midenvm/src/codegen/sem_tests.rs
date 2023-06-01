@@ -24,12 +24,12 @@ use miden_processor::VmState;
 use miden_processor::VmStateIterator;
 use miden_stdlib::StdLibrary;
 use ozk_frontend_wasm::WasmFrontendConfig;
-use pliron::context::Context;
 use wasmtime::*;
 use winter_math::StarkField;
 
 use crate::InstBuffer;
 use crate::MidenTargetConfig;
+use crate::codegen::tests::setup_context_dialects;
 
 fn check_wasm(
     source: &[u8],
@@ -59,7 +59,7 @@ fn check_miden(
     let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
     let target_config = MidenTargetConfig::default();
     let wasm = wat::parse_str(source).unwrap();
-    let mut ctx = Context::new();
+    let mut ctx = setup_context_dialects();
     let module = translate(&mut ctx, &wasm, frontend).unwrap();
     // run_ir_passes(&mut module, &target_config.ir_passes);
     // let inst_buf = compile_module(module, &target_config).unwrap();
