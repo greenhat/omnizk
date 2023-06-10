@@ -14,9 +14,11 @@ categories.workspace = true
 derive_more = { workspace = true }
 thiserror = { workspace = true }
 pliron = { workspace = true }
-intertrait = "0.2.2"
+intertrait = { workspace = true }
 # Required by intertrait
-linkme = "0.2"
-indent = "0.1.1"
+linkme = { workspace = true }
+indent = { workspace = true }
+paste = { workspace = true }
+inventory = { workspace = true }
 
 [dev-dependencies]

@@ -11,12 +11,14 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
+winter-math = { version = "0.6", default-features = false }
 derive_more = { workspace = true }
 thiserror = { workspace = true }
 pliron = { workspace = true }
-intertrait = "0.2.2"
+intertrait = { workspace = true }
 # Required by intertrait
-linkme = "0.2"
-winter-math = { version = "0.6", default-features = false }
+linkme = { workspace = true }
+paste = { workspace = true }
+inventory = { workspace = true }
 
 [dev-dependencies]

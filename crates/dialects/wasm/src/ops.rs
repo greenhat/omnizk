@@ -51,7 +51,6 @@ declare_op!(
     "wasm"
 );
 
-impl AttachContext for ModuleOp {}
 impl DisplayWithContext for ModuleOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let region = self.get_region(ctx).with_ctx(ctx).to_string();
@@ -67,7 +66,7 @@ impl DisplayWithContext for ModuleOp {
 
 impl Verify for ModuleOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
-        self.verify_one_region(ctx)?;
+        self.verify_interfaces(ctx)?;
         self.get_region(ctx).deref(ctx).verify(ctx)
     }
 }
@@ -199,7 +198,6 @@ impl OneRegionInterface for FuncOp {}
 #[cast_to]
 impl SymbolOpInterface for FuncOp {}
 
-impl AttachContext for FuncOp {}
 impl DisplayWithContext for FuncOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let region = self.get_region(ctx).with_ctx(ctx).to_string();
@@ -234,7 +232,7 @@ impl Verify for FuncOp {
                 msg: "Incorrect number of results or operands".to_string(),
             });
         }
-        self.verify_one_region(ctx)?;
+        self.verify_interfaces(ctx)?;
         self.get_entry_block(ctx).verify(ctx)?;
         Ok(())
     }
@@ -283,7 +281,6 @@ impl ConstOp {
     }
 }
 
-impl AttachContext for ConstOp {}
 impl DisplayWithContext for ConstOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
@@ -362,7 +359,6 @@ impl AddOp {
     }
 }
 
-impl AttachContext for AddOp {}
 impl DisplayWithContext for AddOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.get_opid().with_ctx(ctx),)
@@ -429,7 +425,6 @@ impl CallOp {
     }
 }
 
-impl AttachContext for CallOp {}
 impl DisplayWithContext for CallOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
@@ -480,7 +475,6 @@ impl ReturnOp {
     }
 }
 
-impl AttachContext for ReturnOp {}
 impl DisplayWithContext for ReturnOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.get_opid().with_ctx(ctx),)
@@ -567,7 +561,6 @@ impl BlockOp {
 }
 
 impl OneRegionInterface for BlockOp {}
-impl AttachContext for BlockOp {}
 impl DisplayWithContext for BlockOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let region = self.get_region(ctx).with_ctx(ctx).to_string();
@@ -601,7 +594,7 @@ impl Verify for BlockOp {
                 msg: "Incorrect number of results or operands".to_string(),
             });
         }
-        self.verify_one_region(ctx)?;
+        self.verify_interfaces(ctx)?;
         self.get_block(ctx).verify(ctx)?;
         Ok(())
     }
@@ -670,7 +663,6 @@ impl LoopOp {
 }
 
 impl OneRegionInterface for LoopOp {}
-impl AttachContext for LoopOp {}
 impl DisplayWithContext for LoopOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let region = self.get_region(ctx).with_ctx(ctx).to_string();
@@ -704,7 +696,7 @@ impl Verify for LoopOp {
                 msg: "Incorrect number of results or operands".to_string(),
             });
         }
-        self.verify_one_region(ctx)?;
+        self.verify_interfaces(ctx)?;
         self.get_block(ctx).verify(ctx)?;
         Ok(())
     }
@@ -749,7 +741,6 @@ impl LocalGetOp {
     }
 }
 
-impl AttachContext for LocalGetOp {}
 impl DisplayWithContext for LocalGetOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(

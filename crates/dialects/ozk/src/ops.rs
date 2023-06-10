@@ -57,7 +57,6 @@ impl ConstantOp {
     }
 }
 
-impl AttachContext for ConstantOp {}
 impl DisplayWithContext for ConstantOp {
     #[allow(clippy::expect_used)]
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
