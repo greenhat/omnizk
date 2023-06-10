@@ -78,7 +78,7 @@ mod tests {
         let source = wat::parse_str(input).unwrap();
         let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
         let mut ctx = setup_context_dialects();
-        let module = translate(&mut ctx, &source, frontend).unwrap();
+        let module_op = translate(&mut ctx, &source, frontend).unwrap();
         let triton_target_config = MidenTargetConfig::default();
         // run_ir_passes(&mut module, &triton_target_config.ir_passes);
         let triton_target_config = MidenTargetConfig::default();
