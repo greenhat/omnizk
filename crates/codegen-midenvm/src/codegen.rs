@@ -76,7 +76,7 @@ mod tests {
         use c2zk_ir_transform::miden::WasmToMidenLoweringPass;
         use ozk_frontend_wasm::WasmFrontendConfig;
         use pliron::op::Op;
-        use pliron::pass::PassManager;
+        use pliron::pass::Pass;
         use pliron::with_context::AttachContext;
 
         let source = wat::parse_str(input).unwrap();
@@ -85,9 +85,9 @@ mod tests {
         let module_op = translate(&mut ctx, &source, frontend).unwrap();
         let triton_target_config = MidenTargetConfig::default();
 
-        let mut pm = PassManager::new();
-        pm.add_pass(Box::<WasmToMidenLoweringPass>::default());
-        pm.run(&mut ctx, module_op.get_operation()).unwrap();
+        let pass = WasmToMidenLoweringPass::default();
+        pass.run_on_operation(&mut ctx, module_op.get_operation())
+            .unwrap();
 
         expected_tree.assert_eq(&module_op.with_ctx(&ctx).to_string());
     }

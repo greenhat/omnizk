@@ -21,11 +21,7 @@ impl Pass for WasmToMidenLoweringPass {
         "WasmToMidenLoweringPass"
     }
 
-    fn run_on_operation(
-        &mut self,
-        ctx: &mut Context,
-        op: Ptr<Operation>,
-    ) -> Result<(), CompilerError> {
+    fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), CompilerError> {
         let mut target = ConversionTarget::default();
         target.add_illegal_dialect(WASM_DIALECT(ctx));
         target.add_legal_dialect(MIDEN_DIALECT(ctx));
