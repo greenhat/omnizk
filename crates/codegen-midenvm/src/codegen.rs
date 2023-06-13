@@ -73,9 +73,10 @@ mod tests {
     fn check(input: &str, expected_tree: expect_test::Expect) {
         use c2zk_frontend::translate;
         use c2zk_frontend::FrontendConfig;
+        use c2zk_ir_transform::miden::WasmToMidenLoweringPass;
         use ozk_frontend_wasm::WasmFrontendConfig;
-        // use pliron::op::Op;
-        // use pliron::pass::PassManager;
+        use pliron::op::Op;
+        use pliron::pass::PassManager;
         use pliron::with_context::AttachContext;
 
         let source = wat::parse_str(input).unwrap();
@@ -84,9 +85,9 @@ mod tests {
         let module_op = translate(&mut ctx, &source, frontend).unwrap();
         let triton_target_config = MidenTargetConfig::default();
 
-        // let mut pm = PassManager::new();
-        // pm.add_pass(Box::<WasmToMidenLoweringPass>::default());
-        // pm.run(&mut ctx, module_op.get_operation()).unwrap();
+        let mut pm = PassManager::new();
+        pm.add_pass(Box::<WasmToMidenLoweringPass>::default());
+        pm.run(&mut ctx, module_op.get_operation()).unwrap();
 
         expected_tree.assert_eq(&module_op.with_ctx(&ctx).to_string());
     }
@@ -106,7 +107,7 @@ mod tests {
                   block_1_0():
                     wasm.func @f1() -> () {
                       entry():
-                        wasm.const 0x1: si32
+                        miden.constant 1: felt
                         wasm.return
                     }
                 }"#]],
