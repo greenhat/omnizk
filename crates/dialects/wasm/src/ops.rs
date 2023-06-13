@@ -149,6 +149,19 @@ impl FuncOp {
     /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
     /// The returned function has a single region with an empty `entry` block.
     pub fn new_unlinked(ctx: &mut Context, name: &str, ty: Ptr<TypeObj>) -> FuncOp {
+        let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
+        Self::new_unlinked_with_block(ctx, name, ty, body)
+    }
+
+    /// Create a new [FuncOp].
+    /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
+    /// The returned function has a single region with a passed `entry` block.
+    pub fn new_unlinked_with_block(
+        ctx: &mut Context,
+        name: &str,
+        ty: Ptr<TypeObj>,
+        entry_block: Ptr<BasicBlock>,
+    ) -> FuncOp {
         let ty_attr = TypeAttr::create(ty);
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
         {
@@ -158,10 +171,8 @@ impl FuncOp {
         }
         let opop = FuncOp { op };
         // Create an empty entry block.
-        #[allow(clippy::expect_used)]
         let region = opop.get_region(ctx);
-        let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
-        body.insert_at_front(region, ctx);
+        entry_block.insert_at_front(region, ctx);
 
         opop.set_symbol_name(ctx, name);
 
@@ -247,12 +258,12 @@ declare_op!(
     /// |-----|-------|
     /// |[ATTR_KEY_VALUE](ConstantOp::ATTR_KEY_VALUE) | [IntegerAttr] or [FloatAttr] |
     ///
-    ConstOp,
+    ConstantOp,
     "const",
     "wasm"
 );
 
-impl ConstOp {
+impl ConstantOp {
     /// Attribute key for the constant value.
     pub const ATTR_KEY_VALUE: &str = "const.value";
     /// Get the constant value that this Op defines.
@@ -272,16 +283,16 @@ impl ConstOp {
 
     /// Create a new [ConstOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, val: AttrObj) -> ConstOp {
+    pub fn new_unlinked(ctx: &mut Context, val: AttrObj) -> ConstantOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_VALUE, val);
-        ConstOp { op }
+        ConstantOp { op }
     }
 }
 
-impl DisplayWithContext for ConstOp {
+impl DisplayWithContext for ConstantOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
             f,
@@ -292,7 +303,7 @@ impl DisplayWithContext for ConstOp {
     }
 }
 
-impl Verify for ConstOp {
+impl Verify for ConstantOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
         let value = self.get_value(ctx);
         if !(value.is::<IntegerAttr>() || value.is::<FloatAttr>()) {
@@ -336,13 +347,13 @@ impl AddOp {
     pub const ATTR_KEY_OP_TYPE: &str = "add.type";
     /// Create a new [AddOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, ty: Ptr<TypeObj>) -> ConstOp {
+    pub fn new_unlinked(ctx: &mut Context, ty: Ptr<TypeObj>) -> ConstantOp {
         let ty_attr = TypeAttr::create(ty);
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_OP_TYPE, ty_attr);
-        ConstOp { op }
+        ConstantOp { op }
     }
 
     pub fn get_type(&self, ctx: &Context) -> Ptr<TypeObj> {
@@ -783,7 +794,9 @@ impl Verify for LocalGetOp {
 }
 
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
-    ConstOp::register(ctx, dialect);
+    ModuleOp::register(ctx, dialect);
+    ConstantOp::register(ctx, dialect);
+    FuncOp::register(ctx, dialect);
     AddOp::register(ctx, dialect);
     CallOp::register(ctx, dialect);
     ReturnOp::register(ctx, dialect);

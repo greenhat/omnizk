@@ -32,7 +32,7 @@ categories = ["wasm", "no-std", "virtualization"]
 [workspace.dependencies]
 ozk-ozk-dialect = { path = "crates/dialects/ozk" }
 ozk-wasm-dialect = { path = "crates/dialects/wasm" }
-ozk_miden-dialect = { path = "crates/dialects/miden" }
+ozk-miden-dialect = { path = "crates/dialects/miden" }
 c2zk-ir = { path = "crates/ir" }
 c2zk-ir-transform = { path = "crates/ir-transform" }
 c2zk-frontend = { path = "crates/frontend" }
@@ -66,3 +66,4 @@ intertrait = "0.2.2"
 linkme = "0.2"
 indent = "0.1.1"
 once_cell = "1.15.0"
+anyhow = "1.0.44"

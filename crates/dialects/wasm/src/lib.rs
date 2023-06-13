@@ -27,8 +27,20 @@ use pliron::dialect::Dialect;
 use pliron::dialect::DialectName;
 
 pub fn register(ctx: &mut Context) {
-    let mut dialect = Dialect::new(DialectName::new("wasm"));
+    let mut dialect = Dialect::new(WASM_DIALECT_NAME());
     ops::register(ctx, &mut dialect);
     // types::register(&mut dialect);
     // attributes::register(&mut dialect);
+    dialect.register(ctx);
+}
+
+#[allow(non_snake_case)]
+pub fn WASM_DIALECT_NAME() -> DialectName {
+    DialectName::new("wasm")
+}
+
+#[allow(non_snake_case)]
+pub fn WASM_DIALECT(ctx: &Context) -> &Dialect {
+    #[allow(clippy::unwrap_used)]
+    Dialect::get_ref(ctx, WASM_DIALECT_NAME()).unwrap()
 }

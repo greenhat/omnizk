@@ -29,6 +29,8 @@ use pliron::operation::Operation;
 use pliron::r#type::TypeObj;
 use pliron::with_context::AttachContext;
 
+use crate::attributes::FieldElemAttr;
+
 declare_op!(
     /// Represents a Miden module, a top level container operation.
     ///
@@ -236,22 +238,15 @@ impl Verify for FuncOp {
 }
 
 declare_op!(
-    /// Push numeric constant on stack.
-    ///
-    /// Attributes:
-    ///
-    /// | key | value |
-    /// |-----|-------|
-    /// |[ATTR_KEY_VALUE](ConstantOp::ATTR_KEY_VALUE) | [IntegerAttr] or [FloatAttr] |
-    ///
-    ConstOp,
-    "const",
+    /// Pushes numeric constant on the stack.
+    ConstantOp,
+    "constant",
     "miden"
 );
 
-impl ConstOp {
+impl ConstantOp {
     /// Attribute key for the constant value.
-    pub const ATTR_KEY_VALUE: &str = "const.value";
+    pub const ATTR_KEY_VALUE: &str = "constant.value";
     /// Get the constant value that this Op defines.
     pub fn get_value(&self, ctx: &Context) -> AttrObj {
         let op = self.get_operation().deref(ctx);
@@ -263,22 +258,23 @@ impl ConstOp {
         if value.is::<IntegerAttr>() {
             attribute::clone::<IntegerAttr>(value)
         } else {
-            attribute::clone::<FloatAttr>(value)
+            attribute::clone::<FieldElemAttr>(value)
         }
     }
 
-    /// Create a new [ConstOp]. The underlying [Operation] is not linked to a
+    /// Create a new [ConstantOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, val: AttrObj) -> ConstOp {
+    pub fn new_unlinked(ctx: &mut Context, value: FieldElemAttr) -> ConstantOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
-            .insert(Self::ATTR_KEY_VALUE, val);
-        ConstOp { op }
+            .insert(Self::ATTR_KEY_VALUE, Box::new(value));
+        ConstantOp { op }
     }
 }
 
-impl DisplayWithContext for ConstOp {
+impl DisplayWithContext for ConstantOp {
+    #[allow(clippy::expect_used)]
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
             f,
@@ -289,10 +285,10 @@ impl DisplayWithContext for ConstOp {
     }
 }
 
-impl Verify for ConstOp {
+impl Verify for ConstantOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
         let value = self.get_value(ctx);
-        if !(value.is::<IntegerAttr>() || value.is::<FloatAttr>()) {
+        if !value.is::<FieldElemAttr>() {
             return Err(CompilerError::VerificationError {
                 msg: "Unexpected constant type".to_string(),
             });
@@ -333,13 +329,13 @@ impl AddOp {
     pub const ATTR_KEY_OP_TYPE: &str = "add.type";
     /// Create a new [AddOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, ty: Ptr<TypeObj>) -> ConstOp {
+    pub fn new_unlinked(ctx: &mut Context, ty: Ptr<TypeObj>) -> ConstantOp {
         let ty_attr = TypeAttr::create(ty);
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_OP_TYPE, ty_attr);
-        ConstOp { op }
+        ConstantOp { op }
     }
 
     pub fn get_type(&self, ctx: &Context) -> Ptr<TypeObj> {
@@ -539,7 +535,7 @@ impl Verify for LocalGetOp {
 }
 
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
-    ConstOp::register(ctx, dialect);
+    ConstantOp::register(ctx, dialect);
     AddOp::register(ctx, dialect);
     CallOp::register(ctx, dialect);
     LocalGetOp::register(ctx, dialect);

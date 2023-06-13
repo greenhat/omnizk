@@ -20,6 +20,7 @@ linkme = { workspace = true }
 indent = { workspace = true }
 paste = { workspace = true }
 inventory = { workspace = true }
+winter-math = { version = "0.6", default-features = false }
 
 
 [dev-dependencies]

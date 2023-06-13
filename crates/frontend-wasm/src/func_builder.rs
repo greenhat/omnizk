@@ -13,7 +13,6 @@ use thiserror::Error;
 use crate::op_builder::OpBuilder;
 
 pub struct FuncBuilder {
-    // ctx: &'a mut Context,
     name: String,
     sig: Option<Ptr<TypeObj>>,
     blocks: Vec<BlockBuilder>,
@@ -28,7 +27,7 @@ impl FuncBuilder {
             locals: Vec::new(),
             blocks: vec![BlockBuilder::FuncEntryBlock(BasicBlock::new(
                 ctx,
-                None,
+                Some("entry".to_string()),
                 Vec::new(),
             ))],
         }
@@ -44,7 +43,7 @@ impl FuncBuilder {
         self.locals.extend(locals);
     }
 
-    pub fn build(self, ctx: &mut Context) -> Result<FuncOp, FuncBuilderError> {
+    pub fn build(mut self, ctx: &mut Context) -> Result<FuncOp, FuncBuilderError> {
         let sig = self.sig.ok_or_else(|| {
             FuncBuilderError::MissingSignature(format!("FuncBuilder for {}", self.name))
         })?;
@@ -60,7 +59,14 @@ impl FuncBuilder {
         //         },
         //     );
         // }
-        Ok(FuncOp::new_unlinked(ctx, &self.name, sig))
+
+        match self.blocks.pop() {
+            Some(BlockBuilder::FuncEntryBlock(entry_bb)) => {
+                let func_op = FuncOp::new_unlinked_with_block(ctx, &self.name, sig, entry_bb);
+                Ok(func_op)
+            }
+            _ => todo!("error"),
+        }
     }
 
     pub fn op(&mut self) -> OpBuilder {
@@ -68,6 +74,7 @@ impl FuncBuilder {
     }
 
     pub fn push(&mut self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), FuncBuilderError> {
+        // dbg!(op.with_ctx(ctx).to_string());
         let opop = &op.deref(ctx).get_op(ctx);
         if let Some(block) = opop.downcast_ref::<BlockOp>() {
             self.blocks.push(BlockBuilder::Block(*block));
@@ -89,7 +96,12 @@ impl FuncBuilder {
     pub fn push_end(&mut self, ctx: &mut Context) -> Result<(), FuncBuilderError> {
         if let Some(ending_block_builder) = self.blocks.pop() {
             match ending_block_builder {
-                BlockBuilder::FuncEntryBlock(_) => Ok(()), // do nothing, it's function end
+                BlockBuilder::FuncEntryBlock(entry_bb) => {
+                    // it's function end, add it back to the stack as FuncEntryBlock
+                    // TODO: ugly. fix it.
+                    self.blocks.push(BlockBuilder::FuncEntryBlock(entry_bb));
+                    Ok(())
+                }
                 BlockBuilder::Block(block) => {
                     let current_bb = self
                         .blocks

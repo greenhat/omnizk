@@ -1,6 +1,6 @@
 use ozk_wasm_dialect::ops::BlockOp;
 use ozk_wasm_dialect::ops::CallOp;
-use ozk_wasm_dialect::ops::ConstOp;
+use ozk_wasm_dialect::ops::ConstantOp;
 use ozk_wasm_dialect::ops::LoopOp;
 use ozk_wasm_dialect::ops::ReturnOp;
 use ozk_wasm_dialect::types::i32_type;
@@ -35,14 +35,14 @@ impl<'a> OpBuilder<'a> {
 
     pub fn i32const(&mut self, ctx: &mut Context, value: i32) -> Result<(), FuncBuilderError> {
         let val = OpBuilder::i32_attr(ctx, value);
-        let op = ConstOp::new_unlinked(ctx, val).get_operation();
+        let op = ConstantOp::new_unlinked(ctx, val).get_operation();
         self.fbuilder.push(ctx, op)?;
         Ok(())
     }
 
     pub fn i64const(&mut self, ctx: &mut Context, value: i64) -> Result<(), FuncBuilderError> {
         let val = OpBuilder::i64_attr(ctx, value);
-        let op = ConstOp::new_unlinked(ctx, val).get_operation();
+        let op = ConstantOp::new_unlinked(ctx, val).get_operation();
         self.fbuilder.push(ctx, op)?;
         Ok(())
     }

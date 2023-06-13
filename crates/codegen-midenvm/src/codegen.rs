@@ -64,8 +64,8 @@ mod tests {
     pub(crate) fn setup_context_dialects() -> Context {
         let mut ctx = Context::new();
         ozk_wasm_dialect::register(&mut ctx);
-        ozk_ozk_dialect::register(&mut ctx);
         dialects::builtin::register(&mut ctx);
+        ozk_miden_dialect::register(&mut ctx);
         ctx
     }
 
@@ -74,18 +74,21 @@ mod tests {
         use c2zk_frontend::translate;
         use c2zk_frontend::FrontendConfig;
         use ozk_frontend_wasm::WasmFrontendConfig;
+        // use pliron::op::Op;
+        // use pliron::pass::PassManager;
+        use pliron::with_context::AttachContext;
 
         let source = wat::parse_str(input).unwrap();
         let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
         let mut ctx = setup_context_dialects();
         let module_op = translate(&mut ctx, &source, frontend).unwrap();
         let triton_target_config = MidenTargetConfig::default();
-        // run_ir_passes(&mut module, &triton_target_config.ir_passes);
-        let triton_target_config = MidenTargetConfig::default();
-        // dbg!(&module);
-        // let inst_buf = compile_module(module, &triton_target_config).unwrap();
-        // let out_source = inst_buf.pretty_print();
-        // expected_tree.assert_eq(&out_source);
+
+        // let mut pm = PassManager::new();
+        // pm.add_pass(Box::<WasmToMidenLoweringPass>::default());
+        // pm.run(&mut ctx, module_op.get_operation()).unwrap();
+
+        expected_tree.assert_eq(&module_op.with_ctx(&ctx).to_string());
     }
 
     #[test]
@@ -99,105 +102,14 @@ mod tests {
         return)
 )"#,
             expect![[r#"
-                proc.f1.0
-                push.1
-                end
-
-                proc.globals_get.0
-                push.18446744069414584317
-                mul
-                push.2147467263
-                add
-                mem_load
-                end
-
-                proc.globals_set.0
-                push.18446744069414584317
-                mul
-                push.2147467263
-                add
-                swap.1
-                swap.1
-                mem_store
-                end
-
-                proc.save_pub_inputs.2
-                push.2147483647
-                loc_store.0
-                sdepth
-                loc_store.1
-                push.1
-                while.true
-                dup.0
-                neq.0
-                if.true
-                loc_load.0
-                dup.0
-                swap.2
-                swap.1
-                mem_store
-                push.8
-                sub
-                loc_store.0
-                else
-                drop
-                end
-
-                loc_load.1
-                push.1
-                sub
-                dup.0
-                loc_store.1
-                neq.0
-                end
-
-                loc_load.0
-                push.0
-                exec.globals_set
-                end
-
-                proc.init_pub_outputs.0
-                push.2147483647
-                push.1
-                exec.globals_set
-                end
-
-                proc.load_pub_outputs_on_stack.2
-                push.2147483647
-                dup.0
-                loc_store.0
-                push.1
-                exec.globals_get
-                dup.0
-                loc_store.1
-                sub
-                neq.0
-                while.true
-                loc_load.0
-                mem_load
-                loc_load.0
-                push.8
-                sub
-                dup.0
-                loc_store.0
-                loc_load.1
-                sub
-                neq.0
-                end
-
-                end
-
-                proc.start_with_miden_io_persistent.0
-                exec.save_pub_inputs
-                exec.init_pub_outputs
-                exec.f1
-                exec.load_pub_outputs_on_stack
-                end
-
-                begin
-                exec.start_with_miden_io_persistent
-                end
-            "#]],
+                wasm.module @module_name {
+                  block_1_0():
+                    wasm.func @f1() -> () {
+                      entry():
+                        wasm.const 0x1: si32
+                        wasm.return
+                    }
+                }"#]],
         );
     }
 }
