@@ -32,25 +32,13 @@ use pliron::with_context::AttachContext;
 use crate::attributes::FieldElemAttr;
 
 declare_op!(
-    /// Represents a Miden module, a top level container operation.
-    ///
-    /// See MLIR's [builtin.module](https://mlir.llvm.org/docs/Dialects/Builtin/#builtinmodule-mlirmoduleop).
-    /// It contains a single [SSACFG](super::op_interfaces::RegionKind::SSACFG)
-    /// region containing a single block which can contain any operations and
-    /// does not have a terminator.
-    ///
-    /// Attributes:
-    ///
-    /// | key | value |
-    /// |-----|-------|
-    /// | [ATTR_KEY_SYM_NAME](super::ATTR_KEY_SYM_NAME) | [StringAttr](super::attributes::StringAttr) |
-    /// | [ATTR_KEY_START_FUNC_SYM](ModuleOp::ATTR_KEY_START_FUNC_SYM) | [StringAttr](super::attributes::StringAttr) |
-    ModuleOp,
-    "module",
+    /// Represents a Miden program
+    ProgramOp,
+    "program",
     "miden"
 );
 
-impl DisplayWithContext for ModuleOp {
+impl DisplayWithContext for ProgramOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let region = self.get_region(ctx).with_ctx(ctx).to_string();
         write!(
@@ -63,35 +51,21 @@ impl DisplayWithContext for ModuleOp {
     }
 }
 
-impl Verify for ModuleOp {
+impl Verify for ProgramOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
         self.verify_interfaces(ctx)?;
         self.get_region(ctx).deref(ctx).verify(ctx)
     }
 }
 
-impl ModuleOp {
-    /// Attribute key for the the start function symbol.
-    pub const ATTR_KEY_START_FUNC_SYM: &str = "module.start_func_sym";
-
-    /// Create a new [ModuleOp].
+impl ProgramOp {
+    /// Create a new [ProgramOP].
     /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
-    /// The returned module has a single [crate::region::Region] with a single (BasicBlock)[crate::basic_block::BasicBlock].
-    pub fn new(ctx: &mut Context, name: &str, start_func_name: String) -> ModuleOp {
+    /// The returned programm has a single [crate::region::Region] with a single (BasicBlock)[crate::basic_block::BasicBlock].
+    pub fn new(ctx: &mut Context, name: &str) -> ProgramOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
-
-        {
-            let opref = &mut *op.deref_mut(ctx);
-            // Set function type attributes.
-            opref.attributes.insert(
-                Self::ATTR_KEY_START_FUNC_SYM,
-                StringAttr::create(start_func_name),
-            );
-        }
-
-        let opop = ModuleOp { op };
+        let opop = ProgramOp { op };
         opop.set_symbol_name(ctx, name);
-
         // Create an empty block.
         let region = opop.get_region(ctx);
         let block = BasicBlock::new(ctx, None, vec![]);
@@ -104,27 +78,12 @@ impl ModuleOp {
     pub fn add_operation(&self, ctx: &mut Context, op: Ptr<Operation>) {
         self.append_operation(ctx, op, 0)
     }
-
-    #[allow(clippy::expect_used)]
-    pub fn get_start_func_sym(&self, ctx: &Context) -> String {
-        let self_op = self.get_operation().deref(ctx);
-        let s_attr = self_op
-            .attributes
-            .get(Self::ATTR_KEY_START_FUNC_SYM)
-            .expect("ModuleOp has no start function symbol attribute");
-        String::from(
-            s_attr
-                .downcast_ref::<StringAttr>()
-                .expect("ModuleOp start function symbol attribute is not a StringAttr")
-                .clone(),
-        )
-    }
 }
 
-impl OneRegionInterface for ModuleOp {}
-impl SingleBlockRegionInterface for ModuleOp {}
+impl OneRegionInterface for ProgramOp {}
+impl SingleBlockRegionInterface for ProgramOp {}
 #[cast_to]
-impl SymbolOpInterface for ModuleOp {}
+impl SymbolOpInterface for ProgramOp {}
 
 declare_op!(
     /// An operation with a name containing a single region.

@@ -106,6 +106,7 @@ impl ModuleOp {
         self.append_operation(ctx, op, 0)
     }
 
+    /// Return the start function symbol name
     #[allow(clippy::expect_used)]
     pub fn get_start_func_sym(&self, ctx: &Context) -> String {
         let self_op = self.get_operation().deref(ctx);
