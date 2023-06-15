@@ -86,55 +86,26 @@ impl SingleBlockRegionInterface for ProgramOp {}
 impl SymbolOpInterface for ProgramOp {}
 
 declare_op!(
-    /// An operation with a name containing a single region.
-    ///
-    /// Attributes:
-    ///
-    /// | key | value |
-    /// |-----|-------|
-    /// | [ATTR_KEY_SYM_NAME](super::ATTR_KEY_SYM_NAME) | [StringAttr](super::attributes::StringAttr) |
-    /// | [ATTR_KEY_FUNC_TYPE](FuncOp::ATTR_KEY_FUNC_TYPE) | [TypeAttr](super::attributes::TypeAttr) |
-    FuncOp,
-    "func",
+    /// An operation representing a procedure in Miden
+    ProcOp,
+    "proc",
     "miden"
 );
 
-impl FuncOp {
-    /// Attribute key for the function type
-    pub const ATTR_KEY_FUNC_TYPE: &str = "func.type";
-
+impl ProcOp {
     /// Create a new [FuncOp].
     /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
     /// The returned function has a single region with an empty `entry` block.
-    pub fn new_unlinked(ctx: &mut Context, name: &str, ty: Ptr<TypeObj>) -> FuncOp {
-        let ty_attr = TypeAttr::create(ty);
+    pub fn new_unlinked(ctx: &mut Context, name: &str) -> ProcOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
-        {
-            let opref = &mut *op.deref_mut(ctx);
-            // Set function type attributes.
-            opref.attributes.insert(Self::ATTR_KEY_FUNC_TYPE, ty_attr);
-        }
-        let opop = FuncOp { op };
+        let opop = ProcOp { op };
         // Create an empty entry block.
         #[allow(clippy::expect_used)]
         let region = opop.get_region(ctx);
         let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
         body.insert_at_front(region, ctx);
-
         opop.set_symbol_name(ctx, name);
-
         opop
-    }
-
-    /// Get the function signature (type).
-    pub fn get_type(&self, ctx: &Context) -> Ptr<TypeObj> {
-        let opref = self.get_operation().deref(ctx);
-        #[allow(clippy::unwrap_used)]
-        let ty_attr = opref.attributes.get(Self::ATTR_KEY_FUNC_TYPE).unwrap();
-        #[allow(clippy::unwrap_used)]
-        attr_cast::<dyn TypedAttrInterface>(&**ty_attr)
-            .unwrap()
-            .get_type()
     }
 
     /// Get the entry block of this function.
@@ -152,33 +123,25 @@ impl FuncOp {
     }
 }
 
-impl OneRegionInterface for FuncOp {}
+impl OneRegionInterface for ProcOp {}
 #[cast_to]
-impl SymbolOpInterface for FuncOp {}
+impl SymbolOpInterface for ProcOp {}
 
-impl DisplayWithContext for FuncOp {
+impl DisplayWithContext for ProcOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let region = self.get_region(ctx).with_ctx(ctx).to_string();
         write!(
             f,
-            "{} @{}{} {{\n{}}}",
+            "{} @{} {{\n{}}}",
             self.get_opid().with_ctx(ctx),
             self.get_symbol_name(ctx),
-            self.get_type(ctx).with_ctx(ctx),
             indent::indent_all_by(2, region),
         )
     }
 }
 
-impl Verify for FuncOp {
+impl Verify for ProcOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
-        let ty = self.get_type(ctx);
-
-        if !(ty.deref(ctx).is::<FunctionType>()) {
-            return Err(CompilerError::VerificationError {
-                msg: "Unexpected Func type".to_string(),
-            });
-        }
         let op = &*self.get_operation().deref(ctx);
         if op.get_opid() != Self::get_opid_static() {
             return Err(CompilerError::VerificationError {
