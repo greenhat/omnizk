@@ -42,6 +42,8 @@ impl RewritePattern for ControlFlowLowering {
                 {
                     // TODO: check that all locals are converted to mem access
                     todo!("extract func blocks and loops into miden functions");
+                    // TODO: traverse the function body and for every block extract the block's body into the separate function, replace the whole block with a call to this function and after the call put operations to check the exit depth and whether we need to exit the current function.
+                    // Repeat this process for every block in the extracted functions recursively.
                 } else {
                     todo!("error. there should be only func ops in module body");
                 }
