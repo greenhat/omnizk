@@ -512,12 +512,6 @@ impl Verify for ReturnOp {
 
 declare_op!(
     /// A block operation containing a single region.
-    ///
-    /// Attributes:
-    ///
-    /// | key | value |
-    /// |-----|-------|
-    /// | [ATTR_KEY_BLOCK_TYPE](FuncOp::ATTR_KEY_BLOCK_TYPE) | [TypeAttr](super::attributes::TypeAttr) |
     BlockOp,
     "block",
     "wasm"

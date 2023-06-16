@@ -43,9 +43,8 @@ impl DisplayWithContext for ProgramOp {
         let region = self.get_region(ctx).with_ctx(ctx).to_string();
         write!(
             f,
-            "{} @{} {{\n{}}}",
+            "{} {{\n{}}}",
             self.get_opid().with_ctx(ctx),
-            self.get_symbol_name(ctx),
             indent::indent_all_by(2, region),
         )
     }
@@ -60,12 +59,10 @@ impl Verify for ProgramOp {
 
 impl ProgramOp {
     /// Create a new [ProgramOP].
-    /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
     /// The returned programm has a single [crate::region::Region] with a single (BasicBlock)[crate::basic_block::BasicBlock].
-    pub fn new(ctx: &mut Context, name: &str) -> ProgramOp {
+    pub fn new(ctx: &mut Context) -> ProgramOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
         let opop = ProgramOp { op };
-        opop.set_symbol_name(ctx, name);
         // Create an empty block.
         let region = opop.get_region(ctx);
         let block = BasicBlock::new(ctx, None, vec![]);
@@ -82,8 +79,6 @@ impl ProgramOp {
 
 impl OneRegionInterface for ProgramOp {}
 impl SingleBlockRegionInterface for ProgramOp {}
-#[cast_to]
-impl SymbolOpInterface for ProgramOp {}
 
 declare_op!(
     /// An operation representing a procedure in Miden

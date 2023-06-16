@@ -22,5 +22,6 @@ itertools = { workspace = true }
 anyhow = { workspace = true }
 apint = "0.2.0"
 winter-math = { version = "0.6", default-features = false }
+bounded-vec = { workspace = true }
 
 [dev-dependencies]
