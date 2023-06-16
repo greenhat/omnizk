@@ -456,4 +456,6 @@ pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     AddOp::register(ctx, dialect);
     CallOp::register(ctx, dialect);
     LocalGetOp::register(ctx, dialect);
+    ProgramOp::register(ctx, dialect);
+    ProcOp::register(ctx, dialect);
 }

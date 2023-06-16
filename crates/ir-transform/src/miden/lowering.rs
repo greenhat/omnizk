@@ -2,6 +2,8 @@ use ozk_miden_dialect::MIDEN_DIALECT;
 use ozk_wasm_dialect::WASM_DIALECT;
 use pliron::context::Context;
 use pliron::context::Ptr;
+use pliron::dialect::Dialect;
+use pliron::dialect::DialectName;
 use pliron::dialect_conversion::apply_partial_conversion;
 use pliron::dialect_conversion::ConversionTarget;
 use pliron::error::CompilerError;
@@ -27,6 +29,11 @@ impl Pass for WasmToMidenLoweringPass {
         let mut target = ConversionTarget::default();
         target.add_illegal_dialect(WASM_DIALECT(ctx));
         target.add_legal_dialect(MIDEN_DIALECT(ctx));
+        #[allow(clippy::expect_used)]
+        target.add_legal_dialect(
+            Dialect::get_ref(ctx, DialectName::new("builtin"))
+                .expect("builtin dialect not registered"),
+        );
         let mut patterns = RewritePatternSet::default();
         patterns.add(Box::<ControlFlowLowering>::default());
         patterns.add(Box::<ConstantOpLowering>::default());

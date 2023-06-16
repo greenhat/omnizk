@@ -59,12 +59,12 @@ mod tests {
     use super::*;
     use expect_test::expect;
     use pliron::context::Context;
-    use pliron::dialects;
+    use pliron::dialects::builtin;
 
     pub(crate) fn setup_context_dialects() -> Context {
         let mut ctx = Context::new();
         ozk_wasm_dialect::register(&mut ctx);
-        dialects::builtin::register(&mut ctx);
+        builtin::register(&mut ctx);
         ozk_miden_dialect::register(&mut ctx);
         ctx
     }
@@ -75,6 +75,8 @@ mod tests {
         use c2zk_frontend::FrontendConfig;
         use c2zk_ir_transform::miden::WasmToMidenLoweringPass;
         use ozk_frontend_wasm::WasmFrontendConfig;
+        use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
+        use pliron::linked_list::ContainsLinkedList;
         use pliron::op::Op;
         use pliron::pass::Pass;
         use pliron::with_context::AttachContext;
@@ -82,14 +84,19 @@ mod tests {
         let source = wat::parse_str(input).unwrap();
         let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
         let mut ctx = setup_context_dialects();
-        let module_op = translate(&mut ctx, &source, frontend).unwrap();
+        let wasm_module_op = translate(&mut ctx, &source, frontend).unwrap();
+        let builtin_module_op = builtin::ops::ModuleOp::new(&mut ctx, "wrapper");
+        wasm_module_op
+            .get_operation()
+            .insert_at_back(builtin_module_op.get_body(&ctx, 0), &ctx);
         let triton_target_config = MidenTargetConfig::default();
-
         let pass = WasmToMidenLoweringPass::default();
-        pass.run_on_operation(&mut ctx, module_op.get_operation())
+        pass.run_on_operation(&mut ctx, builtin_module_op.get_operation())
             .unwrap();
-
-        expected_tree.assert_eq(&module_op.with_ctx(&ctx).to_string());
+        // TODO: extract the miden program op from the builtin.module
+        for op in builtin_module_op.get_body(&ctx, 0).deref(&ctx).iter(&ctx) {
+            expected_tree.assert_eq(op.with_ctx(&ctx).to_string().as_str());
+        }
     }
 
     #[test]
@@ -103,12 +110,11 @@ mod tests {
         return)
 )"#,
             expect![[r#"
-                wasm.module @module_name {
-                  block_1_0():
-                    wasm.func @f1() -> () {
+                miden.program {
+                  block_3_0():
+                    miden.proc @f1 {
                       entry():
                         miden.constant 1: felt
-                        wasm.return
                     }
                 }"#]],
         );

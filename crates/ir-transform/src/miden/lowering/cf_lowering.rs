@@ -49,12 +49,12 @@ impl RewritePattern for ControlFlowLowering {
             };
             funcs.push(func_op);
         }
-        let prog = miden::ProgramOp::new(ctx);
+        let prog_op = miden::ProgramOp::new(ctx);
         // TODO: call start function in main procedure (begin-end block)
         for func_op in funcs {
             let root_proc_op = miden::ProcOp::new_unlinked(ctx, &func_op.get_symbol_name(ctx));
             let root_proc_bb = root_proc_op.get_entry_block(ctx);
-            prog.add_operation(ctx, root_proc_op.get_operation());
+            prog_op.add_operation(ctx, root_proc_op.get_operation());
             let mut func_ops = Vec::new();
             for op in func_op.op_iter(ctx) {
                 func_ops.push(op.deref(ctx).get_op(ctx));
@@ -68,7 +68,7 @@ impl RewritePattern for ControlFlowLowering {
                         miden::CallOp::new_unlinked(ctx, callee_proc_op.get_symbol_name(ctx));
                     call_op.get_operation().insert_at_back(root_proc_bb, ctx);
                     for proc_op in proc_ops {
-                        prog.add_operation(ctx, proc_op.get_operation());
+                        prog_op.add_operation(ctx, proc_op.get_operation());
                     }
                 } else {
                     op.get_operation().unlink(ctx);
@@ -77,7 +77,8 @@ impl RewritePattern for ControlFlowLowering {
             }
             func_op.get_operation().unlink(ctx);
         }
-        todo!("swap wasm module op into miden program op");
+        prog_op.get_operation().insert_after(ctx, op);
+        rewriter.erase_op(ctx, op)?;
         Ok(())
     }
 }
