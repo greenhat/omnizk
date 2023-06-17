@@ -75,9 +75,11 @@ mod tests {
         use c2zk_frontend::FrontendConfig;
         use c2zk_ir_transform::miden::WasmToMidenLoweringPass;
         use ozk_frontend_wasm::WasmFrontendConfig;
+        use pliron::context::Ptr;
         use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
         use pliron::linked_list::ContainsLinkedList;
         use pliron::op::Op;
+        use pliron::operation::Operation;
         use pliron::pass::Pass;
         use pliron::with_context::AttachContext;
 
@@ -85,18 +87,23 @@ mod tests {
         let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
         let mut ctx = setup_context_dialects();
         let wasm_module_op = translate(&mut ctx, &source, frontend).unwrap();
-        let builtin_module_op = builtin::ops::ModuleOp::new(&mut ctx, "wrapper");
+        let wrapper_module = builtin::ops::ModuleOp::new(&mut ctx, "wrapper");
         wasm_module_op
             .get_operation()
-            .insert_at_back(builtin_module_op.get_body(&ctx, 0), &ctx);
+            .insert_at_back(wrapper_module.get_body(&ctx, 0), &ctx);
         let triton_target_config = MidenTargetConfig::default();
         let pass = WasmToMidenLoweringPass::default();
-        pass.run_on_operation(&mut ctx, builtin_module_op.get_operation())
+        pass.run_on_operation(&mut ctx, wrapper_module.get_operation())
             .unwrap();
-        // TODO: extract the miden program op from the builtin.module
-        for op in builtin_module_op.get_body(&ctx, 0).deref(&ctx).iter(&ctx) {
-            expected_tree.assert_eq(op.with_ctx(&ctx).to_string().as_str());
-        }
+        let miden_prog = wrapper_module
+            .get_body(&ctx, 0)
+            .deref(&ctx)
+            .iter(&ctx)
+            .collect::<Vec<Ptr<Operation>>>()
+            .first()
+            .cloned()
+            .unwrap();
+        expected_tree.assert_eq(miden_prog.with_ctx(&ctx).to_string().as_str());
     }
 
     #[test]
