@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use ozk_wasm_dialect::ops::FuncOp;
+use ozk_wasm_dialect::ops::ImportFuncLabel;
 use ozk_wasm_dialect::ops::ModuleOp;
 use pliron::context::Context;
 use pliron::context::Ptr;
@@ -8,23 +8,16 @@ use pliron::op::Op;
 use pliron::r#type::TypeObj;
 use thiserror::Error;
 
-// mod import_func_body;
-
-// pub use import_func_body::ImportFuncBody;
-
 use crate::func_builder::FuncBuilder;
 use crate::func_builder::FuncBuilderError;
 use crate::types::FuncIndex;
 use crate::types::TypeIndex;
 
-// use self::import_func_body::ImportFunc;
-
 pub struct ModuleBuilder {
     types: Vec<Ptr<TypeObj>>,
     start_func_idx: Option<FuncIndex>,
     functions: Vec<FuncBuilder>,
-    import_functions: Vec<FuncOp>,
-    // import_func_body: ImportFuncBody,
+    import_functions: Vec<(ImportFuncLabel, TypeIndex)>,
     func_names: HashMap<FuncIndex, String>,
     func_types: HashMap<FuncIndex, TypeIndex>,
 }
@@ -48,30 +41,18 @@ impl ModuleBuilder {
 
     pub fn push_import_func(
         &mut self,
-        _type_idx: u32,
-        _module: &str,
-        _name: &str,
+        type_idx: u32,
+        module: &str,
+        name: &str,
     ) -> Result<(), ModuleBuilderError> {
-        todo!();
-        // // dbg!(&self.types);
-        // let ty = self
-        //     .types
-        //     .get(type_idx as usize)
-        //     .ok_or_else(|| ModuleBuilderError::InvalidTypeIndex(format!("type_idx: {}", type_idx)))?
-        //     .clone();
-        // // dbg!(name);
-        // // dbg!(&ty);
-        // let import_func = ImportFunc {
-        //     module: module.to_string(),
-        //     name: name.to_string(),
-        //     ty,
-        // };
-        // let func = self
-        //     .import_func_body
-        //     .func(&import_func)
-        //     .ok_or(ModuleBuilderError::ImportFuncBodyNotFound(import_func))?;
-        // self.import_functions.push(func.clone());
-        // Ok(())
+        self.import_functions.push((
+            ImportFuncLabel {
+                module: module.to_string(),
+                name: name.to_string(),
+            },
+            type_idx.into(),
+        ));
+        Ok(())
     }
 
     pub fn push_func_type(&mut self, func_idx: u32, type_idx: u32) {
@@ -101,20 +82,19 @@ impl ModuleBuilder {
             let func_type = self.get_func_type((func_idx as u32).into())?;
             func_sigs.push(func_type);
         }
-        let imported_funcs_count = self.import_functions.len() as u32;
-
         if let Some(start_func_idx) = self.start_func_idx {
             let start_func_name = self
                 .get_func_name(start_func_idx)
                 .ok_or(ModuleBuilderError::FuncNameNotFound(start_func_idx))?;
-            let module_op = ModuleOp::new(ctx, "module_name", start_func_name);
+            let import_func_types = self
+                .import_functions
+                .iter()
+                .map(|(label, ty_idx)| self.get_type(*ty_idx).map(|ty| (label.clone(), ty)))
+                .collect::<Result<Vec<(ImportFuncLabel, Ptr<TypeObj>)>, ModuleBuilderError>>()?;
+            let module_op = ModuleOp::new(ctx, "module_name", start_func_name, import_func_types);
             let mut funcs = Vec::new();
-            // first, imported functions
-            for import_func in self.import_functions {
-                funcs.push(import_func);
-            }
-
             // TODO: since func indices should be shifted by imported funcs count change the storage and make it obvious
+            let imported_funcs_count = self.import_functions.len() as u32;
             for (func_idx, func_builder) in self.functions.iter_mut().enumerate() {
                 if let Some(func_name) = self
                     .func_names
@@ -156,11 +136,14 @@ impl ModuleBuilder {
             .func_types
             .get(&func_idx)
             .ok_or_else(|| ModuleBuilderError::TypeIndexNotFound(u32::from(func_idx)))?;
+        self.get_type(*type_idx)
+    }
 
+    pub fn get_type(&self, type_idx: TypeIndex) -> Result<Ptr<TypeObj>, ModuleBuilderError> {
         self.types
-            .get(u32::from(*type_idx) as usize)
+            .get(u32::from(type_idx) as usize)
             .cloned()
-            .ok_or_else(|| ModuleBuilderError::TypeNotFound(u32::from(*type_idx)))
+            .ok_or_else(|| ModuleBuilderError::TypeNotFound(u32::from(type_idx)))
     }
 
     // pub fn get_func_type_typed(

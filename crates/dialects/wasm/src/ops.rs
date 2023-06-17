@@ -74,13 +74,21 @@ impl Verify for ModuleOp {
 impl ModuleOp {
     /// Attribute key for the the start function symbol.
     pub const ATTR_KEY_START_FUNC_SYM: &str = "module.start_func_sym";
+    /// Attribute key for the import functions dictionary (function name -> type)
+    pub const ATTR_KEY_DICT_IMPORT_FUNCTION_TYPE: &str = "module.dict_import_function_type";
+    /// Attribute key for the import functions dictionary (function name -> module name)
+    pub const ATTR_KEY_DICT_IMPORT_FUNCTION_MODULE: &str = "module.dict_import_function_module";
 
     /// Create a new [ModuleOp].
     /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
     /// The returned module has a single [crate::region::Region] with a single (BasicBlock)[crate::basic_block::BasicBlock].
-    pub fn new(ctx: &mut Context, name: &str, start_func_name: String) -> ModuleOp {
+    pub fn new(
+        ctx: &mut Context,
+        name: &str,
+        start_func_name: String,
+        import_funcs: Vec<(ImportFuncLabel, Ptr<TypeObj>)>,
+    ) -> ModuleOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
-
         {
             let opref = &mut *op.deref_mut(ctx);
             // Set function type attributes.
@@ -127,6 +135,12 @@ impl OneRegionInterface for ModuleOp {}
 impl SingleBlockRegionInterface for ModuleOp {}
 #[cast_to]
 impl SymbolOpInterface for ModuleOp {}
+
+#[derive(Debug, Clone)]
+pub struct ImportFuncLabel {
+    pub module: String,
+    pub name: String,
+}
 
 declare_op!(
     /// An operation with a name containing a single region.

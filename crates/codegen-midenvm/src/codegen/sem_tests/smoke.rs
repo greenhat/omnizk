@@ -2,7 +2,7 @@ use super::check_miden;
 use expect_test::expect;
 
 #[test]
-fn test_add_wo_imports() {
+fn test_smoke_add_wo_imports() {
     let input = vec![];
     let secret_input = vec![];
     let expected_output = vec![2];
