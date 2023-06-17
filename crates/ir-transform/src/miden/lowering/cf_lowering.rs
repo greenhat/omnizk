@@ -50,7 +50,9 @@ impl RewritePattern for ControlFlowLowering {
             funcs.push(func_op);
         }
         let prog_op = miden::ProgramOp::new(ctx);
-        // TODO: call start function in main procedure (begin-end block)
+        // TODO: make a new pass for module->prog conversion
+        // and call start function in main procedure (begin-end block)
+        // plus, handle imports and all other module stuff
         for func_op in funcs {
             let root_proc_op = miden::ProcOp::new_unlinked(ctx, &func_op.get_symbol_name(ctx));
             let root_proc_bb = root_proc_op.get_entry_block(ctx);
@@ -70,15 +72,21 @@ impl RewritePattern for ControlFlowLowering {
                     for proc_op in proc_ops {
                         prog_op.add_operation(ctx, proc_op.get_operation());
                     }
+                }
+                if op.downcast_ref::<wasm::ReturnOp>().is_some() {
+                    // return in the entry block means that the rest of the ops
+                    // are unreachable and can be removed
+                    rewriter.erase_op(ctx, op.get_operation())?;
+                    // TODO: erase the rest of the ops in this block
+                    break;
                 } else {
                     op.get_operation().unlink(ctx);
                     op.get_operation().insert_at_back(root_proc_bb, ctx);
                 };
             }
-            func_op.get_operation().unlink(ctx);
+            rewriter.erase_op(ctx, func_op.get_operation())?;
         }
-        prog_op.get_operation().insert_after(ctx, op);
-        rewriter.erase_op(ctx, op)?;
+        rewriter.replace_op_with(ctx, module_op.get_operation(), prog_op.get_operation())?;
         Ok(())
     }
 }
@@ -92,7 +100,7 @@ enum WasmStructuredOp<'a> {
 
 fn convert_block_to_proc(
     ctx: &mut Context,
-    struct_op: WasmStructuredOp,
+    _struct_op: WasmStructuredOp,
 ) -> Result<NonEmptyVec<Box<miden::ProcOp>>, anyhow::Error> {
     // TODO: check that all locals are converted to mem access
     // Repeat this process for every block in the extracted functions recursively.
