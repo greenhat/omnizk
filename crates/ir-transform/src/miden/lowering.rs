@@ -11,18 +11,39 @@ use pliron::pass::Pass;
 use pliron::pass::PassError;
 use pliron::rewrite::RewritePatternSet;
 
-use self::cf_lowering::ControlFlowLowering;
 use self::constant_op_lowering::ConstantOpLowering;
 
 mod cf_lowering;
-mod constant_op_lowering;
+pub use cf_lowering::WasmToMidenCFLoweringPass;
+
+pub mod constant_op_lowering;
 
 #[derive(Default)]
-pub struct WasmToMidenLoweringPass {}
+pub struct WasmToMidenArithLoweringPass;
 
-impl Pass for WasmToMidenLoweringPass {
+impl Pass for WasmToMidenArithLoweringPass {
     fn name(&self) -> &str {
-        "WasmToMidenLoweringPass"
+        "WasmToMidenArithLoweringPass"
+    }
+
+    fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), PassError> {
+        let mut target = ConversionTarget::default();
+        target.add_legal_dialect(MIDEN_DIALECT(ctx));
+        // TODO: set illegal ops
+        let mut patterns = RewritePatternSet::default();
+        patterns.add(Box::<ConstantOpLowering>::default());
+        apply_partial_conversion(ctx, op, target, patterns)?;
+        Ok(())
+    }
+}
+
+/// The pass that ensures there are no Wasm ops left.
+#[derive(Default)]
+pub struct WasmToMidenFinalLoweringPass;
+
+impl Pass for WasmToMidenFinalLoweringPass {
+    fn name(&self) -> &str {
+        "WasmToMidenFinalLoweringPass"
     }
 
     fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), PassError> {
@@ -34,9 +55,7 @@ impl Pass for WasmToMidenLoweringPass {
             Dialect::get_ref(ctx, DialectName::new("builtin"))
                 .expect("builtin dialect not registered"),
         );
-        let mut patterns = RewritePatternSet::default();
-        patterns.add(Box::<ControlFlowLowering>::default());
-        patterns.add(Box::<ConstantOpLowering>::default());
+        let patterns = RewritePatternSet::default();
         apply_partial_conversion(ctx, op, target, patterns)?;
         Ok(())
     }

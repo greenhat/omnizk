@@ -4,18 +4,41 @@ use ozk_miden_dialect::ops as miden;
 use ozk_wasm_dialect::ops as wasm;
 use pliron::context::Context;
 use pliron::context::Ptr;
+use pliron::dialect_conversion::apply_partial_conversion;
+use pliron::dialect_conversion::ConversionTarget;
 use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SymbolOpInterface;
 use pliron::linked_list::ContainsLinkedList;
 use pliron::op::Op;
 use pliron::operation::Operation;
+use pliron::pass::Pass;
+use pliron::pass::PassError;
 use pliron::pattern_match::PatternRewriter;
 use pliron::pattern_match::RewritePattern;
+use pliron::rewrite::RewritePatternSet;
+
+#[derive(Default)]
+pub struct WasmToMidenCFLoweringPass;
+
+impl Pass for WasmToMidenCFLoweringPass {
+    fn name(&self) -> &str {
+        "WasmToMidenCFLoweringPass"
+    }
+
+    fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), PassError> {
+        let target = ConversionTarget::default();
+        // TODO: set illegal ops
+        let mut patterns = RewritePatternSet::default();
+        patterns.add(Box::<ControlFlowLowering>::default());
+        apply_partial_conversion(ctx, op, target, patterns)?;
+        Ok(())
+    }
+}
 
 /// Converts Wasm module  into Miden program
 /// converting Wasm blocks/loops and branching ops into Miden functions
 #[derive(Default)]
-pub struct ControlFlowLowering {}
+struct ControlFlowLowering;
 
 impl RewritePattern for ControlFlowLowering {
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
