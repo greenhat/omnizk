@@ -1,12 +1,14 @@
-use super::check_miden;
 use expect_test::expect;
 
+mod sem_tests;
+use crate::sem_tests::check_wat;
+
 #[test]
-fn test_pub_outputs() {
+fn test_one_block() {
     let input = vec![];
     let secret_input = vec![];
-    let expected_output = vec![7, 5, 9, 3];
-    check_miden(
+    let expected_output = vec![3];
+    check_wat(
         r#"
 (module 
     (type (;0;) (func (result i64)))
@@ -18,15 +20,14 @@ fn test_pub_outputs() {
     (export "main" (func $main))
     (start $main)
     (func $main 
-        i64.const 3
-        i64.const 5
-        call $c2zk_stdlib_pub_output
-        i64.const 7
-        call $c2zk_stdlib_pub_output
-        i64.const 9
+        block ;; label = @1
+          i64.const 1
+          i64.const 2
+          i64.add
+          call $c2zk_stdlib_pub_output
+        end
         return)
-)"#
-        .to_string(),
+)"#,
         input,
         secret_input,
         expected_output,
@@ -146,13 +147,15 @@ fn test_pub_outputs() {
             exec.omni_miden_pub_output
             end
 
+            proc.main_l0_b0.0
+            push.1
+            push.2
+            add
+            exec.c2zk_stdlib_pub_output
+            end
+
             proc.main.0
-            push.3
-            push.5
-            exec.c2zk_stdlib_pub_output
-            push.7
-            exec.c2zk_stdlib_pub_output
-            push.9
+            exec.main_l0_b0
             end
 
             proc.start_with_miden_io_persistent.0

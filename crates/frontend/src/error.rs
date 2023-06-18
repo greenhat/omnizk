@@ -1,7 +1,7 @@
-use derive_more::From;
 use ozk_frontend_wasm::WasmError;
 
-#[derive(Debug, From)]
+#[derive(Debug, thiserror::Error)]
 pub enum FrontendError {
-    WasmError(WasmError),
+    #[error("Wasm error: {0}")]
+    WasmError(#[from] WasmError),
 }

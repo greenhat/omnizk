@@ -1,3 +1,4 @@
+use ozk_wasm_dialect::ops::AddOp;
 use ozk_wasm_dialect::ops::BlockOp;
 use ozk_wasm_dialect::ops::CallOp;
 use ozk_wasm_dialect::ops::ConstantOp;
@@ -98,8 +99,10 @@ impl<'a> OpBuilder<'a> {
         todo!();
     }
 
-    pub fn i32add(&mut self, ctx: &mut Context) {
-        todo!();
+    pub fn i32add(&mut self, ctx: &mut Context) -> Result<(), FuncBuilderError> {
+        let ty = i32_type(ctx);
+        let op = AddOp::new_unlinked(ctx, ty).get_operation();
+        self.fbuilder.push(ctx, op)
     }
 
     pub fn i32eqz(&mut self, ctx: &mut Context) {

@@ -2,16 +2,7 @@
 
 #![allow(clippy::unwrap_used)]
 #![allow(unused_variables)]
-
-// mod add;
-mod pub_inputs;
-mod pub_outputs;
-mod smoke;
-
-mod block;
-// mod fib;
-mod func_call;
-// mod locals;
+#![allow(dead_code)]
 
 use std::ops::RangeFrom;
 
@@ -23,15 +14,13 @@ use miden_processor::StackInputs;
 use miden_processor::VmState;
 use miden_processor::VmStateIterator;
 use miden_stdlib::StdLibrary;
+use ozk_codegen_midenvm::MidenTargetConfig;
+use ozk_compiler::compile;
 use ozk_frontend_wasm::WasmFrontendConfig;
 use wasmtime::*;
 use winter_math::StarkField;
 
-use crate::InstBuffer;
-use crate::MidenTargetConfig;
-use crate::codegen::tests::setup_context_dialects;
-
-fn check_wasm(
+pub fn check_wasm(
     source: &[u8],
     input: Vec<u64>,
     secret_input: Vec<u64>,
@@ -45,29 +34,45 @@ fn check_wasm(
     check_miden(wat, input, secret_input, expected_output, expected_miden);
 }
 
+// fn compile(
+//     source: &[u8],
+//     frontend_config: &WasmFrontendConfig,
+//     target_config: &MidenTargetConfig,
+// ) -> Vec<u8> {
+//     let mut ctx = Context::new();
+//     frontend_config.register(&mut ctx);
+//     target_config.register(&mut ctx);
+//     let module = translate_module(&mut ctx, source).unwrap();
+//     target_config
+//         .pass_manager
+//         .run(&mut ctx, module.get_operation())
+//         .unwrap();
+//     let target = MidenTarget::new(target_config);
+//     let code = target.compile_module(module).unwrap();
+//     code
+// }
+
 #[allow(unreachable_code)]
-fn check_miden(
+pub fn check_miden(
     source: String,
     input: Vec<u64>,
     secret_input: Vec<u64>,
     expected_output: Vec<u64>,
     expected_miden: expect_test::Expect,
 ) {
-    use c2zk_frontend::translate;
-    use c2zk_frontend::FrontendConfig;
-
-    let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
+    let frontend_config = WasmFrontendConfig::default();
     let target_config = MidenTargetConfig::default();
     let wasm = wat::parse_str(source).unwrap();
-    let mut ctx = setup_context_dialects();
-    let module = translate(&mut ctx, &wasm, frontend).unwrap();
+    let miden_prog = compile(&wasm, frontend_config.into(), target_config.into()).unwrap();
+    // let module = translate(&mut ctx, &wasm, frontend_config).unwrap();
     // run_ir_passes(&mut module, &target_config.ir_passes);
-    // let inst_buf = compile_module(module, &target_config).unwrap();
-    todo!("compile_module");
-    let inst_buf: InstBuffer = InstBuffer::new(&target_config);
-    let out_source = inst_buf.pretty_print();
-    expected_miden.assert_eq(&out_source);
-    let program = inst_buf.pretty_print();
+    // let inst_buf = compile_prog(module, &target_config).unwrap();
+    // todo!("compile_module");
+    // let inst_buf: InstBuffer = InstBuffer::new(&target_config);
+    // let out_source = inst_buf.pretty_print();
+    // expected_miden.assert_eq(&out_source);
+    // let program = inst_buf.pretty_print();
+    let program = String::from_utf8(miden_prog).unwrap();
 
     let assembler = Assembler::default()
         .with_library(&StdLibrary::default())
@@ -102,7 +107,7 @@ fn check_miden(
     assert_eq!(stack, expected_output);
 }
 
-fn check_wat(
+pub fn check_wat(
     source: &str,
     input: Vec<u64>,
     secret_input: Vec<u64>,

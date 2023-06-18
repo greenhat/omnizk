@@ -6,9 +6,9 @@ use pliron::dialect::Dialect;
 use pliron::dialect::DialectName;
 use pliron::dialect_conversion::apply_partial_conversion;
 use pliron::dialect_conversion::ConversionTarget;
-use pliron::error::CompilerError;
 use pliron::operation::Operation;
 use pliron::pass::Pass;
+use pliron::pass::PassError;
 use pliron::rewrite::RewritePatternSet;
 
 use self::cf_lowering::ControlFlowLowering;
@@ -25,7 +25,7 @@ impl Pass for WasmToMidenLoweringPass {
         "WasmToMidenLoweringPass"
     }
 
-    fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), CompilerError> {
+    fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), PassError> {
         let mut target = ConversionTarget::default();
         target.add_illegal_dialect(WASM_DIALECT(ctx));
         target.add_legal_dialect(MIDEN_DIALECT(ctx));

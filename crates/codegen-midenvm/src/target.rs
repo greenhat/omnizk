@@ -1,8 +1,10 @@
 use c2zk_codegen_shared::CodegenError;
 use c2zk_codegen_shared::Target;
 use c2zk_ir::ir::Module;
+use pliron::context::Context;
+use pliron::context::Ptr;
+use pliron::operation::Operation;
 
-use crate::compile_module;
 use crate::MidenTargetConfig;
 
 pub struct MidenTarget {
@@ -14,10 +16,15 @@ impl Target for MidenTarget {
         "MidenVM"
     }
 
-    fn compile_module(&self, module: Module) -> Result<Vec<u8>, CodegenError> {
-        let inst_buf = compile_module(module, &self.config)
-            .map_err(|e| CodegenError::Miden(format!("{:?}", e)))?;
-        Ok(inst_buf.pretty_print().into_bytes())
+    fn compile_module_old(&self, _module: Module) -> Result<Vec<u8>, CodegenError> {
+        unreachable!()
+        // let inst_buf = compile_prog(module, &self.config)
+        //     .map_err(|e| CodegenError::Miden(format!("{:?}", e)))?;
+        // Ok(inst_buf.pretty_print().into_bytes())
+    }
+
+    fn compile(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<Vec<u8>, CodegenError> {
+        todo!()
     }
 }
 

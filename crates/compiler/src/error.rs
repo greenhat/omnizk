@@ -1,9 +1,13 @@
 use c2zk_codegen_shared::CodegenError;
 use c2zk_frontend::FrontendError;
-use derive_more::From;
+use pliron::pass::PassError;
 
-#[derive(Debug, From)]
+#[derive(Debug, thiserror::Error)]
 pub enum CompileError {
-    FrontendError(FrontendError),
-    CodegenError(CodegenError),
+    #[error("Frontend error: {0}")]
+    FrontendError(#[from] FrontendError),
+    #[error("Codegen error: {0}")]
+    CodegenError(#[from] CodegenError),
+    #[error("Pass error: {0}")]
+    PassError(#[from] PassError),
 }

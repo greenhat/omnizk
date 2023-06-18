@@ -30,6 +30,7 @@ keywords = ["wasm", "webassembly", "zk", "proof", "verification"]
 categories = ["wasm", "no-std", "virtualization"]
 
 [workspace.dependencies]
+ozk-compiler = { path = "crates/compiler" }
 ozk-ozk-dialect = { path = "crates/dialects/ozk" }
 ozk-wasm-dialect = { path = "crates/dialects/wasm" }
 ozk-miden-dialect = { path = "crates/dialects/miden" }
@@ -41,6 +42,7 @@ ozk-frontend-wasm = { path = "crates/frontend-wasm" }
 c2zk-codegen = { path = "crates/codegen" }
 c2zk-codegen-shared = { path = "crates/codegen-shared" }
 c2zk-codegen-tritonvm = { path = "crates/codegen-tritonvm" }
+ozk-codegen-midenvm = { path = "crates/codegen-midenvm" }
 c2zk-stdlib = { path = "crates/stdlib" }
 c2zk-rust-wasm-tests-bundle1 = { path = "crates/rust-wasm-tests/bundle1" }
 c2zk-rust-wasm-tests-helper = { path = "crates/rust-wasm-tests-helper" }

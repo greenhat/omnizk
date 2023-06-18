@@ -1,7 +1,7 @@
 [package]
-name = "c2zk-codegen-midenvm"
+name = "ozk-codegen-midenvm"
 version = "0.1.0"
-description = "Miden VM backend for c2zk"
+description = "Miden VM backend for OmniZK"
 authors.workspace = true
 repository.workspace = true
 edition.workspace = true
@@ -15,6 +15,8 @@ c2zk-ir = { workspace = true }
 c2zk-ir-transform = { workspace = true }
 c2zk-codegen-shared = { workspace = true }
 ozk-miden-dialect = { workspace = true }
+ozk-wasm-dialect = { workspace = true }
+pliron = { workspace = true }
 miden-assembly = "0.5"
 miden-stdlib = "0.4"
 miden-processor = "0.5"
@@ -23,11 +25,12 @@ derive_more = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
+ozk-compiler = { workspace = true }
+c2zk-codegen = { workspace = true }
 c2zk-frontend = { workspace = true }
 ozk-frontend-wasm = { workspace = true }
 c2zk-rust-wasm-tests-helper = { workspace = true }
 c2zk-rust-wasm-tests-bundle1 = { workspace = true }
-ozk-wasm-dialect = { workspace = true }
 pliron = { workspace = true }
 wat = { workspace = true }
 wasmprinter = { workspace = true }

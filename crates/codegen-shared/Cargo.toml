@@ -12,5 +12,8 @@ categories.workspace = true
 
 [dependencies]
 c2zk-ir = { workspace = true }
+ozk-wasm-dialect = { workspace = true }
+pliron = { workspace = true }
+thiserror = { workspace = true }
 
 [dev-dependencies]

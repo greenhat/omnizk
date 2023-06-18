@@ -1,6 +1,8 @@
+
 use expect_test::expect;
 
-use crate::codegen::sem_tests::check_wasm;
+mod sem_tests;
+use crate::sem_tests::check_wasm;
 
 #[test]
 fn test_add() {

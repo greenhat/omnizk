@@ -1,15 +1,14 @@
-use super::check_miden;
 use expect_test::expect;
 
+mod sem_tests;
+use crate::sem_tests::check_wat;
+
 #[test]
-fn test_pub_inputs() {
-    // let input = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2];
-    let input = vec![5, 7];
-    // prepend with 16 zeroes
-    // let input = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2];
+fn test_func_call() {
+    let input = vec![];
     let secret_input = vec![];
-    let expected_output = vec![7, 5];
-    check_miden(
+    let expected_output = vec![3];
+    check_wat(
         r#"
 (module 
     (type (;0;) (func (result i64)))
@@ -20,16 +19,30 @@ fn test_pub_inputs() {
     (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
     (export "main" (func $main))
     (start $main)
-    (func $main 
-        call $c2zk_stdlib_pub_input
-        call $c2zk_stdlib_pub_input
+    (func $add (param i64 i64) (result i64)
+        get_local 0
+        get_local 1
+        i64.add
         return)
-)"#
-        .to_string(),
+    (func $main 
+        i64.const 1
+        i64.const 2
+        call $add
+        call $c2zk_stdlib_pub_output
+        return)
+)"#,
         input,
         secret_input,
         expected_output,
         expect![[r#"
+            proc.add.2
+            loc_store.0
+            loc_store.1
+            loc_load.0
+            loc_load.1
+            add
+            end
+
             proc.globals_get.0
             push.18446744069414584317
             mul
@@ -139,13 +152,17 @@ fn test_pub_inputs() {
 
             end
 
-            proc.c2zk_stdlib_pub_input.0
-            exec.omni_miden_pub_input
+            proc.c2zk_stdlib_pub_output.1
+            loc_store.0
+            loc_load.0
+            exec.omni_miden_pub_output
             end
 
             proc.main.0
-            exec.c2zk_stdlib_pub_input
-            exec.c2zk_stdlib_pub_input
+            push.1
+            push.2
+            exec.add
+            exec.c2zk_stdlib_pub_output
             end
 
             proc.start_with_miden_io_persistent.0
