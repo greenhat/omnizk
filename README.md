@@ -2,26 +2,28 @@
 
 OmniZK transforms code from various sources to various ZK VM's backends. Its design resembles the [MLIR](https://mlir.llvm.org/)(LLVM) architecture, where IR transformations are implemented generically and reused with different custom IR dialects. 
 
-### Features:
+### Planned features:
 
 - generic IR transformations and optimizations (DCE, CSE, etc.) when compiling to your target ZK VM;
 - OmniZK IR transformation pass infrastructure with your added passes;
 - IR dialects (Wasm, [Triton VM](https://github.com/TritonVM/triton-vm), [Miden VM](https://github.com/0xPolygonMiden/miden-vm/), Move IR, Sway IR, etc.) and their transformations and optimizations;
 - compile high-level languages like Rust to your ZK VM (via Wasm);
 
-OmniZK is highly modular, so you can use only crates needed for your use case - specific IRs, parsers, transformations, etc.
+OmniZK is highly modular so that you can use only crates needed for your use case - specific IRs, parsers, transformations, etc.
 
 ## Roadmap
 
+The project is at an early development stage.
+
 ### Implemented:
 
-- Wasm frontend (parser, IR dialect, etc.);
+- Wasm frontend (parser, IR dialect, etc.) for a small subset of instructions ;
 - Triton VM backend (IR dialect, codegen, etc.);
-- Wasm -> Triton VM transformations;
+- Wasm -> Triton VM transformations for a small subset of Wasm instructions;
 
 ### Work in progress:
 
-- Wasm -> Miden VM transformations (see [PR](https://github.com/greenhat/omnizk/pull/5));
+- Wasm -> Miden VM transformations for a small subset of Wasm instructions (see [PR](https://github.com/greenhat/omnizk/pull/5));
 
 ### Next:
 - complete Wasm instructions support;
