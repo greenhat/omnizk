@@ -17,13 +17,13 @@ impl Target for TritonTarget {
         "TritonVM"
     }
 
-    fn compile_module_old(&self, module: Module) -> Result<Vec<u8>, CodegenError> {
+    fn codegen_module_old(&self, module: Module) -> Result<Vec<u8>, CodegenError> {
         let inst_buf = compile_module(module, &self.config)
             .map_err(|e| CodegenError::Triton(format!("{:?}", e)))?;
         Ok(inst_buf.pretty_print().into_bytes())
     }
 
-    fn compile(&self, _ctx: &mut Context, _op: Ptr<Operation>) -> Result<Vec<u8>, CodegenError> {
+    fn codegen(&self, _ctx: &mut Context, _op: Ptr<Operation>) -> Result<Vec<u8>, CodegenError> {
         todo!()
     }
 }

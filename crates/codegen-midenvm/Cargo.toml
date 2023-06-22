@@ -23,6 +23,7 @@ miden-processor = "0.5"
 winter-math = { version = "0.6", default-features = false }
 derive_more = { workspace = true }
 thiserror = { workspace = true }
+anyhow = { workspace = true }
 
 [dev-dependencies]
 ozk-compiler = { workspace = true }

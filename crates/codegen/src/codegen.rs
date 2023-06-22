@@ -20,7 +20,7 @@ pub fn codegen(
         }
         TargetConfig::Miden(config) => {
             let target = MidenTarget::new(config);
-            target.compile(ctx, op)?
+            target.codegen(ctx, op)?
         }
     })
 }
@@ -29,7 +29,7 @@ pub fn codegen_old(module: Module, target_config: TargetConfig) -> Result<Vec<u8
     Ok(match target_config {
         TargetConfig::Triton(config) => {
             let target = TritonTarget::new(config);
-            target.compile_module_old(module)?
+            target.codegen_module_old(module)?
         }
         TargetConfig::Miden(_) => todo!(),
     })

@@ -15,5 +15,6 @@ c2zk-ir = { workspace = true }
 ozk-wasm-dialect = { workspace = true }
 pliron = { workspace = true }
 thiserror = { workspace = true }
+anyhow = { workspace = true }
 
 [dev-dependencies]
