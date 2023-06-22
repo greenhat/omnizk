@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 use c2zk_ir_transform::miden::lowering::WasmToMidenArithLoweringPass;
 use c2zk_ir_transform::miden::lowering::WasmToMidenCFLoweringPass;
 use c2zk_ir_transform::miden::lowering::WasmToMidenFinalLoweringPass;

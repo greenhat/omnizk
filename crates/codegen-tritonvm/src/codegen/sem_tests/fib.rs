@@ -29,13 +29,13 @@ fn test_fib() {
               (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
               (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
               (func $__main (;2;) (type 2)
-                call $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E
+                call $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17haced5c71e56e11f6E
               )
-              (func $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17hac67347610fe4da4E (;3;) (type 2)
+              (func $_ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17haced5c71e56e11f6E (;3;) (type 2)
                 (local i32 i32 i32 i32)
                 block ;; label = @1
                   block ;; label = @2
-                    call $_ZN11c2zk_stdlib9pub_input17h6397ea668b208b48E
+                    call $_ZN11c2zk_stdlib9pub_input17h064aa5b6122db7f5E
                     i32.wrap_i64
                     local.tee 0
                     br_if 0 (;@2;)
@@ -124,12 +124,12 @@ fn test_fib() {
                 end
                 local.get 1
                 i64.extend_i32_u
-                call $_ZN11c2zk_stdlib10pub_output17h458bc26f7eb14631E
+                call $_ZN11c2zk_stdlib10pub_output17h8df5935fc0f775e7E
               )
-              (func $_ZN11c2zk_stdlib9pub_input17h6397ea668b208b48E (;4;) (type 0) (result i64)
+              (func $_ZN11c2zk_stdlib9pub_input17h064aa5b6122db7f5E (;4;) (type 0) (result i64)
                 call $c2zk_stdlib_pub_input
               )
-              (func $_ZN11c2zk_stdlib10pub_output17h458bc26f7eb14631E (;5;) (type 1) (param i64)
+              (func $_ZN11c2zk_stdlib10pub_output17h8df5935fc0f775e7E (;5;) (type 1) (param i64)
                 local.get 0
                 call $c2zk_stdlib_pub_output
               )

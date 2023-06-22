@@ -12,7 +12,6 @@ use pliron::linked_list::ContainsLinkedList;
 use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::pass::Pass;
-use pliron::pass::PassError;
 use pliron::pattern_match::PatternRewriter;
 use pliron::pattern_match::RewritePattern;
 use pliron::rewrite::RewritePatternSet;
@@ -25,7 +24,7 @@ impl Pass for WasmToMidenCFLoweringPass {
         "WasmToMidenCFLoweringPass"
     }
 
-    fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), PassError> {
+    fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
         let target = ConversionTarget::default();
         // TODO: set illegal ops
         let mut patterns = RewritePatternSet::default();

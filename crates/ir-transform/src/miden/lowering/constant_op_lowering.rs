@@ -11,11 +11,11 @@ use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::dialects::builtin::attr_interfaces::TypedAttrInterface;
 use pliron::dialects::builtin::attributes::IntegerAttr;
-use pliron::dialects::builtin::types::IntegerType;
 use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::pattern_match::PatternRewriter;
 use pliron::pattern_match::RewritePattern;
+use wasm::types::i32_type;
 use winter_math::StarkField;
 
 #[derive(Default)]
@@ -30,6 +30,7 @@ impl RewritePattern for ConstantOpLowering {
             .is_some())
     }
 
+    #[allow(clippy::unwrap_used)]
     fn rewrite(
         &self,
         ctx: &mut Context,
@@ -41,21 +42,13 @@ impl RewritePattern for ConstantOpLowering {
             let value = const_op.get_value(ctx);
             if let Ok(value_attr) = value.downcast::<IntegerAttr>() {
                 let field_elem_type = FieldElemType::get(ctx);
-                #[allow(clippy::expect_used)]
-                if value_attr
-                    .get_type()
-                    .deref(ctx)
-                    .downcast_ref::<IntegerType>()
-                    .expect("integer type")
-                    .get_width()
-                    <= 64
-                {
+                if value_attr.get_type() == i32_type(ctx) {
                     let value: ApInt = (*value_attr).into();
                     let attr = FieldElemAttr::create(field_elem_type, apint64_to_field_elem(value));
                     let const_op = miden::ops::ConstantOp::new_unlinked(ctx, attr);
                     rewriter.replace_op_with(ctx, op, const_op.get_operation())?;
                 } else {
-                    return Err(anyhow!("integer width > 64 is not supported"));
+                    return Err(anyhow!("only 32-bit integers are supported"));
                 }
             } else {
                 return Err(anyhow!("only integer constants are supported"));

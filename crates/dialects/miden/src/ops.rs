@@ -228,13 +228,7 @@ impl Verify for ConstantOp {
 // TODO: store expected operand types (poped from stack)?
 
 declare_op!(
-    /// Push two top stack items, sums them and push result on stack
-    ///
-    /// Attributes:
-    ///
-    /// | key | value |
-    /// |-----|-------|
-    /// | [ATTR_KEY_OP_TYPE](FuncOp::ATTR_KEY_OP_TYPE) | [TypeAttr](super::attributes::TypeAttr) |
+    /// Pop two top stack items, sums them and push result on stack
     ///
     AddOp,
     "add",
@@ -242,30 +236,11 @@ declare_op!(
 );
 
 impl AddOp {
-    /// Attribute key
-    pub const ATTR_KEY_OP_TYPE: &str = "add.type";
     /// Create a new [AddOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, ty: Ptr<TypeObj>) -> ConstantOp {
-        let ty_attr = TypeAttr::create(ty);
+    pub fn new_unlinked(ctx: &mut Context) -> ConstantOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
-        op.deref_mut(ctx)
-            .attributes
-            .insert(Self::ATTR_KEY_OP_TYPE, ty_attr);
         ConstantOp { op }
-    }
-
-    pub fn get_type(&self, ctx: &Context) -> Ptr<TypeObj> {
-        let opref = self.get_operation().deref(ctx);
-        #[allow(clippy::expect_used)]
-        let ty_attr = opref
-            .attributes
-            .get(Self::ATTR_KEY_OP_TYPE)
-            .expect("no type attribute");
-        #[allow(clippy::expect_used)]
-        attr_cast::<dyn TypedAttrInterface>(&**ty_attr)
-            .expect("invalid type attribute")
-            .get_type()
     }
 }
 
