@@ -71,10 +71,15 @@ impl RewritePattern for ControlFlowLowering {
             };
             funcs.push(func_op);
         }
-        let prog_op = miden::ProgramOp::new(ctx);
+        let main_proc_op = miden::ProcOp::new_unlinked(ctx, "ozk_miden_main_proc");
+        let start_func_call_op =
+            miden::CallOp::new_unlinked(ctx, module_op.get_start_func_sym(ctx));
+        start_func_call_op
+            .get_operation()
+            .insert_at_back(main_proc_op.get_entry_block(ctx), ctx);
+        let prog_op = miden::ProgramOp::new(ctx, main_proc_op);
         // TODO: make a new pass for module->prog conversion
-        // and call start function in main procedure (begin-end block)
-        // plus, handle imports and all other module stuff
+        // plus, handle there imports and all other module stuff
         for func_op in funcs {
             let root_proc_op = miden::ProcOp::new_unlinked(ctx, &func_op.get_symbol_name(ctx));
             let root_proc_bb = root_proc_op.get_entry_block(ctx);

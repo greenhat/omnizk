@@ -58,16 +58,27 @@ impl Verify for ProgramOp {
 }
 
 impl ProgramOp {
+    /// Attribute key for the main proc symbol.
+    pub const ATTR_KEY_MAIN_PROC_SYM: &'static str = "program.main_proc_sym";
+
     /// Create a new [ProgramOP].
     /// The returned programm has a single [crate::region::Region] with a single (BasicBlock)[crate::basic_block::BasicBlock].
-    pub fn new(ctx: &mut Context) -> ProgramOp {
+    pub fn new(ctx: &mut Context, main_proc: ProcOp) -> ProgramOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
+        let main_proc_name = main_proc.get_symbol_name(ctx);
+        {
+            let opref = &mut *op.deref_mut(ctx);
+            opref.attributes.insert(
+                Self::ATTR_KEY_MAIN_PROC_SYM,
+                StringAttr::create(main_proc_name),
+            );
+        }
         let opop = ProgramOp { op };
         // Create an empty block.
         let region = opop.get_region(ctx);
         let block = BasicBlock::new(ctx, None, vec![]);
+        main_proc.get_operation().insert_at_back(block, ctx);
         block.insert_at_front(region, ctx);
-
         opop
     }
 
