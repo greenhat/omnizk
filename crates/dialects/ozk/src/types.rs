@@ -14,6 +14,8 @@ pub enum Field {
     /// all values that the VM operates with are field elements in this field (
     /// i.e., values between 0 and 2^64 −2^32 , both inclusive).
     Oxfoi,
+    /// a 32-bit prime field defined by modulus p = 2^31 - 1,
+    P231m1,
 }
 
 /// Field element type

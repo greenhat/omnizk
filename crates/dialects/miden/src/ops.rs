@@ -1,6 +1,7 @@
 #![allow(unused_imports)]
 
 use intertrait::cast_to;
+use ozk_ozk_dialect::attributes::FieldElemAttr;
 use pliron::attribute;
 use pliron::attribute::attr_cast;
 use pliron::attribute::AttrObj;
@@ -28,8 +29,6 @@ use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::r#type::TypeObj;
 use pliron::with_context::AttachContext;
-
-use crate::attributes::FieldElemAttr;
 
 declare_op!(
     /// Represents a Miden program

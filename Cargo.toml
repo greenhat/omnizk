@@ -6,6 +6,7 @@ members = [
   "crates/dialects/ozk",
   "crates/dialects/wasm",
   "crates/dialects/miden",
+  "crates/dialects/valida",
   "crates/ir-transform",
   "crates/frontend",
   "crates/frontend-shared",
@@ -34,6 +35,7 @@ ozk-compiler = { path = "crates/compiler" }
 ozk-ozk-dialect = { path = "crates/dialects/ozk" }
 ozk-wasm-dialect = { path = "crates/dialects/wasm" }
 ozk-miden-dialect = { path = "crates/dialects/miden" }
+ozk-valida-dialect = { path = "crates/dialects/valida" }
 c2zk-ir = { path = "crates/ir" }
 c2zk-ir-transform = { path = "crates/ir-transform" }
 c2zk-frontend = { path = "crates/frontend" }

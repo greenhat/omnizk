@@ -1,3 +1,4 @@
+// use pliron::attribute::AttrObj;
 // use pliron::attribute::Attribute;
 // use pliron::common_traits::DisplayWithContext;
 // use pliron::common_traits::Verify;
@@ -20,7 +21,7 @@
 //     ty: Ptr<TypeObj>,
 //     val: FieldElem,
 // }
-// impl_attr!(FieldElemAttr, "FieldElem", "miden");
+// impl_attr!(FieldElemAttr, "FieldElem", "ozk");
 
 // impl DisplayWithContext for FieldElemAttr {
 //     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -36,8 +37,8 @@
 
 // impl FieldElemAttr {
 //     /// Create a new [FieldElemAttr].
-//     pub fn create(ty: Ptr<TypeObj>, val: FieldElem) -> Self {
-//         FieldElemAttr { ty, val }
+//     pub fn create(ty: Ptr<TypeObj>, val: FieldElem) -> AttrObj {
+//         Box::new(FieldElemAttr { ty, val })
 //     }
 // }
 
