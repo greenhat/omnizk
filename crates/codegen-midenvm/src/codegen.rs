@@ -72,7 +72,11 @@ mod tests {
 )"#,
             expect![[r#"
                 miden.program {
-                  block_3_0():
+                  block_4_0():
+                    miden.proc @ozk_miden_main_proc {
+                      entry():
+                        miden.call f1
+                    }
                     miden.proc @f1 {
                       entry():
                         miden.constant 1: felt

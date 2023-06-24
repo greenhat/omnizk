@@ -40,6 +40,10 @@ impl Pass for WasmToMidenCFLoweringPass {
 struct ControlFlowLowering;
 
 impl RewritePattern for ControlFlowLowering {
+    fn name(&self) -> String {
+        "ControlFlowLowering".to_string()
+    }
+
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)

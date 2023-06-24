@@ -21,7 +21,6 @@ pub enum Field {
 /// Field element type
 #[derive(Hash, PartialEq, Eq)]
 pub struct FieldElemType {
-    // TODO: remove?
     field: Field,
 }
 impl_type!(FieldElemType, "felt", "ozk");
