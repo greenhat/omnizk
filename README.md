@@ -26,7 +26,8 @@ The project is at an early development stage.
 - Wasm -> Miden VM transformations for a small subset of Wasm instructions (see [PR](https://github.com/greenhat/omnizk/pull/5));
 
 ### Next:
-- complete Wasm instructions support;
+- look into adding Valida VM support;
+- complete Wasm instructions support with lowering to Triton VM and Miden VM; 
 - Move IR dialect;
 - Sway IR dialect.
 
