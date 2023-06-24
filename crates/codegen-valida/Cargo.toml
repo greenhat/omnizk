@@ -16,6 +16,7 @@ c2zk-ir-transform = { workspace = true }
 c2zk-codegen-shared = { workspace = true }
 ozk-valida-dialect = { workspace = true }
 ozk-wasm-dialect = { workspace = true }
+ozk-ozk-dialect = { workspace = true }
 pliron = { workspace = true }
 derive_more = { workspace = true }
 thiserror = { workspace = true }

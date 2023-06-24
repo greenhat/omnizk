@@ -27,7 +27,7 @@ use pliron::dialect::Dialect;
 use pliron::dialect::DialectName;
 
 pub fn register(ctx: &mut Context) {
-    let mut dialect = Dialect::new(DialectName::new("ozk"));
+    let mut dialect = Dialect::new(DialectName::new("valida"));
     ops::register(ctx, &mut dialect);
     // types::register(&mut dialect);
     // attributes::register(&mut dialect);

@@ -4,4 +4,6 @@ pub enum CodegenError {
     Triton(String),
     #[error("Miden VM codegen error: {0}")]
     Miden(anyhow::Error),
+    #[error("Valida VM codegen error: {0}")]
+    Valida(anyhow::Error),
 }
