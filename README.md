@@ -52,7 +52,7 @@ pub fn fib_seq() {
 }
 ```
 
-is compiled to the following fully executable [Triton VM code](https://github.com/greenhat/omnizk/blob/2b7c7dd325ebf92711ad9f344dbef07dc14581a8/crates/codegen-tritonvm/src/codegen/sem_tests/fib.rs#L156).
+is compiled into the following fully executable [Triton VM code](https://github.com/greenhat/omnizk/blob/2b7c7dd325ebf92711ad9f344dbef07dc14581a8/crates/codegen-tritonvm/src/codegen/sem_tests/fib.rs#L156).
 
 
 ## How to build and run tests
