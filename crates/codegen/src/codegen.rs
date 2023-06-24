@@ -3,6 +3,7 @@ use c2zk_codegen_shared::Target;
 use c2zk_codegen_tritonvm::TritonTarget;
 use c2zk_ir::ir::Module;
 use ozk_codegen_midenvm::MidenTarget;
+use ozk_codegen_valida::ValidaTarget;
 use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::operation::Operation;
@@ -22,6 +23,10 @@ pub fn codegen(
             let target = MidenTarget::new(config);
             target.codegen(ctx, op)?
         }
+        TargetConfig::Valida(config) => {
+            let target = ValidaTarget::new(config);
+            target.codegen(ctx, op)?
+        }
     })
 }
 
@@ -32,5 +37,6 @@ pub fn codegen_old(module: Module, target_config: TargetConfig) -> Result<Vec<u8
             target.codegen_module_old(module)?
         }
         TargetConfig::Miden(_) => todo!(),
+        TargetConfig::Valida(_) => todo!(),
     })
 }

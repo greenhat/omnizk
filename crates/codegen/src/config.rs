@@ -2,6 +2,7 @@ pub use c2zk_codegen_tritonvm::TritonTargetConfig;
 use c2zk_ir::pass::IrPass;
 use derive_more::From;
 use ozk_codegen_midenvm::MidenTargetConfig;
+use ozk_codegen_valida::ValidaTargetConfig;
 use pliron::context::Context;
 use pliron::pass::PassManager;
 
@@ -9,6 +10,7 @@ use pliron::pass::PassManager;
 pub enum TargetConfig {
     Triton(TritonTargetConfig),
     Miden(MidenTargetConfig),
+    Valida(ValidaTargetConfig),
 }
 
 impl TargetConfig {
@@ -16,6 +18,7 @@ impl TargetConfig {
         match self {
             TargetConfig::Triton(c) => c.ir_passes.as_slice(),
             TargetConfig::Miden(_) => todo!(),
+            TargetConfig::Valida(_) => todo!(),
         }
     }
 
@@ -23,6 +26,7 @@ impl TargetConfig {
         match self {
             TargetConfig::Triton(_c) => todo!(),
             TargetConfig::Miden(m) => &m.pass_manager,
+            TargetConfig::Valida(v) => &v.pass_manager,
         }
     }
 
@@ -30,6 +34,7 @@ impl TargetConfig {
         match self {
             TargetConfig::Triton(_c) => todo!(),
             TargetConfig::Miden(m) => m.register(ctx),
+            TargetConfig::Valida(v) => v.register(ctx),
         }
     }
 }
