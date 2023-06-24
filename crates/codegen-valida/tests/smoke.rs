@@ -1,5 +1,5 @@
 mod sem_tests;
-use crate::sem_tests::check_miden;
+use crate::sem_tests::check_valida;
 
 use expect_test::expect;
 
@@ -8,7 +8,7 @@ fn test_smoke_add_wo_imports() {
     let input = vec![];
     let secret_input = vec![];
     let expected_output = vec![2];
-    check_miden(
+    check_valida(
         r#"
 (module 
     (start $main)

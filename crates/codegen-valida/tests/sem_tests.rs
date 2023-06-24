@@ -22,22 +22,23 @@ pub fn check_wasm(
     let wat = wasmprinter::print_bytes(source).unwrap();
     expected_wat.assert_eq(&wat);
 
-    check_miden(wat, input, secret_input, expected_output, expected_miden);
+    check_valida(wat, input, secret_input, expected_output, expected_miden);
 }
 
 #[allow(unreachable_code)]
-pub fn check_miden(
+pub fn check_valida(
     source: String,
     input: Vec<u64>,
     secret_input: Vec<u64>,
     expected_output: Vec<u64>,
-    expected_miden: expect_test::Expect,
+    expected_valida: expect_test::Expect,
 ) {
     let frontend_config = WasmFrontendConfig::default();
     let target_config = ValidaTargetConfig::default();
     let wasm = wat::parse_str(source).unwrap();
     let program_bytes = compile(&wasm, frontend_config.into(), target_config.into()).unwrap();
     let program = String::from_utf8(program_bytes).unwrap();
+    expected_valida.assert_eq(&program);
 }
 
 pub fn check_wat(
@@ -83,7 +84,7 @@ pub fn check_wat(
     let _ = Instance::new(&mut store, &module, &imports).unwrap();
 
     assert_eq!(store.data().output, expected_output);
-    check_miden(
+    check_valida(
         source.to_string(),
         input,
         secret_input,

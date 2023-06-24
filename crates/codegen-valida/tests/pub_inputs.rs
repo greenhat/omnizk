@@ -1,5 +1,5 @@
 mod sem_tests;
-use crate::sem_tests::check_miden;
+use crate::sem_tests::check_valida;
 use expect_test::expect;
 
 #[test]
@@ -10,7 +10,7 @@ fn test_pub_inputs() {
     // let input = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2];
     let secret_input = vec![];
     let expected_output = vec![7, 5];
-    check_miden(
+    check_valida(
         r#"
 (module 
     (type (;0;) (func (result i64)))
