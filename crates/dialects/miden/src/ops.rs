@@ -126,6 +126,16 @@ impl ProcOp {
             .iter(ctx)
             .flat_map(|bb| bb.deref(ctx).iter(ctx))
     }
+
+    pub fn get_callees_sym(&self, ctx: &Context) -> impl Iterator<Item = String> {
+        let mut callees = Vec::new();
+        for op in self.op_iter(ctx) {
+            if let Some(call_op) = op.deref(ctx).get_op(ctx).downcast_ref::<CallOp>() {
+                callees.push(call_op.get_callee_sym(ctx));
+            }
+        }
+        callees.into_iter()
+    }
 }
 
 impl OneRegionInterface for ProcOp {}
@@ -298,14 +308,14 @@ impl CallOp {
     pub const ATTR_KEY_CALLEE_SYM: &str = "call.callee_sym";
 
     /// Get the callee symbol name.
-    pub fn get_callee_sym(&self, ctx: &Context) -> AttrObj {
+    pub fn get_callee_sym(&self, ctx: &Context) -> String {
         let op = self.get_operation().deref(ctx);
         #[allow(clippy::expect_used)]
         let callee_sym = op
             .attributes
             .get(Self::ATTR_KEY_CALLEE_SYM)
             .expect("no attribute found");
-        attribute::clone::<StringAttr>(callee_sym)
+        callee_sym.with_ctx(ctx).to_string()
     }
 
     /// Create a new [CallOp]. The underlying [Operation] is not linked to a
@@ -326,19 +336,13 @@ impl DisplayWithContext for CallOp {
             f,
             "{} {}",
             self.get_opid().with_ctx(ctx),
-            self.get_callee_sym(ctx).with_ctx(ctx)
+            self.get_callee_sym(ctx)
         )
     }
 }
 
 impl Verify for CallOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
-        let callee_sym = self.get_callee_sym(ctx);
-        if !callee_sym.is::<StringAttr>() {
-            return Err(CompilerError::VerificationError {
-                msg: "Unexpected callee symbol type".to_string(),
-            });
-        }
         let op = &*self.get_operation().deref(ctx);
         if op.get_opid() != Self::get_opid_static() {
             return Err(CompilerError::VerificationError {
