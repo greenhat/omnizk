@@ -21,5 +21,6 @@ intertrait = { workspace = true }
 linkme = { workspace = true }
 paste = { workspace = true }
 inventory = { workspace = true }
+indent = { workspace = true }
 
 [dev-dependencies]

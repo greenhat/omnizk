@@ -2,9 +2,9 @@ use anyhow::anyhow;
 use c2zk_codegen_shared::CodegenError;
 use c2zk_codegen_shared::Target;
 use c2zk_ir::ir::Module;
+use ozk_valida_dialect as valida;
 use pliron::context::Context;
 use pliron::context::Ptr;
-use pliron::dialects::builtin;
 use pliron::operation::Operation;
 use pliron::with_context::AttachContext;
 
@@ -24,15 +24,15 @@ impl Target for ValidaTarget {
     }
 
     fn codegen(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<Vec<u8>, CodegenError> {
-        if let Some(module_op) = op
+        if let Some(prog_op) = op
             .deref(ctx)
             .get_op(ctx)
-            .downcast_ref::<builtin::ops::ModuleOp>()
+            .downcast_ref::<valida::ops::ProgramOp>()
         {
             todo!("compile valida program");
         } else {
             Err(CodegenError::Valida(anyhow!(
-                "expected ProgramOp, got {:?}",
+                "expected builtin.module, got {:?}",
                 op.with_ctx(ctx).to_string()
             )))
         }
