@@ -1,14 +1,13 @@
+use ozk_ozk_dialect::attributes::i32_attr;
+use ozk_ozk_dialect::attributes::i64_attr;
+use ozk_ozk_dialect::types::i32_type;
 use ozk_wasm_dialect::ops::AddOp;
 use ozk_wasm_dialect::ops::BlockOp;
 use ozk_wasm_dialect::ops::CallOp;
 use ozk_wasm_dialect::ops::ConstantOp;
 use ozk_wasm_dialect::ops::LoopOp;
 use ozk_wasm_dialect::ops::ReturnOp;
-use ozk_wasm_dialect::types::i32_type;
-use ozk_wasm_dialect::types::i64_type;
-use pliron::attribute::AttrObj;
 use pliron::context::Context;
-use pliron::dialects::builtin::attributes::IntegerAttr;
 use pliron::op::Op;
 use wasmparser::BlockType;
 
@@ -22,27 +21,19 @@ pub struct OpBuilder<'a> {
 
 #[allow(unused_variables)]
 impl<'a> OpBuilder<'a> {
-    fn i32_attr(ctx: &mut Context, value: i32) -> AttrObj {
-        IntegerAttr::create(i32_type(ctx), value.into())
-    }
-
-    fn i64_attr(ctx: &mut Context, value: i64) -> AttrObj {
-        IntegerAttr::create(i64_type(ctx), value.into())
-    }
-
     pub fn new(fbuilder: &'a mut FuncBuilder) -> OpBuilder<'a> {
         OpBuilder { fbuilder }
     }
 
     pub fn i32const(&mut self, ctx: &mut Context, value: i32) -> Result<(), FuncBuilderError> {
-        let val = OpBuilder::i32_attr(ctx, value);
+        let val = i32_attr(ctx, value);
         let op = ConstantOp::new_unlinked(ctx, val).get_operation();
         self.fbuilder.push(ctx, op)?;
         Ok(())
     }
 
     pub fn i64const(&mut self, ctx: &mut Context, value: i64) -> Result<(), FuncBuilderError> {
-        let val = OpBuilder::i64_attr(ctx, value);
+        let val = i64_attr(ctx, value);
         let op = ConstantOp::new_unlinked(ctx, val).get_operation();
         self.fbuilder.push(ctx, op)?;
         Ok(())

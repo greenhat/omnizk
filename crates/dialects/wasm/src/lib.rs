@@ -41,6 +41,6 @@ pub fn WASM_DIALECT_NAME() -> DialectName {
 
 #[allow(non_snake_case)]
 pub fn WASM_DIALECT(ctx: &Context) -> &Dialect {
-    #[allow(clippy::unwrap_used)]
-    Dialect::get_ref(ctx, WASM_DIALECT_NAME()).unwrap()
+    #[allow(clippy::expect_used)]
+    Dialect::get_ref(ctx, WASM_DIALECT_NAME()).expect("wasm dialect not registered")
 }

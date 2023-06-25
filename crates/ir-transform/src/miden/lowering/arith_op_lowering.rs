@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 use ozk_miden_dialect as miden;
+use ozk_ozk_dialect::types::i32_type;
 use ozk_wasm_dialect as wasm;
 use pliron::context::Context;
 use pliron::context::Ptr;
@@ -7,7 +8,6 @@ use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::pattern_match::PatternRewriter;
 use pliron::pattern_match::RewritePattern;
-use wasm::types::i32_type;
 
 #[derive(Default)]
 pub struct ArithOpLowering {}

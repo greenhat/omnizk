@@ -38,28 +38,28 @@ impl Imm32Op {
     /// [BasicBlock](crate::basic_block::BasicBlock).
     pub fn new_unlinked(
         ctx: &mut Context,
-        a: AttrObj,
-        b: AttrObj,
-        c: AttrObj,
-        d: AttrObj,
-        e: AttrObj,
+        a: FieldElemAttr,
+        b: FieldElemAttr,
+        c: FieldElemAttr,
+        d: FieldElemAttr,
+        e: FieldElemAttr,
     ) -> Imm32Op {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
-            .insert(Self::ATTR_KEY_OPERAND_A, a);
+            .insert(Self::ATTR_KEY_OPERAND_A, Box::new(a));
         op.deref_mut(ctx)
             .attributes
-            .insert(Self::ATTR_KEY_OPERAND_B, b);
+            .insert(Self::ATTR_KEY_OPERAND_B, Box::new(b));
         op.deref_mut(ctx)
             .attributes
-            .insert(Self::ATTR_KEY_OPERAND_C, c);
+            .insert(Self::ATTR_KEY_OPERAND_C, Box::new(c));
         op.deref_mut(ctx)
             .attributes
-            .insert(Self::ATTR_KEY_OPERAND_D, d);
+            .insert(Self::ATTR_KEY_OPERAND_D, Box::new(d));
         op.deref_mut(ctx)
             .attributes
-            .insert(Self::ATTR_KEY_OPERAND_E, e);
+            .insert(Self::ATTR_KEY_OPERAND_E, Box::new(e));
         Imm32Op { op }
     }
 
@@ -130,7 +130,7 @@ impl DisplayWithContext for Imm32Op {
 }
 
 impl Verify for Imm32Op {
-    fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+    fn verify(&self, _ctx: &Context) -> Result<(), CompilerError> {
         todo!()
     }
 }

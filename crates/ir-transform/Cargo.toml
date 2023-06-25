@@ -16,6 +16,7 @@ c2zk-frontend-shared = { workspace = true }
 ozk-ozk-dialect = { workspace = true }
 ozk-wasm-dialect = { workspace = true }
 ozk-miden-dialect = { workspace = true }
+ozk-valida-dialect = { workspace = true }
 pliron = { workspace = true }
 derive_more = { workspace = true }
 itertools = { workspace = true }

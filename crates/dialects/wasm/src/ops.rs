@@ -1,6 +1,7 @@
 #![allow(unused_imports)]
 
 use intertrait::cast_to;
+use ozk_ozk_dialect::types::u32_type_unwrapped;
 use pliron::attribute;
 use pliron::attribute::attr_cast;
 use pliron::attribute::AttrObj;
@@ -28,9 +29,6 @@ use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::r#type::TypeObj;
 use pliron::with_context::AttachContext;
-
-use crate::types::u32_type;
-use crate::types::u32_type_unwrapped;
 
 declare_op!(
     /// Represents a Wasm module, a top level container operation.
@@ -86,7 +84,7 @@ impl ModuleOp {
         ctx: &mut Context,
         name: &str,
         start_func_name: String,
-        import_funcs: Vec<(ImportFuncLabel, Ptr<TypeObj>)>,
+        _import_funcs: Vec<(ImportFuncLabel, Ptr<TypeObj>)>,
     ) -> ModuleOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
         {

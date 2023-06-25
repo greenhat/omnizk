@@ -3,6 +3,7 @@ use apint::Int;
 use apint::Width;
 use derive_more::Display;
 use derive_more::From;
+use pliron::attribute::AttrObj;
 use pliron::attribute::Attribute;
 use pliron::common_traits::DisplayWithContext;
 use pliron::common_traits::Verify;
@@ -20,6 +21,8 @@ use intertrait::cast_to;
 use pliron::with_context::AttachContext;
 use thiserror::Error;
 
+use crate::types::i32_type;
+use crate::types::i64_type;
 use crate::types::Field;
 use crate::types::FieldElemType;
 
@@ -92,6 +95,26 @@ pub fn oxfoi_field_elem_from_int(
     }
 }
 
+pub fn p231m1_field_elem_from_int_attr(
+    ctx: &mut Context,
+    int_attr: IntegerAttr,
+) -> Result<FieldElemAttr, FieldElemError> {
+    let field_elem_type = FieldElemType::get(ctx, Field::P231m1);
+    if int_attr.get_type() == IntegerType::get(ctx, 32, Signedness::Signed) {
+        Ok(FieldElemAttr::create(
+            field_elem_type,
+            apint_to_p231m1(int_attr.into()),
+        ))
+    } else {
+        Err(FieldElemError::TooLarge(int_attr.into()))
+    }
+}
+
+pub fn p231m1_field_elem_from_int(ctx: &mut Context, v: i32) -> FieldElemAttr {
+    let field_elem_type = FieldElemType::get(ctx, Field::P231m1);
+    FieldElemAttr::create(field_elem_type, FieldElem::P231m1(v as u32))
+}
+
 #[derive(Debug, Error)]
 pub enum FieldElemError {
     #[error("ApInt {0:?} is too large to fit in a field element")]
@@ -111,4 +134,20 @@ pub fn apint_to_oxfoi(value: ApInt) -> FieldElem {
     } else {
         OxfoiFieldElem::new(raw as u64).into()
     }
+}
+
+pub fn apint_to_p231m1(value: ApInt) -> FieldElem {
+    assert!(value.width() <= 32.into());
+    let i = Int::from(value);
+    #[allow(clippy::expect_used)]
+    let raw = i.try_to_i32().expect("32-bit integer");
+    (raw as u32).into()
+}
+
+pub fn i32_attr(ctx: &mut Context, value: i32) -> AttrObj {
+    IntegerAttr::create(i32_type(ctx), value.into())
+}
+
+pub fn i64_attr(ctx: &mut Context, value: i64) -> AttrObj {
+    IntegerAttr::create(i64_type(ctx), value.into())
 }

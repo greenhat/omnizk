@@ -4,7 +4,7 @@
 //! WebAssembly.
 
 use derive_more::{From, Into};
-use ozk_wasm_dialect::types::{i32_type, i64_type};
+use ozk_ozk_dialect::types::{i32_type, i64_type};
 use pliron::{
     context::{Context, Ptr},
     dialects::builtin::types::FunctionType,

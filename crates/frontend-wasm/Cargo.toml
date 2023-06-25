@@ -12,6 +12,7 @@ categories.workspace = true
 
 [dependencies]
 ozk-wasm-dialect = { workspace = true }
+ozk-ozk-dialect = { workspace = true }
 pliron = { workspace = true }
 thiserror = { workspace = true }
 c2zk-stdlib = { workspace = true }

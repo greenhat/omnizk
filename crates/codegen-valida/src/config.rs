@@ -1,5 +1,7 @@
 #![allow(unused_imports)]
 
+use c2zk_ir_transform::valida::lowering::WasmToValidaArithLoweringPass;
+use c2zk_ir_transform::valida::lowering::WasmToValidaFinalLoweringPass;
 use pliron::context::Context;
 use pliron::pass::PassManager;
 
@@ -9,10 +11,9 @@ pub struct ValidaTargetConfig {
 
 impl Default for ValidaTargetConfig {
     fn default() -> Self {
-        let pass_manager = PassManager::new();
-        // pass_manager.add_pass(Box::<WasmToMidenCFLoweringPass>::default());
-        // pass_manager.add_pass(Box::<WasmToMidenArithLoweringPass>::default());
-        // pass_manager.add_pass(Box::<WasmToMidenFinalLoweringPass>::default());
+        let mut pass_manager = PassManager::new();
+        pass_manager.add_pass(Box::<WasmToValidaArithLoweringPass>::default());
+        pass_manager.add_pass(Box::<WasmToValidaFinalLoweringPass>::default());
         Self { pass_manager }
     }
 }

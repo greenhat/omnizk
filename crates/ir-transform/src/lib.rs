@@ -27,6 +27,7 @@ mod save_stack_pub_inputs;
 
 pub mod miden;
 pub mod triton;
+pub mod valida;
 
 pub use and_minus_8::AndMinus8Pass;
 pub use dce_unused_functions::*;

@@ -2,6 +2,8 @@ use pliron::common_traits::DisplayWithContext;
 use pliron::common_traits::Verify;
 use pliron::context::Context;
 use pliron::context::Ptr;
+use pliron::dialects::builtin::types::IntegerType;
+use pliron::dialects::builtin::types::Signedness;
 use pliron::error::CompilerError;
 use pliron::impl_type;
 use pliron::r#type::Type;
@@ -55,4 +57,21 @@ impl Verify for FieldElemType {
 
 pub(crate) fn register(dialect: &mut pliron::dialect::Dialect) {
     FieldElemType::register_type_in_dialect(dialect);
+}
+
+pub fn i32_type(ctx: &mut Context) -> Ptr<TypeObj> {
+    IntegerType::get(ctx, 32, Signedness::Signed)
+}
+
+pub fn u32_type(ctx: &mut Context) -> Ptr<TypeObj> {
+    IntegerType::get(ctx, 32, Signedness::Unsigned)
+}
+
+pub fn u32_type_unwrapped(ctx: &Context) -> Ptr<TypeObj> {
+    #[allow(clippy::unwrap_used)]
+    IntegerType::get_existing(ctx, 32, Signedness::Unsigned).unwrap()
+}
+
+pub fn i64_type(ctx: &mut Context) -> Ptr<TypeObj> {
+    IntegerType::get(ctx, 64, Signedness::Signed)
 }
