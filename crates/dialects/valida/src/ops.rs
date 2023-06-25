@@ -63,21 +63,6 @@ impl Imm32Op {
         Imm32Op { op }
     }
 
-    // /// Get the constant value that this Op defines.
-    // pub fn get_value(&self, ctx: &Context) -> AttrObj {
-    //     let op = self.get_operation().deref(ctx);
-    //     #[allow(clippy::expect_used)]
-    //     let value = op
-    //         .attributes
-    //         .get(Self::ATTR_KEY_OPERANDS)
-    //         .expect("no attribute found");
-    //     if value.is::<VecAttr>() {
-    //         todo!("extract ValidaOperands from VecAttr")
-    //     } else {
-    //         todo!("panic?")
-    //     }
-    // }
-
     fn get_operand(&self, ctx: &Context, operand_name: &str) -> AttrObj {
         let op = self.get_operation().deref(ctx);
         #[allow(clippy::panic)]
