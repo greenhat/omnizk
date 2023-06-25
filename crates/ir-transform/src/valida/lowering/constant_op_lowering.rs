@@ -40,6 +40,9 @@ impl RewritePattern for ConstantOpLowering {
             if let Ok(value_attr) = value.downcast::<IntegerAttr>() {
                 let value = p231m1_field_elem_from_int_attr(ctx, *value_attr)?;
                 todo!("cell ofsset can be determined only by analyzing the entire function(track stack depth?");
+                // TODO: moreover, we need to know stack depth in runtime for every wasm op
+                // prepend every wasm op with an op that will update the current stack depth stored in the local var?
+                // and define for each wasm op how many elements it pops from and pushes to the stack
                 let cell_offset = p231m1_field_elem_from_int(ctx, 0);
                 let zero = p231m1_field_elem_from_int(ctx, 0);
                 let b = zero.clone();
