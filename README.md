@@ -51,3 +51,52 @@ pub fn fib_seq() {
 ```
 
 Is compiled to the following fully executable [Triton VM code](https://github.com/greenhat/omnizk/blob/main/crates/codegen-tritonvm/src/codegen/sem_tests/fib.rs#L146).
+
+
+### Compilation pipeline example (Wasm -> Miden VM)
+
+Here is how one can build a compiler from Wasm to Miden VM using OmniZK framework:
+
+```rust 
+pub fn compile(wasm: &[u8]) -> String {
+    let frontend_config = WasmFrontendConfig::default();
+    let target_config = MidenTargetConfig::default();
+    let mut ctx = Context::new();
+    frontend_config.register(&mut ctx);
+    target_config.register(&mut ctx);
+    let wasm_module_op =
+        ozk_frontend_wasm::parse_module(&mut ctx, wasm, &frontend_config).unwrap();
+    let miden_prog = run_conversion_passes(&mut ctx, wasm_module_op);
+    let inst_buf = emit_prog(&ctx, miden_prog, &target_config).unwrap();
+    inst_buf.pretty_print()
+}
+
+fn run_conversion_passes(ctx: &mut Context, wasm_module: ModuleOp) -> Ptr<Operation> {
+    // we need to wrap the wasm in an op because passes cannot replace the root op
+    let wrapper_module = builtin::ops::ModuleOp::new(ctx, "wrapper");
+    wasm_module
+        .get_operation()
+        .insert_at_back(wrapper_module.get_body(ctx, 0), ctx);
+    let mut pass_manager = PassManager::new();
+    pass_manager.add_pass(Box::<WasmToMidenCFLoweringPass>::default());
+    pass_manager.add_pass(Box::<WasmToMidenArithLoweringPass>::default());
+    pass_manager.add_pass(Box::<WasmToMidenFinalLoweringPass>::default());
+    pass_manager
+        .run(ctx, wrapper_module.get_operation())
+        .unwrap();
+    let inner_module = wrapper_module
+        .get_body(ctx, 0)
+        .deref(ctx)
+        .iter(ctx)
+        .collect::<Vec<Ptr<Operation>>>()
+        .first()
+        .cloned()
+        .unwrap();
+    inner_module
+}
+```
+from https://github.com/greenhat/omnizk/blob/ce2f0ebc7efa7bd82487000a0df2f7733be7304d/crates/codegen-midenvm/tests/sem_tests.rs#L35-L70
+
+You can define your custom transformations as passes and extend IRs with your custom ops.
+
+
