@@ -6,6 +6,7 @@
 use crate::error::WasmError;
 use crate::func_builder::FuncBuilder;
 use crate::types::{from_func_type, from_val_type, FuncIndex};
+use crate::WasmFrontendConfig;
 use crate::{code_translator::translate_operator, mod_builder::ModuleBuilder};
 use ozk_wasm_dialect::ops::ModuleOp;
 use pliron::context::Context;
@@ -15,12 +16,16 @@ use wasmparser::{
     Payload, Type, TypeRef, Validator, ValidatorResources, WasmModuleResources,
 };
 
-/// Translate a sequence of bytes forming a valid Wasm binary into a list of valid IR
-pub fn translate_module(ctx: &mut Context, data: &[u8]) -> Result<ModuleOp, WasmError> {
+/// Translate a sequence of bytes forming a valid Wasm binary into a `wasm.module` operation.
+pub fn parse_module(
+    ctx: &mut Context,
+    wasm: &[u8],
+    _config: &WasmFrontendConfig,
+) -> Result<ModuleOp, WasmError> {
     let mut validator = Validator::new();
     let mut mod_builder = ModuleBuilder::new();
 
-    for payload in Parser::new(0).parse_all(data) {
+    for payload in Parser::new(0).parse_all(wasm) {
         // dbg!(&mod_builder);
         match payload? {
             Payload::Version {

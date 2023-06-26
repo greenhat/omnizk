@@ -33,7 +33,7 @@ mod types;
 
 pub use crate::config::WasmFrontendConfig;
 pub use crate::error::WasmError;
-pub use crate::module_translator::translate_module;
+pub use crate::module_translator::parse_module;
 
 // Convenience reexport of the wasmparser crate that we're linking against,
 // since a number of types in `wasmparser` show up in the public API of

@@ -6,6 +6,9 @@
 
 use std::ops::RangeFrom;
 
+use c2zk_ir_transform::miden::lowering::WasmToMidenArithLoweringPass;
+use c2zk_ir_transform::miden::lowering::WasmToMidenCFLoweringPass;
+use c2zk_ir_transform::miden::lowering::WasmToMidenFinalLoweringPass;
 use miden_assembly::Assembler;
 use miden_processor::math::Felt;
 use miden_processor::AdviceInputs;
@@ -14,11 +17,57 @@ use miden_processor::StackInputs;
 use miden_processor::VmState;
 use miden_processor::VmStateIterator;
 use miden_stdlib::StdLibrary;
+use ozk_codegen_midenvm::emit_prog;
 use ozk_codegen_midenvm::MidenTargetConfig;
-use ozk_compiler::compile;
 use ozk_frontend_wasm::WasmFrontendConfig;
+use ozk_wasm_dialect::ops::ModuleOp;
+use pliron::context::Context;
+use pliron::context::Ptr;
+use pliron::dialects::builtin;
+use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
+use pliron::linked_list::ContainsLinkedList;
+use pliron::op::Op;
+use pliron::operation::Operation;
+use pliron::pass::PassManager;
 use wasmtime::*;
 use winter_math::StarkField;
+
+pub fn compile(source: &[u8]) -> String {
+    let frontend_config = WasmFrontendConfig::default();
+    let target_config = MidenTargetConfig::default();
+    let mut ctx = Context::new();
+    frontend_config.register(&mut ctx);
+    target_config.register(&mut ctx);
+    let wasm_module_op =
+        ozk_frontend_wasm::parse_module(&mut ctx, source, &frontend_config).unwrap();
+    let miden_prog = run_conversion_passes(&mut ctx, wasm_module_op);
+    let inst_buf = emit_prog(&ctx, miden_prog, &target_config).unwrap();
+    inst_buf.pretty_print()
+}
+
+fn run_conversion_passes(ctx: &mut Context, wasm_module: ModuleOp) -> Ptr<Operation> {
+    // we need to wrap the wasm in an op because passes cannot replace the root op
+    let wrapper_module = builtin::ops::ModuleOp::new(ctx, "wrapper");
+    wasm_module
+        .get_operation()
+        .insert_at_back(wrapper_module.get_body(ctx, 0), ctx);
+    let mut pass_manager = PassManager::new();
+    pass_manager.add_pass(Box::<WasmToMidenCFLoweringPass>::default());
+    pass_manager.add_pass(Box::<WasmToMidenArithLoweringPass>::default());
+    pass_manager.add_pass(Box::<WasmToMidenFinalLoweringPass>::default());
+    pass_manager
+        .run(ctx, wrapper_module.get_operation())
+        .unwrap();
+    let inner_module = wrapper_module
+        .get_body(ctx, 0)
+        .deref(ctx)
+        .iter(ctx)
+        .collect::<Vec<Ptr<Operation>>>()
+        .first()
+        .cloned()
+        .unwrap();
+    inner_module
+}
 
 pub fn check_wasm(
     source: &[u8],
@@ -34,24 +83,6 @@ pub fn check_wasm(
     check_miden(wat, input, secret_input, expected_output, expected_miden);
 }
 
-// fn compile(
-//     source: &[u8],
-//     frontend_config: &WasmFrontendConfig,
-//     target_config: &MidenTargetConfig,
-// ) -> Vec<u8> {
-//     let mut ctx = Context::new();
-//     frontend_config.register(&mut ctx);
-//     target_config.register(&mut ctx);
-//     let module = translate_module(&mut ctx, source).unwrap();
-//     target_config
-//         .pass_manager
-//         .run(&mut ctx, module.get_operation())
-//         .unwrap();
-//     let target = MidenTarget::new(target_config);
-//     let code = target.compile_module(module).unwrap();
-//     code
-// }
-
 #[allow(unreachable_code)]
 pub fn check_miden(
     source: String,
@@ -60,20 +91,8 @@ pub fn check_miden(
     expected_output: Vec<u64>,
     expected_miden: expect_test::Expect,
 ) {
-    let frontend_config = WasmFrontendConfig::default();
-    let target_config = MidenTargetConfig::default();
     let wasm = wat::parse_str(source).unwrap();
-    let miden_prog = compile(&wasm, frontend_config.into(), target_config.into()).unwrap();
-    // let module = translate(&mut ctx, &wasm, frontend_config).unwrap();
-    // run_ir_passes(&mut module, &target_config.ir_passes);
-    // let inst_buf = compile_prog(module, &target_config).unwrap();
-    // todo!("compile_module");
-    // let inst_buf: InstBuffer = InstBuffer::new(&target_config);
-    // let out_source = inst_buf.pretty_print();
-    // expected_miden.assert_eq(&out_source);
-    // let program = inst_buf.pretty_print();
-    let program = String::from_utf8(miden_prog).unwrap();
-
+    let program = compile(&wasm);
     let assembler = Assembler::default()
         .with_library(&StdLibrary::default())
         .unwrap();

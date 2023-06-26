@@ -13,7 +13,7 @@ impl InstBuffer {
         }
     }
 
-    pub(crate) fn pretty_print(&self) -> String {
+    pub fn pretty_print(&self) -> String {
         self.inner
             .iter()
             .map(|inst| {

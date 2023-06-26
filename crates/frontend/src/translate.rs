@@ -9,7 +9,7 @@ pub fn translate(
     config: FrontendConfig,
 ) -> Result<ModuleOp, FrontendError> {
     Ok(match config {
-        FrontendConfig::Wasm(_) => ozk_frontend_wasm::translate_module(ctx, source)?,
+        FrontendConfig::Wasm(config) => ozk_frontend_wasm::parse_module(ctx, source, &config)?,
     })
 }
 

@@ -8,7 +8,9 @@ pub use miden_inst::*;
 use ozk_miden_dialect::ops::*;
 use pliron::context::Context;
 use pliron::context::Ptr;
+use pliron::dialects::builtin::op_interfaces::get_callees_syms;
 use pliron::dialects::builtin::op_interfaces::SymbolOpInterface;
+use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::with_context::AttachContext;
 use thiserror::Error;
@@ -18,7 +20,7 @@ use crate::MidenError;
 use crate::MidenTargetConfig;
 
 pub fn emit_prog(
-    ctx: &mut Context,
+    ctx: &Context,
     op: Ptr<Operation>,
     target_config: &MidenTargetConfig,
 ) -> Result<InstBuffer, MidenError> {
@@ -47,7 +49,7 @@ pub fn topo_sort_procedures(
     for proc in procedures {
         let proc_name = proc.get_symbol_name(ctx);
         topo_sort.insert(proc_name.clone());
-        for dep in proc.get_callees_sym(ctx) {
+        for dep in get_callees_syms(ctx, proc.get_operation()) {
             topo_sort.add_dependency(dep, proc_name.clone());
         }
     }

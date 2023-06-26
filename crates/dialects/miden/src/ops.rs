@@ -17,6 +17,7 @@ use pliron::dialects::builtin::attributes::FloatAttr;
 use pliron::dialects::builtin::attributes::IntegerAttr;
 use pliron::dialects::builtin::attributes::StringAttr;
 use pliron::dialects::builtin::attributes::TypeAttr;
+use pliron::dialects::builtin::op_interfaces::CallOpInterface;
 use pliron::dialects::builtin::op_interfaces::OneRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SymbolOpInterface;
@@ -127,15 +128,15 @@ impl ProcOp {
             .flat_map(|bb| bb.deref(ctx).iter(ctx))
     }
 
-    pub fn get_callees_sym(&self, ctx: &Context) -> impl Iterator<Item = String> {
-        let mut callees = Vec::new();
-        for op in self.op_iter(ctx) {
-            if let Some(call_op) = op.deref(ctx).get_op(ctx).downcast_ref::<CallOp>() {
-                callees.push(call_op.get_callee_sym(ctx));
-            }
-        }
-        callees.into_iter()
-    }
+    // pub fn get_callees_sym(&self, ctx: &Context) -> impl Iterator<Item = String> {
+    //     let mut callees = Vec::new();
+    //     for op in self.op_iter(ctx) {
+    //         if let Some(call_op) = op.deref(ctx).get_op(ctx).downcast_ref::<CallOp>() {
+    //             callees.push(call_op.get_callee_sym(ctx));
+    //         }
+    //     }
+    //     callees.into_iter()
+    // }
 }
 
 impl OneRegionInterface for ProcOp {}
@@ -355,6 +356,12 @@ impl Verify for CallOp {
             });
         }
         Ok(())
+    }
+}
+
+impl CallOpInterface for CallOp {
+    fn get_callee_sym(&self, ctx: &Context) -> String {
+        self.get_callee_sym(ctx)
     }
 }
 
