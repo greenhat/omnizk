@@ -64,4 +64,4 @@ Add rust Wasm target:
 ```bash
 rustup target add wasm32-unknown-unknown
 ```
-and 'cargo build` and 'cargo test' should work fine.
+and `cargo build` and `cargo test` should work fine.
