@@ -1,7 +1,7 @@
-use c2zk_ir::ir::TopoSortError;
 use thiserror::Error;
 
 use crate::EmitError;
+use crate::TopoSortError;
 
 #[derive(Debug, Error)]
 pub enum MidenError {

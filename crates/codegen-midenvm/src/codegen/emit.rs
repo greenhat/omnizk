@@ -5,6 +5,9 @@ use c2zk_ir::ir::ext::Ext;
 use c2zk_ir::ir::ext::MidenExt;
 use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Inst;
+use pliron::context::Context;
+use pliron::context::Ptr;
+use pliron::operation::Operation;
 use thiserror::Error;
 
 use crate::InstBuffer;
@@ -17,7 +20,14 @@ pub enum EmitError {
     UnsupportedInstruction(Inst),
 }
 
-// TODO: add IR pass to remove LocalGet for accessing function parameters
+pub fn emit_op(
+    ctx: &Context,
+    op: Ptr<Operation>,
+    config: &MidenTargetConfig,
+    sink: &mut InstBuffer,
+) -> Result<(), EmitError> {
+    todo!()
+}
 
 #[allow(unused_variables)]
 pub fn emit_inst(

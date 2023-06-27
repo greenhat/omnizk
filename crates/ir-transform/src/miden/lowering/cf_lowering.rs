@@ -87,7 +87,7 @@ impl RewritePattern for ControlFlowLowering {
         for func_op in funcs {
             let root_proc_op = miden::ProcOp::new_unlinked(ctx, &func_op.get_symbol_name(ctx));
             let root_proc_bb = root_proc_op.get_entry_block(ctx);
-            prog_op.add_operation(ctx, root_proc_op.get_operation());
+            prog_op.add_proc_op(ctx, root_proc_op);
             let mut func_ops = Vec::new();
             for op in func_op.op_iter(ctx) {
                 func_ops.push(op.deref(ctx).get_op(ctx));
@@ -101,7 +101,7 @@ impl RewritePattern for ControlFlowLowering {
                         miden::CallOp::new_unlinked(ctx, callee_proc_op.get_symbol_name(ctx));
                     call_op.get_operation().insert_at_back(root_proc_bb, ctx);
                     for proc_op in proc_ops {
-                        prog_op.add_operation(ctx, proc_op.get_operation());
+                        prog_op.add_proc_op(ctx, *proc_op);
                     }
                 }
                 if op.downcast_ref::<wasm::ReturnOp>().is_some() {

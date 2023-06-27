@@ -17,16 +17,17 @@ c2zk-codegen-shared = { workspace = true }
 ozk-miden-dialect = { workspace = true }
 ozk-wasm-dialect = { workspace = true }
 pliron = { workspace = true }
-miden-assembly = "0.5"
-miden-stdlib = "0.4"
-miden-processor = "0.5"
 winter-math = { version = "0.6", default-features = false }
 derive_more = { workspace = true }
 thiserror = { workspace = true }
 anyhow = { workspace = true }
 topological-sort = { workspace = true }
+rustc-hash = "1.1.0"
 
 [dev-dependencies]
+miden-assembly = "0.5"
+miden-stdlib = "0.4"
+miden-processor = "0.5"
 ozk-frontend-wasm = { workspace = true }
 c2zk-rust-wasm-tests-helper = { workspace = true }
 c2zk-rust-wasm-tests-bundle1 = { workspace = true }

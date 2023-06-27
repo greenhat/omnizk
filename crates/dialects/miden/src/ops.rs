@@ -1,5 +1,7 @@
 #![allow(unused_imports)]
 
+use std::ops::Deref;
+
 use intertrait::cast_to;
 use ozk_ozk_dialect::attributes::FieldElemAttr;
 use pliron::attribute;
@@ -82,9 +84,23 @@ impl ProgramOp {
         opop
     }
 
-    /// Add an [Operation] into this module.
-    pub fn add_operation(&self, ctx: &mut Context, op: Ptr<Operation>) {
-        self.append_operation(ctx, op, 0)
+    pub fn get_main_proc_sym(&self, ctx: &Context) -> String {
+        #[allow(clippy::unwrap_used)]
+        let attr = self
+            .get_operation()
+            .deref(ctx)
+            .attributes
+            .get(Self::ATTR_KEY_MAIN_PROC_SYM)
+            .unwrap();
+        todo!()
+        // attr_cast::<StringAttr>(attr).unwrap().get_value()
+    }
+
+    /// Add an [ProcOp] into this program.
+    pub fn add_proc_op(&self, ctx: &mut Context, proc_op: ProcOp) {
+        // TODO: check for procedure name clashes with existing procedures?
+        // In case the procedure with the same name exist, return an error or substitute the old one?
+        self.append_operation(ctx, proc_op.get_operation(), 0)
     }
 }
 
@@ -127,16 +143,6 @@ impl ProcOp {
             .iter(ctx)
             .flat_map(|bb| bb.deref(ctx).iter(ctx))
     }
-
-    // pub fn get_callees_sym(&self, ctx: &Context) -> impl Iterator<Item = String> {
-    //     let mut callees = Vec::new();
-    //     for op in self.op_iter(ctx) {
-    //         if let Some(call_op) = op.deref(ctx).get_op(ctx).downcast_ref::<CallOp>() {
-    //             callees.push(call_op.get_callee_sym(ctx));
-    //         }
-    //     }
-    //     callees.into_iter()
-    // }
 }
 
 impl OneRegionInterface for ProcOp {}

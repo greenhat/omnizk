@@ -41,7 +41,6 @@ fn test_smoke_ir() {
     );
 }
 
-#[ignore]
 #[test]
 fn test_smoke_add_wo_imports() {
     let input = vec![];
