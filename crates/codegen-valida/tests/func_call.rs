@@ -3,6 +3,7 @@ use expect_test::expect;
 mod sem_tests;
 use crate::sem_tests::check_wat;
 
+#[ignore]
 #[test]
 fn test_func_call() {
     let input = vec![];

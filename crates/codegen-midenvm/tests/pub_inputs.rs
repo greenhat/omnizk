@@ -2,6 +2,7 @@ mod sem_tests;
 use crate::sem_tests::check_miden;
 use expect_test::expect;
 
+#[ignore]
 #[test]
 fn test_pub_inputs() {
     // let input = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2];

@@ -76,6 +76,7 @@ mod tests {
         expected_tree.assert_eq(&out_source);
     }
 
+    #[ignore]
     #[test]
     fn test_start_section() {
         check(

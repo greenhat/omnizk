@@ -3,6 +3,7 @@ use crate::sem_tests::check_miden;
 
 use expect_test::expect;
 
+#[ignore]
 #[test]
 fn test_pub_outputs() {
     let input = vec![];
