@@ -27,9 +27,6 @@ anyhow = { workspace = true }
 topological-sort = { workspace = true }
 
 [dev-dependencies]
-ozk-compiler = { workspace = true }
-c2zk-codegen = { workspace = true }
-c2zk-frontend = { workspace = true }
 ozk-frontend-wasm = { workspace = true }
 c2zk-rust-wasm-tests-helper = { workspace = true }
 c2zk-rust-wasm-tests-bundle1 = { workspace = true }

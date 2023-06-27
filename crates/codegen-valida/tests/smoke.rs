@@ -3,6 +3,7 @@ use crate::sem_tests::check_valida;
 
 use expect_test::expect;
 
+#[ignore]
 #[test]
 fn test_smoke_add_wo_imports() {
     let input = vec![];

@@ -20,6 +20,7 @@ use miden_stdlib::StdLibrary;
 use ozk_codegen_midenvm::emit_prog;
 use ozk_codegen_midenvm::MidenTargetConfig;
 use ozk_frontend_wasm::WasmFrontendConfig;
+use ozk_miden_dialect::ops::ProgramOp;
 use ozk_wasm_dialect::ops::ModuleOp;
 use pliron::context::Context;
 use pliron::context::Ptr;
@@ -32,20 +33,26 @@ use pliron::pass::PassManager;
 use wasmtime::*;
 use winter_math::StarkField;
 
-pub fn compile(source: &[u8]) -> String {
+pub fn compile_to_miden_dialect(
+    ctx: &mut Context,
+    source: &[u8],
+    target_config: &MidenTargetConfig,
+) -> ProgramOp {
     let frontend_config = WasmFrontendConfig::default();
+    frontend_config.register(ctx);
+    target_config.register(ctx);
+    let wasm_module_op = ozk_frontend_wasm::parse_module(ctx, source, &frontend_config).unwrap();
+    run_conversion_passes(ctx, wasm_module_op)
+}
+
+pub fn compile(ctx: &mut Context, source: &[u8]) -> String {
     let target_config = MidenTargetConfig::default();
-    let mut ctx = Context::new();
-    frontend_config.register(&mut ctx);
-    target_config.register(&mut ctx);
-    let wasm_module_op =
-        ozk_frontend_wasm::parse_module(&mut ctx, source, &frontend_config).unwrap();
-    let miden_prog = run_conversion_passes(&mut ctx, wasm_module_op);
-    let inst_buf = emit_prog(&ctx, miden_prog, &target_config).unwrap();
+    let miden_prog = compile_to_miden_dialect(ctx, source, &target_config);
+    let inst_buf = emit_prog(ctx, &miden_prog, &target_config).unwrap();
     inst_buf.pretty_print()
 }
 
-fn run_conversion_passes(ctx: &mut Context, wasm_module: ModuleOp) -> Ptr<Operation> {
+fn run_conversion_passes(ctx: &mut Context, wasm_module: ModuleOp) -> ProgramOp {
     // we need to wrap the wasm in an op because passes cannot replace the root op
     let wrapper_module = builtin::ops::ModuleOp::new(ctx, "wrapper");
     wasm_module
@@ -66,7 +73,11 @@ fn run_conversion_passes(ctx: &mut Context, wasm_module: ModuleOp) -> Ptr<Operat
         .first()
         .cloned()
         .unwrap();
-    inner_module
+    *inner_module
+        .deref(ctx)
+        .get_op(ctx)
+        .downcast::<ProgramOp>()
+        .unwrap_or_else(|_| panic!("Expected ProgramOp"))
 }
 
 pub fn check_wasm(
@@ -92,7 +103,8 @@ pub fn check_miden(
     expected_miden: expect_test::Expect,
 ) {
     let wasm = wat::parse_str(source).unwrap();
-    let program = compile(&wasm);
+    let mut ctx = Context::default();
+    let program = compile(&mut ctx, &wasm);
     let assembler = Assembler::default()
         .with_library(&StdLibrary::default())
         .unwrap();

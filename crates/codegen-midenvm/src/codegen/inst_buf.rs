@@ -1,3 +1,6 @@
+#![allow(unused_variables)]
+#![allow(dead_code)]
+
 use crate::MidenInst;
 use crate::MidenOutputFormat;
 use crate::MidenTargetConfig;

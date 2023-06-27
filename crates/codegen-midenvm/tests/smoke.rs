@@ -1,7 +1,45 @@
-mod sem_tests;
 use crate::sem_tests::check_miden;
+use ozk_codegen_midenvm::MidenTargetConfig;
+use pliron::context::Context;
+use pliron::with_context::AttachContext;
 
 use expect_test::expect;
+use sem_tests::compile_to_miden_dialect;
+
+mod sem_tests;
+
+fn check_ir(input: &str, expected_tree: expect_test::Expect) {
+    let source = wat::parse_str(input).unwrap();
+    let mut ctx = Context::default();
+    let target_config = MidenTargetConfig::default();
+    let miden_prog = compile_to_miden_dialect(&mut ctx, &source, &target_config);
+    expected_tree.assert_eq(miden_prog.with_ctx(&ctx).to_string().as_str());
+}
+
+#[test]
+fn test_smoke_ir() {
+    check_ir(
+        r#"
+(module 
+    (start $f1)
+    (func $f1 
+        i32.const 1
+        return)
+)"#,
+        expect![[r#"
+                miden.program {
+                  block_4_0():
+                    miden.proc @ozk_miden_main_proc {
+                      entry():
+                        miden.call f1
+                    }
+                    miden.proc @f1 {
+                      entry():
+                        miden.constant 1: felt
+                    }
+                }"#]],
+    );
+}
 
 #[ignore]
 #[test]

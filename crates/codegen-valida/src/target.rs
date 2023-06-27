@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
+
 use anyhow::anyhow;
 use c2zk_codegen_shared::CodegenError;
 use c2zk_codegen_shared::Target;

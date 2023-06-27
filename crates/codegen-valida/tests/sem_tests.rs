@@ -4,8 +4,6 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-use std::ops::RangeFrom;
-
 use ozk_codegen_valida::ValidaTargetConfig;
 use ozk_compiler::compile;
 use ozk_frontend_wasm::WasmFrontendConfig;

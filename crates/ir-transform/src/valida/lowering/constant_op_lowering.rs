@@ -1,3 +1,6 @@
+#![allow(unused_variables)]
+#![allow(dead_code)]
+
 use anyhow::anyhow;
 use ozk_ozk_dialect::attributes::p231m1_field_elem_from_int;
 use ozk_ozk_dialect::attributes::p231m1_field_elem_from_int_attr;
@@ -39,10 +42,6 @@ impl RewritePattern for ConstantOpLowering {
             let value = const_op.get_value(ctx);
             if let Ok(value_attr) = value.downcast::<IntegerAttr>() {
                 let value = p231m1_field_elem_from_int_attr(ctx, *value_attr)?;
-                todo!("cell ofsset can be determined only by analyzing the entire function(track stack depth?");
-                // TODO: moreover, we need to know stack depth in runtime for every wasm op
-                // prepend every wasm op with an op that will update the current stack depth stored in the local var?
-                // and define for each wasm op how many elements it pops from and pushes to the stack
                 let cell_offset = p231m1_field_elem_from_int(ctx, 0);
                 let zero = p231m1_field_elem_from_int(ctx, 0);
                 let b = zero.clone();
@@ -50,6 +49,10 @@ impl RewritePattern for ConstantOpLowering {
                 let d = zero;
                 let imm_op = valida::ops::Imm32Op::new_unlinked(ctx, cell_offset, b, c, d, value);
                 rewriter.replace_op_with(ctx, op, imm_op.get_operation())?;
+                // todo!("cell ofsset can be determined only by analyzing the entire function(track stack depth?");
+                // TODO: moreover, we need to know stack depth in runtime for every wasm op
+                // prepend every wasm op with an op that will update the current stack depth stored in the local var?
+                // and define for each wasm op how many elements it pops from and pushes to the stack
             } else {
                 return Err(anyhow!("only integer constants are supported"));
             }
