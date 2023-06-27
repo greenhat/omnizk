@@ -84,16 +84,14 @@ impl ProgramOp {
         opop
     }
 
+    #[allow(clippy::unwrap_used)]
     pub fn get_main_proc_sym(&self, ctx: &Context) -> String {
-        #[allow(clippy::unwrap_used)]
-        let attr = self
-            .get_operation()
-            .deref(ctx)
+        let self_op = self.get_operation().deref(ctx);
+        let attr = self_op
             .attributes
             .get(Self::ATTR_KEY_MAIN_PROC_SYM)
             .unwrap();
-        todo!()
-        // attr_cast::<StringAttr>(attr).unwrap().get_value()
+        String::from(attr.downcast_ref::<StringAttr>().unwrap().clone())
     }
 
     /// Add an [ProcOp] into this program.
