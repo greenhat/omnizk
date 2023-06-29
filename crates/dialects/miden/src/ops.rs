@@ -293,9 +293,7 @@ impl Verify for AddOp {
 }
 
 declare_op!(
-    /// Call a function.
-    ///
-    /// https://webassembly.github.io/spec/core/syntax/instructions.html#syntax-instr-control
+    /// Call miden exec on provided symbol.
     ///
     /// Attributes:
     ///
@@ -303,12 +301,12 @@ declare_op!(
     /// |-----|-------|
     /// | [ATTR_KEY_SYM_NAME](super::ATTR_KEY_SYM_NAME) | [StringAttr](super::attributes::StringAttr) |
     ///
-    CallOp,
-    "call",
+    ExecOp,
+    "exec",
     "miden"
 );
 
-impl CallOp {
+impl ExecOp {
     /// Attribute key for the callee symbol name.
     pub const ATTR_KEY_CALLEE_SYM: &str = "call.callee_sym";
 
@@ -325,17 +323,17 @@ impl CallOp {
 
     /// Create a new [CallOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, callee_name: String) -> CallOp {
+    pub fn new_unlinked(ctx: &mut Context, callee_name: String) -> ExecOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         let callee_sym = StringAttr::create(callee_name);
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_CALLEE_SYM, callee_sym);
-        CallOp { op }
+        ExecOp { op }
     }
 }
 
-impl DisplayWithContext for CallOp {
+impl DisplayWithContext for ExecOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
             f,
@@ -346,7 +344,7 @@ impl DisplayWithContext for CallOp {
     }
 }
 
-impl Verify for CallOp {
+impl Verify for ExecOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
         let op = &*self.get_operation().deref(ctx);
         if op.get_opid() != Self::get_opid_static() {
@@ -363,14 +361,14 @@ impl Verify for CallOp {
     }
 }
 
-impl CallOpInterface for CallOp {
+impl CallOpInterface for ExecOp {
     fn get_callee_sym(&self, ctx: &Context) -> String {
         self.get_callee_sym(ctx)
     }
 }
 
 declare_op!(
-    /// Push local variable with the given index onto the stack.
+    /// Push local variable value with the given index onto the stack.
     ///
     /// Attributes:
     ///
@@ -378,12 +376,12 @@ declare_op!(
     /// |-----|-------|
     /// |[ATTR_KEY_INDEX](Self::ATTR_KEY_INDEX) | [IntegerAttr] |
     ///
-    LocalGetOp,
-    "local.get",
+    LocLoadOp,
+    "loc.load",
     "miden"
 );
 
-impl LocalGetOp {
+impl LocLoadOp {
     /// Attribute key for the index
     pub const ATTR_KEY_INDEX: &str = "local.get.index";
 
@@ -399,16 +397,16 @@ impl LocalGetOp {
     }
 
     /// Create a new [LocalGetOp].
-    pub fn new_unlinked(ctx: &mut Context, index: AttrObj) -> LocalGetOp {
+    pub fn new_unlinked(ctx: &mut Context, index: AttrObj) -> LocLoadOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_INDEX, index);
-        LocalGetOp { op }
+        LocLoadOp { op }
     }
 }
 
-impl DisplayWithContext for LocalGetOp {
+impl DisplayWithContext for LocLoadOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
             f,
@@ -419,7 +417,7 @@ impl DisplayWithContext for LocalGetOp {
     }
 }
 
-impl Verify for LocalGetOp {
+impl Verify for LocLoadOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
         let index = self.get_index(ctx);
         if let Ok(index_attr) = index.downcast::<IntegerAttr>() {
@@ -454,8 +452,8 @@ impl Verify for LocalGetOp {
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ConstantOp::register(ctx, dialect);
     AddOp::register(ctx, dialect);
-    CallOp::register(ctx, dialect);
-    LocalGetOp::register(ctx, dialect);
+    ExecOp::register(ctx, dialect);
+    LocLoadOp::register(ctx, dialect);
     ProgramOp::register(ctx, dialect);
     ProcOp::register(ctx, dialect);
 }

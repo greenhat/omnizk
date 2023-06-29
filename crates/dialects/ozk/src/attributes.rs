@@ -20,6 +20,7 @@ use pliron::r#type::TypeObj;
 use intertrait::cast_to;
 use pliron::with_context::AttachContext;
 use thiserror::Error;
+use winter_math::fields::f64::BaseElement;
 
 use crate::types::i32_type;
 use crate::types::i64_type;
@@ -31,7 +32,7 @@ pub type ValidaFieldElem = u32;
 #[derive(PartialEq, Eq, Clone, Display, Debug, From)]
 // pub struct FieldElem(u64);
 pub enum FieldElem {
-    Oxfoi(winter_math::fields::f64::BaseElement),
+    Oxfoi(BaseElement),
     P231m1(u32),
 }
 
@@ -150,4 +151,12 @@ pub fn i32_attr(ctx: &mut Context, value: i32) -> AttrObj {
 
 pub fn i64_attr(ctx: &mut Context, value: i64) -> AttrObj {
     IntegerAttr::create(i64_type(ctx), value.into())
+}
+
+#[allow(clippy::panic)]
+pub fn get_oxfoi(field_elem_attr: FieldElemAttr) -> BaseElement {
+    match field_elem_attr.val {
+        FieldElem::Oxfoi(v) => v,
+        _ => panic!("Expected an Oxfoi field element"),
+    }
 }

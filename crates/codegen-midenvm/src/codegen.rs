@@ -22,12 +22,12 @@ use topological_sort::TopologicalSort;
 use crate::MidenError;
 use crate::MidenTargetConfig;
 
+// TODO: move to EmitMasm impl for ProgramOp?
 pub fn emit_prog(
     ctx: &Context,
     prog_op: &ProgramOp,
     target_config: &MidenTargetConfig,
 ) -> Result<InstBuffer, MidenError> {
-    let mut inst_buf = InstBuffer::new(target_config);
     let body = prog_op.get_body(ctx, 0);
     let mut procs = Vec::new();
     for op in body.deref(ctx).iter(ctx) {
@@ -44,32 +44,33 @@ pub fn emit_prog(
         .map(|proc| (proc.get_symbol_name(ctx), *proc))
         .collect();
     let sorted_procs = topo_sort_procedures(ctx, procs.into_iter())?;
+    let mut b = MidenAssemblyBuilder::new(InstBuffer::new(target_config));
     for proc_name in sorted_procs {
         #[allow(clippy::unwrap_used)] // topo sort should not introduce new proc syms
         let proc_op = proc_map.get(&proc_name).unwrap();
         let is_main_proc = proc_name == prog_op.get_main_proc_sym(ctx);
-        emit_proc(ctx, proc_op, is_main_proc, target_config, &mut inst_buf)?;
+        emit_proc(ctx, proc_op, is_main_proc, target_config, &mut b)?;
     }
-    Ok(inst_buf)
+    Ok(InstBuffer::new(target_config))
 }
 
+// TODO: move to EmitMasm impl for ProcOp?
 pub fn emit_proc(
     ctx: &Context,
     proc_op: &ProcOp,
     is_main_proc: bool,
     target_config: &MidenTargetConfig,
-    sink: &mut InstBuffer,
+    b: &mut MidenAssemblyBuilder,
 ) -> Result<(), MidenError> {
-    let b = MidenAssemblyBuilder::new();
     if is_main_proc {
-        sink.push(b.begin());
+        b.begin();
     } else {
-        sink.push(b.proc(proc_op.get_symbol_name(ctx), 0));
+        b.proc(proc_op.get_symbol_name(ctx), 0);
     }
     for op in proc_op.get_entry_block(ctx).deref(ctx).iter(ctx) {
-        emit_op(ctx, op, target_config, sink)?;
+        emit_op(ctx, op, target_config, b)?;
     }
-    sink.push(b.end());
+    b.end();
     Ok(())
 }
 

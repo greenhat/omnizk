@@ -77,7 +77,7 @@ impl RewritePattern for ControlFlowLowering {
         }
         let main_proc_op = miden::ProcOp::new_unlinked(ctx, "ozk_miden_main_proc");
         let start_func_call_op =
-            miden::CallOp::new_unlinked(ctx, module_op.get_start_func_sym(ctx));
+            miden::ExecOp::new_unlinked(ctx, module_op.get_start_func_sym(ctx));
         start_func_call_op
             .get_operation()
             .insert_at_back(main_proc_op.get_entry_block(ctx), ctx);
@@ -98,7 +98,7 @@ impl RewritePattern for ControlFlowLowering {
                     block_op.get_operation().unlink(ctx);
                     let callee_proc_op = proc_ops.first();
                     let call_op =
-                        miden::CallOp::new_unlinked(ctx, callee_proc_op.get_symbol_name(ctx));
+                        miden::ExecOp::new_unlinked(ctx, callee_proc_op.get_symbol_name(ctx));
                     call_op.get_operation().insert_at_back(root_proc_bb, ctx);
                     for proc_op in proc_ops {
                         prog_op.add_proc_op(ctx, *proc_op);

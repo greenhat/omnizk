@@ -1,18 +1,17 @@
-use std::collections::HashMap;
-
-use c2zk_codegen_shared::func_index_to_label;
-use c2zk_ir::ir::ext::Ext;
-use c2zk_ir::ir::ext::MidenExt;
-use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Inst;
 use pliron::context::Context;
 use pliron::context::Ptr;
+use pliron::op::op_cast;
 use pliron::operation::Operation;
+use pliron::with_context::AttachContext;
 use thiserror::Error;
 
-use crate::InstBuffer;
 use crate::MidenAssemblyBuilder;
 use crate::MidenTargetConfig;
+
+use self::emit_instr::EmitMasm;
+
+mod emit_instr;
 
 #[derive(Debug, Error)]
 pub enum EmitError {
@@ -24,11 +23,18 @@ pub fn emit_op(
     ctx: &Context,
     op: Ptr<Operation>,
     config: &MidenTargetConfig,
-    sink: &mut InstBuffer,
+    b: &mut MidenAssemblyBuilder,
 ) -> Result<(), EmitError> {
-    todo!()
+    #[allow(clippy::panic)] // all ops should be emitable
+    if let Some(emitable_op) = op_cast::<dyn EmitMasm>(op.deref(ctx).get_op(ctx).as_ref()) {
+        emitable_op.emit_masm(ctx, &b)?;
+    } else {
+        panic!("cannot emit op: {}", op.with_ctx(ctx));
+    }
+    Ok(())
 }
 
+/*
 #[allow(unused_variables)]
 pub fn emit_inst(
     inst_iter: &mut impl Iterator<Item = Inst>,
@@ -100,3 +106,4 @@ fn emit_mem_load(sink: &mut InstBuffer, builder: &MidenAssemblyBuilder, offset: 
     }
     sink.push(builder.mem_load());
 }
+*/
