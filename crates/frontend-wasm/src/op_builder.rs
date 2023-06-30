@@ -41,8 +41,8 @@ impl<'a> OpBuilder<'a> {
         Ok(())
     }
 
-    pub fn call(&mut self, ctx: &mut Context, callee_name: String) -> Result<(), FuncBuilderError> {
-        let op = CallOp::new_unlinked(ctx, callee_name).get_operation();
+    pub fn call(&mut self, ctx: &mut Context, func_index: u32) -> Result<(), FuncBuilderError> {
+        let op = CallOp::new_unlinked(ctx, func_index).get_operation();
         self.fbuilder.push(ctx, op)?;
         Ok(())
     }

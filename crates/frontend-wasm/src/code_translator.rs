@@ -22,15 +22,7 @@ pub fn translate_operator(
         Operator::End => func_builder.op().end(ctx)?,
         Operator::Return => func_builder.op().ret(ctx)?,
         Operator::Call { function_index } => {
-            let callee_name = mod_builder
-                .get_func_name((*function_index).into())
-                .ok_or_else(|| {
-                    WasmError::User(format!(
-                        "function name for call index {} is not found",
-                        function_index
-                    ))
-                })?;
-            func_builder.op().call(ctx, callee_name)?;
+            func_builder.op().call(ctx, *function_index)?;
         }
         Operator::Loop { blockty } => {
             func_builder.op().bloop(ctx, blockty)?;

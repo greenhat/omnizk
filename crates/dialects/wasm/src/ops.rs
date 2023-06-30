@@ -408,15 +408,9 @@ impl Verify for AddOp {
 }
 
 declare_op!(
-    /// Call a function.
+    /// Call a function by it's index in the module
     ///
     /// https://webassembly.github.io/spec/core/syntax/instructions.html#syntax-instr-control
-    ///
-    /// Attributes:
-    ///
-    /// | key | value |
-    /// |-----|-------|
-    /// | [ATTR_KEY_SYM_NAME](super::ATTR_KEY_SYM_NAME) | [StringAttr](super::attributes::StringAttr) |
     ///
     CallOp,
     "call",
@@ -424,28 +418,27 @@ declare_op!(
 );
 
 impl CallOp {
-    /// Attribute key for the callee symbol name.
-    pub const ATTR_KEY_CALLEE_SYM: &str = "call.callee_sym";
+    pub const ATTR_KEY_FUNC_INDEX: &str = "call.func_index";
 
-    /// Get the callee symbol name.
-    pub fn get_callee_sym(&self, ctx: &Context) -> AttrObj {
+    /// Get the function index
+    pub fn get_func_index(&self, ctx: &Context) -> AttrObj {
         let op = self.get_operation().deref(ctx);
         #[allow(clippy::expect_used)]
-        let callee_sym = op
+        let func_index = op
             .attributes
-            .get(Self::ATTR_KEY_CALLEE_SYM)
+            .get(Self::ATTR_KEY_FUNC_INDEX)
             .expect("no attribute found");
-        attribute::clone::<StringAttr>(callee_sym)
+        attribute::clone::<IntegerAttr>(func_index)
     }
 
     /// Create a new [CallOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, callee_name: String) -> CallOp {
+    pub fn new_unlinked(ctx: &mut Context, func_index: u32) -> CallOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
-        let callee_sym = StringAttr::create(callee_name);
+        let func_index_attr = u32_attr(ctx, func_index);
         op.deref_mut(ctx)
             .attributes
-            .insert(Self::ATTR_KEY_CALLEE_SYM, callee_sym);
+            .insert(Self::ATTR_KEY_FUNC_INDEX, func_index_attr);
         CallOp { op }
     }
 }
@@ -456,14 +449,14 @@ impl DisplayWithContext for CallOp {
             f,
             "{} {}",
             self.get_opid().with_ctx(ctx),
-            self.get_callee_sym(ctx).with_ctx(ctx)
+            self.get_func_index(ctx).with_ctx(ctx)
         )
     }
 }
 
 impl Verify for CallOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
-        let callee_sym = self.get_callee_sym(ctx);
+        let callee_sym = self.get_func_index(ctx);
         if !callee_sym.is::<StringAttr>() {
             return Err(CompilerError::VerificationError {
                 msg: "Unexpected callee symbol type".to_string(),
