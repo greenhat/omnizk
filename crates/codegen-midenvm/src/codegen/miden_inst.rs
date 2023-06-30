@@ -17,6 +17,10 @@ impl MidenAssemblyBuilder {
         Self { sink }
     }
 
+    pub fn build(self) -> InstBuffer {
+        self.sink
+    }
+
     pub fn begin(&mut self) {
         self.sink.push("begin".to_string().into());
     }

@@ -17,12 +17,15 @@ c2zk-codegen-shared = { workspace = true }
 ozk-miden-dialect = { workspace = true }
 ozk-wasm-dialect = { workspace = true }
 pliron = { workspace = true }
+rustc-hash = "1.1.0"
+intertrait = { workspace = true }
+# intertait dependency
+linkme = { workspace = true }
 winter-math = { version = "0.6", default-features = false }
 derive_more = { workspace = true }
 thiserror = { workspace = true }
 anyhow = { workspace = true }
 topological-sort = { workspace = true }
-rustc-hash = "1.1.0"
 
 [dev-dependencies]
 miden-assembly = "0.5"

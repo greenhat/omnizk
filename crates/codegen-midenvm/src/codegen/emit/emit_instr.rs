@@ -4,6 +4,7 @@ use ozk_miden_dialect::ops::ExecOp;
 use ozk_miden_dialect::ops::LocLoadOp;
 use pliron::context::Context;
 use pliron::op::Op;
+use intertrait::cast_to;
 
 use crate::EmitError;
 use crate::MidenAssemblyBuilder;
@@ -13,6 +14,7 @@ pub trait EmitMasm: Op {
         -> Result<(), EmitError>;
 }
 
+#[cast_to]
 impl EmitMasm for ConstantOp {
     fn emit_masm(
         &self,
@@ -25,6 +27,7 @@ impl EmitMasm for ConstantOp {
     }
 }
 
+#[cast_to]
 impl EmitMasm for AddOp {
     fn emit_masm(
         &self,
@@ -36,6 +39,7 @@ impl EmitMasm for AddOp {
     }
 }
 
+#[cast_to]
 impl EmitMasm for ExecOp {
     fn emit_masm(
         &self,
@@ -48,6 +52,7 @@ impl EmitMasm for ExecOp {
     }
 }
 
+#[cast_to]
 impl EmitMasm for LocLoadOp {
     fn emit_masm(
         &self,

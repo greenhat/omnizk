@@ -51,7 +51,7 @@ pub fn emit_prog(
         let is_main_proc = proc_name == prog_op.get_main_proc_sym(ctx);
         emit_proc(ctx, proc_op, is_main_proc, target_config, &mut b)?;
     }
-    Ok(InstBuffer::new(target_config))
+    Ok(b.build())
 }
 
 // TODO: move to EmitMasm impl for ProcOp?
