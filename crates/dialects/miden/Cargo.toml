@@ -22,6 +22,7 @@ indent = { workspace = true }
 paste = { workspace = true }
 inventory = { workspace = true }
 winter-math = { version = "0.6", default-features = false }
+apint = { workspace = true }
 
 
 [dev-dependencies]

@@ -1,6 +1,6 @@
 use anyhow::anyhow;
+use miden::attributes::FieldElemAttr;
 use ozk_miden_dialect as miden;
-use ozk_ozk_dialect::attributes::oxfoi_field_elem_from_int;
 use ozk_wasm_dialect as wasm;
 use pliron::context::Context;
 use pliron::context::Ptr;
@@ -37,7 +37,7 @@ impl RewritePattern for ConstantOpLowering {
         if let Some(const_op) = opop.downcast_ref::<wasm::ops::ConstantOp>() {
             let value = const_op.get_value(ctx);
             if let Ok(value_attr) = value.downcast::<IntegerAttr>() {
-                let value = oxfoi_field_elem_from_int(ctx, *value_attr)?;
+                let value = FieldElemAttr::from_integer_attr(ctx, *value_attr)?;
                 let const_op = miden::ops::ConstantOp::new_unlinked(ctx, value);
                 rewriter.replace_op_with(ctx, op, const_op.get_operation())?;
             } else {

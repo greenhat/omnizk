@@ -62,6 +62,13 @@ impl FieldElemAttr {
     pub fn create(ty: Ptr<TypeObj>, val: FieldElem) -> Self {
         FieldElemAttr { ty, val }
     }
+
+    pub fn as_oxfoi(&self) -> Option<&BaseElement> {
+        match &self.val {
+            FieldElem::Oxfoi(v) => Some(v),
+            FieldElem::P231m1(_) => todo!(),
+        }
+    }
 }
 
 impl From<FieldElemAttr> for FieldElem {

@@ -65,6 +65,7 @@ indexmap = "1.9"
 topological-sort = "0.2"
 # pliron = { git = "https://github.com/greenhat/pliron", rev = "28a177519e29315575c5133d6416739f233fe857" }
 pliron = { path = "../pliron" }
+apint = "0.2.0"
 paste = "1.0"
 inventory = "0.3"
 intertrait = "0.2.2"

@@ -29,8 +29,8 @@ use pliron::dialect::DialectName;
 pub fn register(ctx: &mut Context) {
     let mut dialect = Dialect::new(MIDEN_DIALECT_NAME());
     ops::register(ctx, &mut dialect);
-    // types::register(&mut dialect);
-    // attributes::register(&mut dialect);
+    types::register(&mut dialect);
+    attributes::register(&mut dialect);
     dialect.register(ctx);
 }
 

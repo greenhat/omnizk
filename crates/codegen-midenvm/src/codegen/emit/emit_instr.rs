@@ -9,11 +9,16 @@ use crate::EmitError;
 use crate::MidenAssemblyBuilder;
 
 pub trait EmitMasm: Op {
-    fn emit_masm(&self, ctx: &Context, builder: &MidenAssemblyBuilder) -> Result<(), EmitError>;
+    fn emit_masm(&self, ctx: &Context, builder: &mut MidenAssemblyBuilder)
+        -> Result<(), EmitError>;
 }
 
 impl EmitMasm for ConstantOp {
-    fn emit_masm(&self, ctx: &Context, builder: &MidenAssemblyBuilder) -> Result<(), EmitError> {
+    fn emit_masm(
+        &self,
+        ctx: &Context,
+        builder: &mut MidenAssemblyBuilder,
+    ) -> Result<(), EmitError> {
         let val = self.get_value(ctx);
         builder.push(val.into());
         Ok(())
@@ -21,14 +26,22 @@ impl EmitMasm for ConstantOp {
 }
 
 impl EmitMasm for AddOp {
-    fn emit_masm(&self, ctx: &Context, builder: &MidenAssemblyBuilder) -> Result<(), EmitError> {
+    fn emit_masm(
+        &self,
+        ctx: &Context,
+        builder: &mut MidenAssemblyBuilder,
+    ) -> Result<(), EmitError> {
         builder.add();
         Ok(())
     }
 }
 
 impl EmitMasm for ExecOp {
-    fn emit_masm(&self, ctx: &Context, builder: &MidenAssemblyBuilder) -> Result<(), EmitError> {
+    fn emit_masm(
+        &self,
+        ctx: &Context,
+        builder: &mut MidenAssemblyBuilder,
+    ) -> Result<(), EmitError> {
         let callee = self.get_callee_sym(ctx);
         builder.exec(callee);
         Ok(())
@@ -36,9 +49,13 @@ impl EmitMasm for ExecOp {
 }
 
 impl EmitMasm for LocLoadOp {
-    fn emit_masm(&self, ctx: &Context, builder: &MidenAssemblyBuilder) -> Result<(), EmitError> {
-        let local = self.get_index(ctx);
-        builder.loc_load(local);
+    fn emit_masm(
+        &self,
+        ctx: &Context,
+        builder: &mut MidenAssemblyBuilder,
+    ) -> Result<(), EmitError> {
+        let index = self.get_index_as_u32(ctx);
+        builder.loc_load(index);
         Ok(())
     }
 }

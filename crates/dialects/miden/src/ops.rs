@@ -2,8 +2,8 @@
 
 use std::ops::Deref;
 
+use apint::ApInt;
 use intertrait::cast_to;
-use ozk_ozk_dialect::attributes::FieldElemAttr;
 use pliron::attribute;
 use pliron::attribute::attr_cast;
 use pliron::attribute::AttrObj;
@@ -32,6 +32,8 @@ use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::r#type::TypeObj;
 use pliron::with_context::AttachContext;
+
+use crate::attributes::FieldElemAttr;
 
 declare_op!(
     /// Represents a Miden program
@@ -190,18 +192,15 @@ impl ConstantOp {
     /// Attribute key for the constant value.
     pub const ATTR_KEY_VALUE: &str = "constant.value";
     /// Get the constant value that this Op defines.
-    pub fn get_value(&self, ctx: &Context) -> AttrObj {
+    pub fn get_value(&self, ctx: &Context) -> FieldElemAttr {
         let op = self.get_operation().deref(ctx);
         #[allow(clippy::expect_used)]
         let value = op
             .attributes
             .get(Self::ATTR_KEY_VALUE)
             .expect("no attribute found");
-        if value.is::<IntegerAttr>() {
-            attribute::clone::<IntegerAttr>(value)
-        } else {
-            attribute::clone::<FieldElemAttr>(value)
-        }
+        #[allow(clippy::unwrap_used)]
+        value.downcast_ref::<FieldElemAttr>().unwrap().clone()
     }
 
     /// Create a new [ConstantOp]. The underlying [Operation] is not linked to a
@@ -229,12 +228,6 @@ impl DisplayWithContext for ConstantOp {
 
 impl Verify for ConstantOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
-        let value = self.get_value(ctx);
-        if !value.is::<FieldElemAttr>() {
-            return Err(CompilerError::VerificationError {
-                msg: "Unexpected constant type".to_string(),
-            });
-        }
         let op = &*self.get_operation().deref(ctx);
         if op.get_opid() != Self::get_opid_static() {
             return Err(CompilerError::VerificationError {
@@ -383,7 +376,7 @@ declare_op!(
 
 impl LocLoadOp {
     /// Attribute key for the index
-    pub const ATTR_KEY_INDEX: &str = "local.get.index";
+    pub const ATTR_KEY_INDEX: &str = "loc.load.index";
 
     /// Get the index of the local variable.
     pub fn get_index(&self, ctx: &Context) -> AttrObj {
@@ -394,6 +387,15 @@ impl LocLoadOp {
             .get(Self::ATTR_KEY_INDEX)
             .expect("no attribute found");
         attribute::clone::<IntegerAttr>(value)
+    }
+
+    /// Get the index of the local variable as u32.
+    #[allow(clippy::unwrap_used)]
+    pub fn get_index_as_u32(&self, ctx: &Context) -> u32 {
+        let attr = self.get_index(ctx);
+        #[allow(clippy::unwrap_used)]
+        let apint: ApInt = attr.downcast_ref::<IntegerAttr>().unwrap().clone().into();
+        apint.try_to_u32().unwrap()
     }
 
     /// Create a new [LocalGetOp].
