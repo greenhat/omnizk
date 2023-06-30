@@ -26,6 +26,7 @@ use crate::types::i32_type;
 use crate::types::i64_type;
 use crate::types::Field;
 use crate::types::FieldElemType;
+use crate::types::u32_type;
 
 pub type ValidaFieldElem = u32;
 
@@ -150,6 +151,10 @@ pub fn apint_to_p231m1(value: ApInt) -> FieldElem {
     #[allow(clippy::expect_used)]
     let raw = i.try_to_i32().expect("32-bit integer");
     (raw as u32).into()
+}
+
+pub fn u32_attr(ctx: &mut Context, value: u32) -> AttrObj {
+    IntegerAttr::create(u32_type(ctx), value.into())
 }
 
 pub fn i32_attr(ctx: &mut Context, value: i32) -> AttrObj {

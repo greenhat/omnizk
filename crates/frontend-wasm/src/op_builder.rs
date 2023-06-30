@@ -1,10 +1,12 @@
 use ozk_ozk_dialect::attributes::i32_attr;
 use ozk_ozk_dialect::attributes::i64_attr;
 use ozk_ozk_dialect::types::i32_type;
+use ozk_ozk_dialect::types::i64_type;
 use ozk_wasm_dialect::ops::AddOp;
 use ozk_wasm_dialect::ops::BlockOp;
 use ozk_wasm_dialect::ops::CallOp;
 use ozk_wasm_dialect::ops::ConstantOp;
+use ozk_wasm_dialect::ops::LocalGetOp;
 use ozk_wasm_dialect::ops::LoopOp;
 use ozk_wasm_dialect::ops::ReturnOp;
 use pliron::context::Context;
@@ -74,12 +76,16 @@ impl<'a> OpBuilder<'a> {
     }
 
     pub fn end(&mut self, ctx: &mut Context) -> Result<(), FuncBuilderError> {
-        self.fbuilder.push_end(ctx)?;
-        Ok(())
+        self.fbuilder.push_end(ctx)
     }
 
-    pub fn local_get(&mut self, ctx: &mut Context, local_index: u32) {
-        todo!();
+    pub fn local_get(
+        &mut self,
+        ctx: &mut Context,
+        local_index: u32,
+    ) -> Result<(), FuncBuilderError> {
+        let op = LocalGetOp::new_unlinked(ctx, local_index);
+        self.fbuilder.push(ctx, op.get_operation())
     }
 
     pub fn local_tee(&mut self, ctx: &mut Context, local_index: u32) {
@@ -112,8 +118,10 @@ impl<'a> OpBuilder<'a> {
         todo!();
     }
 
-    pub fn i64add(&mut self, ctx: &mut Context) {
-        todo!();
+    pub fn i64add(&mut self, ctx: &mut Context) -> Result<(), FuncBuilderError> {
+        let ty = i64_type(ctx);
+        let op = AddOp::new_unlinked(ctx, ty).get_operation();
+        self.fbuilder.push(ctx, op)
     }
 
     pub fn i64eqz(&mut self, ctx: &mut Context) {

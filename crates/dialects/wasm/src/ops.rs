@@ -1,6 +1,7 @@
 #![allow(unused_imports)]
 
 use intertrait::cast_to;
+use ozk_ozk_dialect::attributes::u32_attr;
 use ozk_ozk_dialect::types::u32_type_unwrapped;
 use pliron::attribute;
 use pliron::attribute::attr_cast;
@@ -750,11 +751,13 @@ impl LocalGetOp {
     }
 
     /// Create a new [LocalGetOp].
-    pub fn new_unlinked(ctx: &mut Context, index: AttrObj) -> LocalGetOp {
+    pub fn new_unlinked(ctx: &mut Context, index: u32) -> LocalGetOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+
+        let index_attr = u32_attr(ctx, index);
         op.deref_mut(ctx)
             .attributes
-            .insert(Self::ATTR_KEY_INDEX, index);
+            .insert(Self::ATTR_KEY_INDEX, index_attr);
         LocalGetOp { op }
     }
 }

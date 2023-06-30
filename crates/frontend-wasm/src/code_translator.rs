@@ -24,7 +24,12 @@ pub fn translate_operator(
         Operator::Call { function_index } => {
             let callee_name = mod_builder
                 .get_func_name((*function_index).into())
-                .ok_or_else(|| WasmError::User("Call index is not found".to_string()))?;
+                .ok_or_else(|| {
+                    WasmError::User(format!(
+                        "function name for call index {} is not found",
+                        function_index
+                    ))
+                })?;
             func_builder.op().call(ctx, callee_name)?;
         }
         Operator::Loop { blockty } => {
@@ -39,7 +44,7 @@ pub fn translate_operator(
         Operator::Br { relative_depth } => {
             func_builder.op().br(ctx, *relative_depth);
         }
-        Operator::LocalGet { local_index } => func_builder.op().local_get(ctx, *local_index),
+        Operator::LocalGet { local_index } => func_builder.op().local_get(ctx, *local_index)?,
         Operator::LocalTee { local_index } => func_builder.op().local_tee(ctx, *local_index),
         Operator::LocalSet { local_index } => func_builder.op().local_set(ctx, *local_index),
         Operator::I32Const { value } => func_builder.op().i32const(ctx, *value)?,
@@ -49,7 +54,7 @@ pub fn translate_operator(
         Operator::I32WrapI64 => func_builder.op().i32wrapi64(ctx),
         Operator::I32GeU => func_builder.op().i32geu(ctx),
         Operator::I32And => func_builder.op().i32and(ctx),
-        Operator::I64Add => func_builder.op().i64add(ctx),
+        Operator::I64Add => func_builder.op().i64add(ctx)?,
         Operator::I64Eqz => func_builder.op().i64eqz(ctx),
         Operator::I64And => func_builder.op().i64and(ctx),
         Operator::I64GeU => func_builder.op().i64geu(ctx),
