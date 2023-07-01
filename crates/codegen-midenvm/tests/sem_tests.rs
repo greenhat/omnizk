@@ -102,12 +102,11 @@ pub fn check_wasm(
     let wat = wasmprinter::print_bytes(source).unwrap();
     expected_wat.assert_eq(&wat);
 
-    check_miden(wat, input, secret_input, expected_output, expected_miden);
+    check_miden(&wat, input, secret_input, expected_output, expected_miden);
 }
 
-#[allow(unreachable_code)]
 pub fn check_miden(
-    source: String,
+    source: &str,
     input: Vec<u64>,
     secret_input: Vec<u64>,
     expected_output: Vec<u64>,
@@ -193,13 +192,7 @@ pub fn check_wat(
     let _ = Instance::new(&mut store, &module, &imports).unwrap();
 
     assert_eq!(store.data().output, expected_output);
-    check_miden(
-        source.to_string(),
-        input,
-        secret_input,
-        expected_output,
-        expected_miden,
-    );
+    check_miden(source, input, secret_input, expected_output, expected_miden);
 }
 
 fn pretty_stack_felt(stack: &[Felt]) -> Vec<u64> {

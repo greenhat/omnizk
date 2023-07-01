@@ -13,7 +13,7 @@ fn test_pub_inputs() {
     let expected_output = vec![7, 5];
     check_miden(
         r#"
-(module 
+(module
     (type (;0;) (func (result i64)))
     (type (;1;) (func (param i64)))
     (type (;2;) (func))
@@ -22,12 +22,11 @@ fn test_pub_inputs() {
     (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
     (export "main" (func $main))
     (start $main)
-    (func $main 
+    (func $main
         call $c2zk_stdlib_pub_input
         call $c2zk_stdlib_pub_input
         return)
-)"#
-        .to_string(),
+)"#,
         input,
         secret_input,
         expected_output,

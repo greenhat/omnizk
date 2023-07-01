@@ -25,8 +25,7 @@ fn test_func_call_no_args() {
     (func $main
         call $get
         return)
-)"#
-        .to_owned(),
+)"#,
         input,
         secret_input,
         expected_output,
@@ -116,8 +115,7 @@ fn test_func_call_w_args() {
         i32.const 2
         call $add
         return)
-)"#
-        .to_owned(),
+)"#,
         input,
         secret_input,
         expected_output,

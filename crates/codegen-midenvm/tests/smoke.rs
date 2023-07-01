@@ -44,8 +44,7 @@ fn test_smoke_add_wo_imports() {
         i32.const 2
         i32.add
         return)
-)"#
-        .to_string(),
+)"#,
         input,
         secret_input,
         expected_output,
