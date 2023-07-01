@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use ozk_wasm_dialect::ops::ImportFuncLabel;
 use ozk_wasm_dialect::ops::ModuleOp;
+use ozk_wasm_dialect::types::FuncIndex;
+use ozk_wasm_dialect::types::TypeIndex;
 use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::op::Op;
@@ -10,8 +12,6 @@ use thiserror::Error;
 
 use crate::func_builder::FuncBuilder;
 use crate::func_builder::FuncBuilderError;
-use crate::types::FuncIndex;
-use crate::types::TypeIndex;
 
 pub struct ModuleBuilder {
     types: Vec<Ptr<TypeObj>>,

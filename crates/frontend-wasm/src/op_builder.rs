@@ -9,13 +9,13 @@ use ozk_wasm_dialect::ops::ConstantOp;
 use ozk_wasm_dialect::ops::LocalGetOp;
 use ozk_wasm_dialect::ops::LoopOp;
 use ozk_wasm_dialect::ops::ReturnOp;
+use ozk_wasm_dialect::types::from_block_type;
 use pliron::context::Context;
 use pliron::op::Op;
 use wasmparser::BlockType;
 
 use crate::func_builder::FuncBuilder;
 use crate::func_builder::FuncBuilderError;
-use crate::types::from_block_type;
 
 pub struct OpBuilder<'a> {
     fbuilder: &'a mut FuncBuilder,

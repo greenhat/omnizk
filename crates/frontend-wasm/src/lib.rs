@@ -29,7 +29,6 @@ mod func_builder;
 mod mod_builder;
 mod module_translator;
 mod op_builder;
-mod types;
 
 pub use crate::config::WasmFrontendConfig;
 pub use crate::error::WasmError;

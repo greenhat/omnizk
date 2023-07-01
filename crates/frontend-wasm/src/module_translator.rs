@@ -5,10 +5,10 @@
 
 use crate::error::WasmError;
 use crate::func_builder::FuncBuilder;
-use crate::types::{from_func_type, from_val_type, FuncIndex};
 use crate::WasmFrontendConfig;
 use crate::{code_translator::translate_operator, mod_builder::ModuleBuilder};
 use ozk_wasm_dialect::ops::ModuleOp;
+use ozk_wasm_dialect::types::{from_func_type, from_val_type, FuncIndex};
 use pliron::context::Context;
 use pliron::dialects::builtin::types::FunctionType;
 use wasmparser::{

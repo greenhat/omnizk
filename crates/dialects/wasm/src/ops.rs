@@ -31,6 +31,8 @@ use pliron::operation::Operation;
 use pliron::r#type::TypeObj;
 use pliron::with_context::AttachContext;
 
+use crate::types::FuncIndex;
+
 declare_op!(
     /// Represents a Wasm module, a top level container operation.
     ///
@@ -86,6 +88,7 @@ impl ModuleOp {
         name: &str,
         start_func_name: String,
         _import_funcs: Vec<(ImportFuncLabel, Ptr<TypeObj>)>,
+        // func_names: Vec<(FuncIndex, String)>,
     ) -> ModuleOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
         {
