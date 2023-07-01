@@ -107,6 +107,7 @@ pub fn check_miden(
     let wasm = wat::parse_str(source).unwrap();
     let mut ctx = Context::default();
     let program = compile(&mut ctx, &wasm);
+    expected_miden.assert_eq(&program);
     let assembler = Assembler::default()
         .with_library(&StdLibrary::default())
         .unwrap();
