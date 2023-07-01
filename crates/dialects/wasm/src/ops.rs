@@ -250,6 +250,16 @@ impl FuncOp {
             .get_type()
     }
 
+    /// Get the function signature (type).
+    pub fn get_type_typed(&self, ctx: &Context) -> FunctionType {
+        let func_type_obj = self.get_type(ctx).deref(ctx);
+        #[allow(clippy::panic)]
+        let Some(func_type) = func_type_obj.downcast_ref::<FunctionType>() else {
+            panic!("FuncOp type is not a FunctionType");
+        };
+        func_type.clone()
+    }
+
     /// Get the entry block of this function.
     pub fn get_entry_block(&self, ctx: &Context) -> Ptr<BasicBlock> {
         #[allow(clippy::unwrap_used)]
@@ -842,6 +852,88 @@ impl Verify for LocalGetOp {
     }
 }
 
+declare_op!(
+    /// Pops the stack and save the value into the local variable with the given index
+    ///
+    /// Attributes:
+    ///
+    /// | key | value |
+    /// |-----|-------|
+    /// |[ATTR_KEY_INDEX](Self::ATTR_KEY_INDEX) | [IntegerAttr] |
+    ///
+    LocalSetOp,
+    "local.set",
+    "wasm"
+);
+
+impl LocalSetOp {
+    /// Attribute key for the index
+    pub const ATTR_KEY_INDEX: &str = "local.set.index";
+
+    /// Get the index of the local variable.
+    pub fn get_index(&self, ctx: &Context) -> AttrObj {
+        let op = self.get_operation().deref(ctx);
+        #[allow(clippy::expect_used)]
+        let value = op
+            .attributes
+            .get(Self::ATTR_KEY_INDEX)
+            .expect("no attribute found");
+        attribute::clone::<IntegerAttr>(value)
+    }
+
+    /// Create a new [LocalSetOp].
+    pub fn new_unlinked(ctx: &mut Context, index: u32) -> LocalSetOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+
+        let index_attr = u32_attr(ctx, index);
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_INDEX, index_attr);
+        LocalSetOp { op }
+    }
+}
+
+impl DisplayWithContext for LocalSetOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "{} {}",
+            self.get_opid().with_ctx(ctx),
+            self.get_index(ctx).with_ctx(ctx)
+        )
+    }
+}
+
+impl Verify for LocalSetOp {
+    fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+        let index = self.get_index(ctx);
+        if let Ok(index_attr) = index.downcast::<IntegerAttr>() {
+            #[allow(clippy::unwrap_used)]
+            if index_attr.get_type() != u32_type_unwrapped(ctx) {
+                return Err(CompilerError::VerificationError {
+                    msg: "Expected u32 for index".to_string(),
+                });
+            }
+        } else {
+            return Err(CompilerError::VerificationError {
+                msg: "Unexpected index type".to_string(),
+            });
+        };
+        let op = &*self.get_operation().deref(ctx);
+        if op.get_opid() != Self::get_opid_static() {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect OpId".to_string(),
+            });
+        }
+        if op.get_num_results() != 0 || op.get_num_operands() != 0 {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect number of results or operands".to_string(),
+            });
+        }
+        Ok(())
+    }
+}
+
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ModuleOp::register(ctx, dialect);
     ConstantOp::register(ctx, dialect);
@@ -852,4 +944,5 @@ pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     BlockOp::register(ctx, dialect);
     LoopOp::register(ctx, dialect);
     LocalGetOp::register(ctx, dialect);
+    LocalSetOp::register(ctx, dialect);
 }

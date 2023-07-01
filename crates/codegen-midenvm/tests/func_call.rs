@@ -5,7 +5,7 @@ mod sem_tests;
 use crate::sem_tests::check_wat;
 
 #[test]
-fn test_minimum_func_call() {
+fn test_func_call_no_args() {
     let input = vec![];
     let secret_input = vec![];
     let expected_output = vec![3];
@@ -23,6 +23,51 @@ fn test_minimum_func_call() {
         return)
     (func $main
         call $get
+        return)
+)"#
+        .to_owned(),
+        input,
+        secret_input,
+        expected_output,
+        expect![[r#"
+            proc.get.0
+            push.1
+            push.2
+            add
+            end
+
+            proc.main.0
+            exec.get
+            end
+
+            begin
+            exec.main
+            end
+        "#]],
+    );
+}
+
+#[test]
+fn test_func_call_w_args() {
+    let input = vec![];
+    let secret_input = vec![];
+    let expected_output = vec![3];
+    check_miden(
+        r#"
+(module
+    (type (;0;) (func (result i32)))
+    (type (;2;) (func))
+    (export "main" (func $main))
+    (start $main)
+    (func $add (param i32 i32) (result i32)
+        get_local 0
+        get_local 1
+        i32.add
+        return)
+    (func $main
+        i32.const 1
+        i32.const 2
+        call $add
         return)
 )"#
         .to_owned(),

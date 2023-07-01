@@ -6,10 +6,6 @@
 
 use std::ops::RangeFrom;
 
-use c2zk_ir_transform::miden::lowering::call_op_lowering::WasmToMidenCallOpLoweringPass;
-use c2zk_ir_transform::miden::lowering::WasmToMidenArithLoweringPass;
-use c2zk_ir_transform::miden::lowering::WasmToMidenCFLoweringPass;
-use c2zk_ir_transform::miden::lowering::WasmToMidenFinalLoweringPass;
 use miden_assembly::Assembler;
 use miden_processor::math::Felt;
 use miden_processor::AdviceInputs;
@@ -30,7 +26,6 @@ use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
 use pliron::linked_list::ContainsLinkedList;
 use pliron::op::Op;
 use pliron::operation::Operation;
-use pliron::pass::PassManager;
 use wasmtime::*;
 use winter_math::StarkField;
 
@@ -43,7 +38,7 @@ pub fn compile_to_miden_dialect(
     frontend_config.register(ctx);
     target_config.register(ctx);
     let wasm_module_op = ozk_frontend_wasm::parse_module(ctx, source, &frontend_config).unwrap();
-    run_conversion_passes(ctx, wasm_module_op)
+    run_conversion_passes(ctx, wasm_module_op, target_config)
 }
 
 pub fn compile(ctx: &mut Context, source: &[u8]) -> String {
@@ -53,18 +48,18 @@ pub fn compile(ctx: &mut Context, source: &[u8]) -> String {
     inst_buf.pretty_print()
 }
 
-fn run_conversion_passes(ctx: &mut Context, wasm_module: ModuleOp) -> ProgramOp {
+fn run_conversion_passes(
+    ctx: &mut Context,
+    wasm_module: ModuleOp,
+    target_config: &MidenTargetConfig,
+) -> ProgramOp {
     // we need to wrap the wasm in an op because passes cannot replace the root op
     let wrapper_module = builtin::ops::ModuleOp::new(ctx, "wrapper");
     wasm_module
         .get_operation()
         .insert_at_back(wrapper_module.get_body(ctx, 0), ctx);
-    let mut pass_manager = PassManager::new();
-    pass_manager.add_pass(Box::<WasmToMidenCallOpLoweringPass>::default());
-    pass_manager.add_pass(Box::<WasmToMidenCFLoweringPass>::default());
-    pass_manager.add_pass(Box::<WasmToMidenArithLoweringPass>::default());
-    pass_manager.add_pass(Box::<WasmToMidenFinalLoweringPass>::default());
-    pass_manager
+    target_config
+        .pass_manager
         .run(ctx, wrapper_module.get_operation())
         .unwrap();
     let inner_module = wrapper_module
