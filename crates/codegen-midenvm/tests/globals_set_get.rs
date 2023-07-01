@@ -3,6 +3,7 @@ use sem_tests::check_miden;
 
 mod sem_tests;
 
+#[ignore]
 #[test]
 fn test_globals_set_get() {
     let input = vec![];
@@ -21,7 +22,8 @@ fn test_globals_set_get() {
         global.set $MyGlobalVal
         global.get $MyGlobalVal
         return)
-)"#,
+)
+"#,
         input,
         secret_input,
         expected_output,

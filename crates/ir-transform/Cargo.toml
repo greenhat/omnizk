@@ -24,3 +24,6 @@ anyhow = { workspace = true }
 bounded-vec = { workspace = true }
 
 [dev-dependencies]
+ozk-frontend-wasm = { workspace = true }
+expect-test = { workspace = true }
+wat = { workspace = true }
