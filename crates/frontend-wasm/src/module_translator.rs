@@ -189,7 +189,7 @@ fn parse_code_section_entry(
     let func_idx = mod_builder.next_func_idx();
     let func_name = mod_builder
         .get_func_name(func_idx)
-        .unwrap_or(format!("f{}", u32::from(func_idx)));
+        .unwrap_or(format!("f{}", u32::from(func_idx)).into());
     // dbg!(&func_name);
     let mut builder = FuncBuilder::new(ctx, func_name);
     let mut reader = body.get_binary_reader();

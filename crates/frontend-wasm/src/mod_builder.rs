@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use ozk_wasm_dialect::ops::ImportFuncLabel;
 use ozk_wasm_dialect::ops::ModuleOp;
 use ozk_wasm_dialect::types::FuncIndex;
+use ozk_wasm_dialect::types::FuncSym;
 use ozk_wasm_dialect::types::TypeIndex;
 use pliron::context::Context;
 use pliron::context::Ptr;
@@ -18,7 +19,7 @@ pub struct ModuleBuilder {
     start_func_idx: Option<FuncIndex>,
     functions: Vec<FuncBuilder>,
     import_functions: Vec<(ImportFuncLabel, TypeIndex)>,
-    func_names: HashMap<FuncIndex, String>,
+    func_names: HashMap<FuncIndex, FuncSym>,
     func_types: HashMap<FuncIndex, TypeIndex>,
 }
 
@@ -124,10 +125,10 @@ impl ModuleBuilder {
     pub fn declare_func_name(&mut self, func_idx: FuncIndex, name: String) {
         // dbg!(&func_idx);
         // dbg!(&name);
-        self.func_names.insert(func_idx, name);
+        self.func_names.insert(func_idx, name.into());
     }
 
-    pub fn get_func_name(&self, func_idx: FuncIndex) -> Option<String> {
+    pub fn get_func_name(&self, func_idx: FuncIndex) -> Option<FuncSym> {
         self.func_names.get(&func_idx).cloned()
     }
 

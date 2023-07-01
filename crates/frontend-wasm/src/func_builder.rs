@@ -1,6 +1,7 @@
 use ozk_wasm_dialect::ops::BlockOp;
 use ozk_wasm_dialect::ops::FuncOp;
 use ozk_wasm_dialect::ops::LoopOp;
+use ozk_wasm_dialect::types::FuncSym;
 use pliron::basic_block::BasicBlock;
 use pliron::context::Context;
 use pliron::context::Ptr;
@@ -13,14 +14,14 @@ use thiserror::Error;
 use crate::op_builder::OpBuilder;
 
 pub struct FuncBuilder {
-    name: String,
+    name: FuncSym,
     sig: Option<Ptr<TypeObj>>,
     blocks: Vec<BlockBuilder>,
     locals: Vec<Ptr<TypeObj>>,
 }
 
 impl FuncBuilder {
-    pub fn new(ctx: &mut Context, name: String) -> FuncBuilder {
+    pub fn new(ctx: &mut Context, name: FuncSym) -> FuncBuilder {
         FuncBuilder {
             name,
             sig: None,
@@ -45,7 +46,7 @@ impl FuncBuilder {
 
     pub fn build(mut self, ctx: &mut Context) -> Result<FuncOp, FuncBuilderError> {
         let sig = self.sig.ok_or_else(|| {
-            FuncBuilderError::MissingSignature(format!("FuncBuilder for {}", self.name))
+            FuncBuilderError::MissingSignature(format!("FuncBuilder for {:?}", self.name))
         })?;
         // TODO: should be a separate lowering pass
         // let mut locals_with_params = self.locals.clone();
@@ -62,7 +63,8 @@ impl FuncBuilder {
 
         match self.blocks.pop() {
             Some(BlockBuilder::FuncEntryBlock(entry_bb)) => {
-                let func_op = FuncOp::new_unlinked_with_block(ctx, &self.name, sig, entry_bb);
+                let func_op =
+                    FuncOp::new_unlinked_with_block(ctx, self.name.clone(), sig, entry_bb);
                 Ok(func_op)
             }
             _ => todo!("error"),
@@ -140,7 +142,7 @@ impl FuncBuilder {
         self.sig = Some(signature);
     }
 
-    pub fn set_name(&mut self, clone: String) {
+    pub fn set_name(&mut self, clone: FuncSym) {
         self.name = clone;
     }
 }

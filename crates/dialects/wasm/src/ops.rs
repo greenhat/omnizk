@@ -32,6 +32,7 @@ use pliron::r#type::TypeObj;
 use pliron::with_context::AttachContext;
 
 use crate::types::FuncIndex;
+use crate::types::FuncSym;
 
 declare_op!(
     /// Represents a Wasm module, a top level container operation.
@@ -86,7 +87,7 @@ impl ModuleOp {
     pub fn new(
         ctx: &mut Context,
         name: &str,
-        start_func_name: String,
+        start_func_name: FuncSym,
         _import_funcs: Vec<(ImportFuncLabel, Ptr<TypeObj>)>,
         // func_names: Vec<(FuncIndex, String)>,
     ) -> ModuleOp {
@@ -96,7 +97,7 @@ impl ModuleOp {
             // Set function type attributes.
             opref.attributes.insert(
                 Self::ATTR_KEY_START_FUNC_SYM,
-                StringAttr::create(start_func_name),
+                StringAttr::create(start_func_name.into()),
             );
         }
 
@@ -169,7 +170,7 @@ impl FuncOp {
     /// Create a new [FuncOp].
     /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
     /// The returned function has a single region with an empty `entry` block.
-    pub fn new_unlinked(ctx: &mut Context, name: &str, ty: Ptr<TypeObj>) -> FuncOp {
+    pub fn new_unlinked(ctx: &mut Context, name: FuncSym, ty: Ptr<TypeObj>) -> FuncOp {
         let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
         Self::new_unlinked_with_block(ctx, name, ty, body)
     }
@@ -179,7 +180,7 @@ impl FuncOp {
     /// The returned function has a single region with a passed `entry` block.
     pub fn new_unlinked_with_block(
         ctx: &mut Context,
-        name: &str,
+        name: FuncSym,
         ty: Ptr<TypeObj>,
         entry_block: Ptr<BasicBlock>,
     ) -> FuncOp {
@@ -195,7 +196,7 @@ impl FuncOp {
         let region = opop.get_region(ctx);
         entry_block.insert_at_front(region, ctx);
 
-        opop.set_symbol_name(ctx, name);
+        opop.set_symbol_name(ctx, name.as_ref());
 
         opop
     }
