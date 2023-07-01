@@ -1,8 +1,10 @@
 #![allow(unused_imports)]
 
 use intertrait::cast_to;
+use ozk_ozk_dialect::attributes::apint_to_i32;
 use ozk_ozk_dialect::attributes::u32_attr;
 use ozk_ozk_dialect::types::u32_type_unwrapped;
+use ozk_ozk_dialect::types::FuncSym;
 use pliron::attribute;
 use pliron::attribute::attr_cast;
 use pliron::attribute::AttrObj;
@@ -16,8 +18,10 @@ use pliron::dialect::Dialect;
 use pliron::dialects::builtin::attr_interfaces::TypedAttrInterface;
 use pliron::dialects::builtin::attributes::FloatAttr;
 use pliron::dialects::builtin::attributes::IntegerAttr;
+use pliron::dialects::builtin::attributes::SmallDictAttr;
 use pliron::dialects::builtin::attributes::StringAttr;
 use pliron::dialects::builtin::attributes::TypeAttr;
+use pliron::dialects::builtin::attributes::VecAttr;
 use pliron::dialects::builtin::op_interfaces::OneRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SymbolOpInterface;
@@ -32,7 +36,6 @@ use pliron::r#type::TypeObj;
 use pliron::with_context::AttachContext;
 
 use crate::types::FuncIndex;
-use crate::types::FuncSym;
 
 declare_op!(
     /// Represents a Wasm module, a top level container operation.
@@ -80,6 +83,8 @@ impl ModuleOp {
     pub const ATTR_KEY_DICT_IMPORT_FUNCTION_TYPE: &str = "module.dict_import_function_type";
     /// Attribute key for the import functions dictionary (function name -> module name)
     pub const ATTR_KEY_DICT_IMPORT_FUNCTION_MODULE: &str = "module.dict_import_function_module";
+    /// Attribute key for the function symbol dictionary (function name -> function index)
+    pub const ATTR_KEY_VEC_FUNC_SYMS: &str = "module.vec_func_syms";
 
     /// Create a new [ModuleOp].
     /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
@@ -89,7 +94,7 @@ impl ModuleOp {
         name: &str,
         start_func_name: FuncSym,
         _import_funcs: Vec<(ImportFuncLabel, Ptr<TypeObj>)>,
-        // func_names: Vec<(FuncIndex, String)>,
+        func_names: Vec<FuncSym>,
     ) -> ModuleOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
         {
@@ -98,6 +103,15 @@ impl ModuleOp {
             opref.attributes.insert(
                 Self::ATTR_KEY_START_FUNC_SYM,
                 StringAttr::create(start_func_name.into()),
+            );
+            opref.attributes.insert(
+                Self::ATTR_KEY_VEC_FUNC_SYMS,
+                VecAttr::create(
+                    func_names
+                        .into_iter()
+                        .map(|name| StringAttr::create(name.into()))
+                        .collect(),
+                ),
             );
         }
 
@@ -119,7 +133,7 @@ impl ModuleOp {
 
     /// Return the start function symbol name
     #[allow(clippy::expect_used)]
-    pub fn get_start_func_sym(&self, ctx: &Context) -> String {
+    pub fn get_start_func_sym(&self, ctx: &Context) -> FuncSym {
         let self_op = self.get_operation().deref(ctx);
         let s_attr = self_op
             .attributes
@@ -131,10 +145,34 @@ impl ModuleOp {
                 .expect("ModuleOp start function symbol attribute is not a StringAttr")
                 .clone(),
         )
+        .into()
     }
 
-    pub fn get_func_sym(&self, ctx: &Context, func_index: AttrObj) -> String {
-        todo!("RESOLVE_FUNC_SYM")
+    #[allow(clippy::expect_used)]
+    pub fn get_func_sym(&self, ctx: &Context, func_index: AttrObj) -> FuncSym {
+        let self_op = self.get_operation().deref(ctx);
+        let func_index = apint_to_i32(
+            func_index
+                .downcast_ref::<IntegerAttr>()
+                .expect("ModuleOp function index is not an IntegerAttr")
+                .clone()
+                .into(),
+        );
+        let v_attr = self_op
+            .attributes
+            .get(Self::ATTR_KEY_VEC_FUNC_SYMS)
+            .expect("ModuleOp has no function symbols vector attribute");
+        let func_sym: String = v_attr
+            .downcast_ref::<VecAttr>()
+            .expect("ModuleOp function symbols vector attribute is not a VecAttr")
+            .0
+            .get(func_index as usize)
+            .expect("ModuleOp function symbols vector attribute index out of bounds")
+            .downcast_ref::<StringAttr>()
+            .expect("ModuleOp function symbol is not a StringAttr")
+            .clone()
+            .into();
+        func_sym.into()
     }
 }
 

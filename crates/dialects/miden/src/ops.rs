@@ -4,6 +4,7 @@ use std::ops::Deref;
 
 use apint::ApInt;
 use intertrait::cast_to;
+use ozk_ozk_dialect::types::FuncSym;
 use pliron::attribute;
 use pliron::attribute::attr_cast;
 use pliron::attribute::AttrObj;
@@ -316,9 +317,9 @@ impl ExecOp {
 
     /// Create a new [CallOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, callee_name: String) -> ExecOp {
+    pub fn new_unlinked(ctx: &mut Context, callee_name: FuncSym) -> ExecOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
-        let callee_sym = StringAttr::create(callee_name);
+        let callee_sym = StringAttr::create(callee_name.into());
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_CALLEE_SYM, callee_sym);

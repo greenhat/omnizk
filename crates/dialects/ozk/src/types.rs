@@ -1,3 +1,5 @@
+use derive_more::From;
+use derive_more::Into;
 use pliron::common_traits::DisplayWithContext;
 use pliron::common_traits::Verify;
 use pliron::context::Context;
@@ -74,4 +76,14 @@ pub fn u32_type_unwrapped(ctx: &Context) -> Ptr<TypeObj> {
 
 pub fn i64_type(ctx: &mut Context) -> Ptr<TypeObj> {
     IntegerType::get(ctx, 64, Signedness::Signed)
+}
+
+/// Symbol name type of a function
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into)]
+pub struct FuncSym(String);
+
+impl AsRef<str> for FuncSym {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
 }

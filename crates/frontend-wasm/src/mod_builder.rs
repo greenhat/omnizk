@@ -1,9 +1,9 @@
+use ozk_ozk_dialect::types::FuncSym;
 use std::collections::HashMap;
 
 use ozk_wasm_dialect::ops::ImportFuncLabel;
 use ozk_wasm_dialect::ops::ModuleOp;
 use ozk_wasm_dialect::types::FuncIndex;
-use ozk_wasm_dialect::types::FuncSym;
 use ozk_wasm_dialect::types::TypeIndex;
 use pliron::context::Context;
 use pliron::context::Ptr;
@@ -24,6 +24,21 @@ pub struct ModuleBuilder {
 }
 
 impl ModuleBuilder {
+    fn build_func_sym_vec(&self) -> Vec<FuncSym> {
+        let mut func_syms = Vec::new();
+        // build from self.func_names, substitute with "undefined" if index is not found
+        for func_idx in 0..self.functions.len() {
+            let func_idx = (func_idx as u32).into();
+            let func_sym = self
+                .func_names
+                .get(&func_idx)
+                .cloned()
+                .unwrap_or_else(|| "undefined".to_string().into());
+            func_syms.push(func_sym);
+        }
+        func_syms
+    }
+
     pub fn new() -> Self {
         Self {
             types: Vec::new(),
@@ -92,7 +107,13 @@ impl ModuleBuilder {
                 .iter()
                 .map(|(label, ty_idx)| self.get_type(*ty_idx).map(|ty| (label.clone(), ty)))
                 .collect::<Result<Vec<(ImportFuncLabel, Ptr<TypeObj>)>, ModuleBuilderError>>()?;
-            let module_op = ModuleOp::new(ctx, "module_name", start_func_name, import_func_types);
+            let module_op = ModuleOp::new(
+                ctx,
+                "module_name",
+                start_func_name,
+                import_func_types,
+                self.build_func_sym_vec(),
+            );
             let mut funcs = Vec::new();
             // TODO: since func indices should be shifted by imported funcs count change the storage and make it obvious
             let imported_funcs_count = self.import_functions.len() as u32;

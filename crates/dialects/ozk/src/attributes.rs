@@ -24,9 +24,9 @@ use winter_math::fields::f64::BaseElement;
 
 use crate::types::i32_type;
 use crate::types::i64_type;
+use crate::types::u32_type;
 use crate::types::Field;
 use crate::types::FieldElemType;
-use crate::types::u32_type;
 
 pub type ValidaFieldElem = u32;
 
@@ -171,4 +171,10 @@ pub fn get_oxfoi(field_elem_attr: FieldElemAttr) -> BaseElement {
         FieldElem::Oxfoi(v) => v,
         _ => panic!("Expected an Oxfoi field element"),
     }
+}
+
+pub fn apint_to_i32(value: ApInt) -> i32 {
+    let i = Int::from(value);
+    #[allow(clippy::expect_used)]
+    i.try_to_i32().expect("32-bit integer")
 }

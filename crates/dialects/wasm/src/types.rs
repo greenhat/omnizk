@@ -17,16 +17,6 @@ use wasmparser::{BlockType, FuncType, RefType, ValType};
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into)]
 pub struct FuncIndex(u32);
 
-/// Symbol name type of a function (imported or defined) inside the WebAssembly module.
-#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into)]
-pub struct FuncSym(String);
-
-impl AsRef<str> for FuncSym {
-    fn as_ref(&self) -> &str {
-        &self.0
-    }
-}
-
 /// Index type of a defined function inside the WebAssembly module.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into)]
 pub struct DefinedFuncIndex(u32);

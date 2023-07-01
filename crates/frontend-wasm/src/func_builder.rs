@@ -1,7 +1,7 @@
+use ozk_ozk_dialect::types::FuncSym;
 use ozk_wasm_dialect::ops::BlockOp;
 use ozk_wasm_dialect::ops::FuncOp;
 use ozk_wasm_dialect::ops::LoopOp;
-use ozk_wasm_dialect::types::FuncSym;
 use pliron::basic_block::BasicBlock;
 use pliron::context::Context;
 use pliron::context::Ptr;
