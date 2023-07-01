@@ -26,8 +26,22 @@ use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
 use pliron::linked_list::ContainsLinkedList;
 use pliron::op::Op;
 use pliron::operation::Operation;
+use pliron::with_context::AttachContext;
 use wasmtime::*;
 use winter_math::StarkField;
+
+pub fn check_ir(input: &str, expected_tree: expect_test::Expect) {
+    let source = wat::parse_str(input).unwrap();
+    let mut ctx = Context::default();
+    let target_config = MidenTargetConfig::default();
+    let frontend_config = WasmFrontendConfig::default();
+    frontend_config.register(&mut ctx);
+    target_config.register(&mut ctx);
+    let wasm_module_op =
+        ozk_frontend_wasm::parse_module(&mut ctx, &source, &frontend_config).unwrap();
+    let miden_prog = run_conversion_passes(&mut ctx, wasm_module_op, &target_config);
+    expected_tree.assert_eq(miden_prog.with_ctx(&ctx).to_string().as_str());
+}
 
 pub fn compile_to_miden_dialect(
     ctx: &mut Context,

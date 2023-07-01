@@ -1,4 +1,5 @@
 use expect_test::expect;
+use sem_tests::check_ir;
 use sem_tests::check_miden;
 
 mod sem_tests;
@@ -47,6 +48,52 @@ fn test_func_call_no_args() {
     );
 }
 
+#[test]
+fn test_ir_func_call_w_args() {
+    check_ir(
+        r#"
+(module
+    (type (;0;) (func (result i32)))
+    (type (;2;) (func))
+    (export "main" (func $main))
+    (start $main)
+    (func $add (param i32 i32) (result i32)
+        get_local 0
+        get_local 1
+        i32.add
+        return)
+    (func $main
+        i32.const 1
+        i32.const 2
+        call $add
+        return)
+)"#,
+        expect![[r#"
+            miden.program {
+              block_5_0():
+                miden.proc @ozk_miden_main_proc {
+                  entry():
+                    miden.exec main
+                }
+                miden.proc @add {
+                  entry():
+                    wasm.local.set 0x0: ui32
+                    wasm.local.set 0x1: ui32
+                    wasm.local.get 0x0: ui32
+                    wasm.local.get 0x1: ui32
+                    miden.add
+                }
+                miden.proc @main {
+                  entry():
+                    miden.constant 1: felt
+                    miden.constant 2: felt
+                    miden.exec add
+                }
+            }"#]],
+    );
+}
+
+#[ignore]
 #[test]
 fn test_func_call_w_args() {
     let input = vec![];

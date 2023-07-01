@@ -24,7 +24,7 @@ impl Default for MidenTargetConfig {
         pass_manager.add_pass(Box::<WasmToMidenCallOpLoweringPass>::default());
         pass_manager.add_pass(Box::<WasmToMidenCFLoweringPass>::default());
         pass_manager.add_pass(Box::<WasmToMidenArithLoweringPass>::default());
-        pass_manager.add_pass(Box::<WasmToMidenFinalLoweringPass>::default());
+        // pass_manager.add_pass(Box::<WasmToMidenFinalLoweringPass>::default());
         Self {
             output_format: MidenOutputFormat::Source,
             // ir_passes: vec![
