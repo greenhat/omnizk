@@ -130,7 +130,7 @@ impl ModuleOp {
     }
 
     pub fn get_func_sym(&self, ctx: &Context, func_index: AttrObj) -> String {
-        "RESOLVE_FUNC_SYM".to_string()
+        todo!("RESOLVE_FUNC_SYM")
     }
 }
 
