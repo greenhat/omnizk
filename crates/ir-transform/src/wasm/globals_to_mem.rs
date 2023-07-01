@@ -102,16 +102,15 @@ mod tests {
 )
 "#,
             expect![[r#"
-            proc.main.0
-            push.1
-            push.2
-            add
-            end
-
-            begin
-            exec.main
-            end
-        "#]],
+                wasm.module @module_name {
+                  block_1_0():
+                    wasm.func @main() -> () {
+                      entry():
+                        wasm.const 0x9: si32
+                        MEM_ACCESS_CALLS
+                        wasm.return
+                    }
+                }"#]],
         );
     }
 }

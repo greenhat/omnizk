@@ -6,6 +6,8 @@ use ozk_wasm_dialect::ops::AddOp;
 use ozk_wasm_dialect::ops::BlockOp;
 use ozk_wasm_dialect::ops::CallOp;
 use ozk_wasm_dialect::ops::ConstantOp;
+use ozk_wasm_dialect::ops::GlobalGetOp;
+use ozk_wasm_dialect::ops::GlobalSetOp;
 use ozk_wasm_dialect::ops::LocalGetOp;
 use ozk_wasm_dialect::ops::LoopOp;
 use ozk_wasm_dialect::ops::ReturnOp;
@@ -77,6 +79,24 @@ impl<'a> OpBuilder<'a> {
 
     pub fn end(&mut self, ctx: &mut Context) -> Result<(), FuncBuilderError> {
         self.fbuilder.push_end(ctx)
+    }
+
+    pub fn global_set(
+        &mut self,
+        ctx: &mut Context,
+        global_index: u32,
+    ) -> Result<(), FuncBuilderError> {
+        let op = GlobalSetOp::new_unlinked(ctx, global_index);
+        self.fbuilder.push(ctx, op.get_operation())
+    }
+
+    pub fn global_get(
+        &mut self,
+        ctx: &mut Context,
+        global_index: u32,
+    ) -> Result<(), FuncBuilderError> {
+        let op = GlobalGetOp::new_unlinked(ctx, global_index);
+        self.fbuilder.push(ctx, op.get_operation())
     }
 
     pub fn local_get(

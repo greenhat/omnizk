@@ -934,6 +934,170 @@ impl Verify for LocalSetOp {
     }
 }
 
+declare_op!(
+    /// Pops the stack and save the value into the global variable with the given index
+    ///
+    /// Attributes:
+    ///
+    /// | key | value |
+    /// |-----|-------|
+    /// |[ATTR_KEY_INDEX](Self::ATTR_KEY_INDEX) | [IntegerAttr] |
+    ///
+    GlobalSetOp,
+    "global.set",
+    "wasm"
+);
+
+impl GlobalSetOp {
+    /// Attribute key for the index
+    pub const ATTR_KEY_INDEX: &str = "global.set.index";
+
+    /// Get the index of the global variable.
+    pub fn get_index(&self, ctx: &Context) -> AttrObj {
+        let op = self.get_operation().deref(ctx);
+        #[allow(clippy::expect_used)]
+        let value = op
+            .attributes
+            .get(Self::ATTR_KEY_INDEX)
+            .expect("no attribute found");
+        attribute::clone::<IntegerAttr>(value)
+    }
+
+    /// Create a new [GlobalSetOp].
+    pub fn new_unlinked(ctx: &mut Context, index: u32) -> GlobalSetOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+
+        let index_attr = u32_attr(ctx, index);
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_INDEX, index_attr);
+        GlobalSetOp { op }
+    }
+}
+
+impl DisplayWithContext for GlobalSetOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "{} {}",
+            self.get_opid().with_ctx(ctx),
+            self.get_index(ctx).with_ctx(ctx)
+        )
+    }
+}
+
+impl Verify for GlobalSetOp {
+    fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+        let index = self.get_index(ctx);
+        if let Ok(index_attr) = index.downcast::<IntegerAttr>() {
+            #[allow(clippy::unwrap_used)]
+            if index_attr.get_type() != u32_type_unwrapped(ctx) {
+                return Err(CompilerError::VerificationError {
+                    msg: "Expected u32 for index".to_string(),
+                });
+            }
+        } else {
+            return Err(CompilerError::VerificationError {
+                msg: "Unexpected index type".to_string(),
+            });
+        };
+        let op = &*self.get_operation().deref(ctx);
+        if op.get_opid() != Self::get_opid_static() {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect OpId".to_string(),
+            });
+        }
+        if op.get_num_results() != 0 || op.get_num_operands() != 0 {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect number of results or operands".to_string(),
+            });
+        }
+        Ok(())
+    }
+}
+
+declare_op!(
+    /// Push global variable with the given index onto the stack.
+    ///
+    /// Attributes:
+    ///
+    /// | key | value |
+    /// |-----|-------|
+    /// |[ATTR_KEY_INDEX](Self::ATTR_KEY_INDEX) | [IntegerAttr] |
+    ///
+    GlobalGetOp,
+    "global.get",
+    "wasm"
+);
+
+impl GlobalGetOp {
+    /// Attribute key for the index
+    pub const ATTR_KEY_INDEX: &str = "global.get.index";
+
+    /// Get the index of the global variable.
+    pub fn get_index(&self, ctx: &Context) -> AttrObj {
+        let op = self.get_operation().deref(ctx);
+        #[allow(clippy::expect_used)]
+        let value = op
+            .attributes
+            .get(Self::ATTR_KEY_INDEX)
+            .expect("no attribute found");
+        attribute::clone::<IntegerAttr>(value)
+    }
+
+    /// Create a new [GlobalGetOp].
+    pub fn new_unlinked(ctx: &mut Context, index: u32) -> GlobalGetOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+
+        let index_attr = u32_attr(ctx, index);
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_INDEX, index_attr);
+        GlobalGetOp { op }
+    }
+}
+
+impl DisplayWithContext for GlobalGetOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "{} {}",
+            self.get_opid().with_ctx(ctx),
+            self.get_index(ctx).with_ctx(ctx)
+        )
+    }
+}
+
+impl Verify for GlobalGetOp {
+    fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+        let index = self.get_index(ctx);
+        if let Ok(index_attr) = index.downcast::<IntegerAttr>() {
+            #[allow(clippy::unwrap_used)]
+            if index_attr.get_type() != u32_type_unwrapped(ctx) {
+                return Err(CompilerError::VerificationError {
+                    msg: "Expected u32 for index".to_string(),
+                });
+            }
+        } else {
+            return Err(CompilerError::VerificationError {
+                msg: "Unexpected index type".to_string(),
+            });
+        };
+        let op = &*self.get_operation().deref(ctx);
+        if op.get_opid() != Self::get_opid_static() {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect OpId".to_string(),
+            });
+        }
+        if op.get_num_results() != 0 || op.get_num_operands() != 0 {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect number of results or operands".to_string(),
+            });
+        }
+        Ok(())
+    }
+}
+
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ModuleOp::register(ctx, dialect);
     ConstantOp::register(ctx, dialect);
@@ -945,4 +1109,6 @@ pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     LoopOp::register(ctx, dialect);
     LocalGetOp::register(ctx, dialect);
     LocalSetOp::register(ctx, dialect);
+    GlobalSetOp::register(ctx, dialect);
+    GlobalGetOp::register(ctx, dialect);
 }

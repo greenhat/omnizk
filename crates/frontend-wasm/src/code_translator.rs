@@ -36,6 +36,8 @@ pub fn translate_operator(
         Operator::Br { relative_depth } => {
             func_builder.op().br(ctx, *relative_depth);
         }
+        Operator::GlobalSet { global_index } => func_builder.op().global_set(ctx, *global_index)?,
+        Operator::GlobalGet { global_index } => func_builder.op().global_get(ctx, *global_index)?,
         Operator::LocalGet { local_index } => func_builder.op().local_get(ctx, *local_index)?,
         Operator::LocalTee { local_index } => func_builder.op().local_tee(ctx, *local_index),
         Operator::LocalSet { local_index } => func_builder.op().local_set(ctx, *local_index),
