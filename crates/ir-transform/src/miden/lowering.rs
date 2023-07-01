@@ -10,6 +10,8 @@ use pliron::operation::Operation;
 use pliron::pass::Pass;
 use pliron::rewrite::RewritePatternSet;
 
+pub mod call_op_lowering;
+
 use self::arith_op_lowering::ArithOpLowering;
 use self::constant_op_lowering::ConstantOpLowering;
 

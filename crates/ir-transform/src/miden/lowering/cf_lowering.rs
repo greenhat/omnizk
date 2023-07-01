@@ -16,9 +16,6 @@ use pliron::pattern_match::PatternRewriter;
 use pliron::pattern_match::RewritePattern;
 use pliron::rewrite::RewritePatternSet;
 
-mod call_op_lowering;
-pub use call_op_lowering::CallOpLowering;
-
 #[derive(Default)]
 pub struct WasmToMidenCFLoweringPass;
 
@@ -31,13 +28,11 @@ impl Pass for WasmToMidenCFLoweringPass {
         let target = ConversionTarget::default();
         // TODO: set illegal ops
         let mut patterns = RewritePatternSet::default();
-        patterns.add(Box::<CallOpLowering>::default());
         patterns.add(Box::<ControlFlowLowering>::default());
         apply_partial_conversion(ctx, op, target, patterns)?;
         Ok(())
     }
 }
-
 /// Converts Wasm module into Miden program
 /// converting Wasm blocks/loops and branching ops into Miden functions
 #[derive(Default)]
@@ -81,7 +76,7 @@ impl RewritePattern for ControlFlowLowering {
         }
         let main_proc_op = miden::ProcOp::new_unlinked(ctx, "ozk_miden_main_proc");
         let start_func_call_op =
-            miden::ExecOp::new_unlinked(ctx, module_op.get_start_func_sym(ctx).into());
+            miden::ExecOp::new_unlinked(ctx, module_op.get_start_func_sym(ctx));
         start_func_call_op
             .get_operation()
             .insert_at_back(main_proc_op.get_entry_block(ctx), ctx);

@@ -1,5 +1,6 @@
 #![allow(unused_imports)]
 
+use c2zk_ir_transform::miden::lowering::call_op_lowering::WasmToMidenCallOpLoweringPass;
 use c2zk_ir_transform::miden::lowering::WasmToMidenArithLoweringPass;
 use c2zk_ir_transform::miden::lowering::WasmToMidenCFLoweringPass;
 use c2zk_ir_transform::miden::lowering::WasmToMidenFinalLoweringPass;
@@ -18,6 +19,7 @@ impl Default for MidenTargetConfig {
     fn default() -> Self {
         let memory_layout = MidenMemoryLayout::default();
         let mut pass_manager = PassManager::new();
+        pass_manager.add_pass(Box::<WasmToMidenCallOpLoweringPass>::default());
         pass_manager.add_pass(Box::<WasmToMidenCFLoweringPass>::default());
         pass_manager.add_pass(Box::<WasmToMidenArithLoweringPass>::default());
         pass_manager.add_pass(Box::<WasmToMidenFinalLoweringPass>::default());
