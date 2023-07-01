@@ -4,7 +4,7 @@ use c2zk_ir_transform::miden::lowering::call_op_lowering::WasmToMidenCallOpLower
 use c2zk_ir_transform::miden::lowering::WasmToMidenArithLoweringPass;
 use c2zk_ir_transform::miden::lowering::WasmToMidenCFLoweringPass;
 use c2zk_ir_transform::miden::lowering::WasmToMidenFinalLoweringPass;
-use c2zk_ir_transform::wasm::explicit_func_args::WasmExplicitFuncArgsPass;
+use c2zk_ir_transform::wasm::explicit_func_args_pass::WasmExplicitFuncArgsPass;
 use pliron::context::Context;
 use pliron::pass::PassManager;
 
