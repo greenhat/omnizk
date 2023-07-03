@@ -71,6 +71,7 @@ mod tests {
 
     use super::*;
 
+    // TODO: move to crate's test utils
     pub fn check_pass<T: Pass>(pass: &T, wat: &str, expected: expect_test::Expect) {
         let source = wat::parse_str(wat).unwrap();
         let mut ctx = Context::default();

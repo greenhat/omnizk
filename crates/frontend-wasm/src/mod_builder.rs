@@ -1,18 +1,25 @@
 use ozk_ozk_dialect::types::FuncSym;
+use pliron::common_traits::Verify;
+use pliron::dialects::builtin::op_interfaces::SymbolOpInterface;
+use pliron::error::CompilerError;
 use std::collections::HashMap;
 
-use ozk_wasm_dialect::ops::ImportFuncLabel;
 use ozk_wasm_dialect::ops::ModuleOp;
 use ozk_wasm_dialect::types::FuncIndex;
 use ozk_wasm_dialect::types::TypeIndex;
 use pliron::context::Context;
 use pliron::context::Ptr;
-use pliron::op::Op;
 use pliron::r#type::TypeObj;
 use thiserror::Error;
 
 use crate::func_builder::FuncBuilder;
 use crate::func_builder::FuncBuilderError;
+
+#[derive(Debug, Clone)]
+pub struct ImportFuncLabel {
+    pub module: String,
+    pub name: String,
+}
 
 pub struct ModuleBuilder {
     types: Vec<Ptr<TypeObj>>,
@@ -26,7 +33,6 @@ pub struct ModuleBuilder {
 impl ModuleBuilder {
     fn build_func_sym_vec(&self) -> Vec<FuncSym> {
         let mut func_syms = Vec::new();
-        // build from self.func_names, substitute with "undefined" if index is not found
         for func_idx in 0..self.functions.len() {
             let func_idx = (func_idx as u32).into();
             let func_sym = self
@@ -107,13 +113,6 @@ impl ModuleBuilder {
                 .iter()
                 .map(|(label, ty_idx)| self.get_type(*ty_idx).map(|ty| (label.clone(), ty)))
                 .collect::<Result<Vec<(ImportFuncLabel, Ptr<TypeObj>)>, ModuleBuilderError>>()?;
-            let module_op = ModuleOp::new(
-                ctx,
-                "module_name",
-                start_func_name,
-                import_func_types,
-                self.build_func_sym_vec(),
-            );
             let mut funcs = Vec::new();
             // TODO: since func indices should be shifted by imported funcs count change the storage and make it obvious
             let imported_funcs_count = self.import_functions.len() as u32;
@@ -126,13 +125,26 @@ impl ModuleBuilder {
                 }
                 func_builder.set_signature(func_sigs[func_idx]);
             }
+            let mut all_func_syms: Vec<FuncSym> = Vec::new();
+            for (label, _) in self.import_functions.iter() {
+                all_func_syms.push(label.name.clone().into());
+            }
             for func_builder in self.functions {
-                funcs.push(func_builder.build(ctx)?);
+                let func = func_builder.build(ctx)?;
+                funcs.push(func);
+                all_func_syms.push(func.get_symbol_name(ctx).into());
             }
 
-            for func in funcs {
-                module_op.add_operation(ctx, func.get_operation());
-            }
+            let module_op = ModuleOp::new(
+                ctx,
+                "module_name",
+                start_func_name,
+                all_func_syms,
+                funcs,
+                Vec::new(),
+                Vec::new(),
+            );
+            module_op.verify(ctx)?;
             Ok(module_op)
         } else {
             Err(ModuleBuilderError::StartFuncUndefined)
@@ -197,4 +209,6 @@ pub enum ModuleBuilderError {
     InvalidTypeIndex(String),
     #[error("func name not found for func index: {0:?}")]
     FuncNameNotFound(FuncIndex),
+    #[error("compiler error: {0:?}")]
+    CompilerError(#[from] CompilerError),
 }

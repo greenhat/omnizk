@@ -1,5 +1,7 @@
 #![allow(unused_imports)]
 
+use std::collections::HashMap;
+
 use intertrait::cast_to;
 use ozk_ozk_dialect::attributes::apint_to_i32;
 use ozk_ozk_dialect::attributes::u32_attr;
@@ -71,6 +73,7 @@ impl DisplayWithContext for ModuleOp {
 
 impl Verify for ModuleOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+        // TODO: check that the start function is defined.
         self.verify_interfaces(ctx)?;
         self.get_region(ctx).deref(ctx).verify(ctx)
     }
@@ -83,8 +86,12 @@ impl ModuleOp {
     pub const ATTR_KEY_DICT_IMPORT_FUNCTION_TYPE: &str = "module.dict_import_function_type";
     /// Attribute key for the import functions dictionary (function name -> module name)
     pub const ATTR_KEY_DICT_IMPORT_FUNCTION_MODULE: &str = "module.dict_import_function_module";
-    /// Attribute key for the function symbol dictionary (function name -> function index)
-    pub const ATTR_KEY_VEC_FUNC_SYMS: &str = "module.vec_func_syms";
+    /// Attribute key for all function (defined + imports) symbols
+    pub const ATTR_KEY_FUNC_INDICES: &str = "module.func_indices";
+    /// Attribute key for the import function types.
+    pub const ATTR_KEY_IMPORT_FUNC_TYPES: &str = "module.import_func_types";
+    /// Attribute key for the import function modules.
+    pub const ATTR_KEY_IMPORT_FUNC_MODULES: &str = "module.import_func_modules";
 
     /// Create a new [ModuleOp].
     /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
@@ -93,8 +100,10 @@ impl ModuleOp {
         ctx: &mut Context,
         name: &str,
         start_func_name: FuncSym,
-        _import_funcs: Vec<(ImportFuncLabel, Ptr<TypeObj>)>,
-        func_names: Vec<FuncSym>,
+        all_func_syms: Vec<FuncSym>,
+        functions: Vec<FuncOp>,
+        import_func_types: Vec<Ptr<TypeObj>>,
+        import_func_modules: Vec<String>,
     ) -> ModuleOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
         {
@@ -105,11 +114,29 @@ impl ModuleOp {
                 StringAttr::create(start_func_name.into()),
             );
             opref.attributes.insert(
-                Self::ATTR_KEY_VEC_FUNC_SYMS,
+                Self::ATTR_KEY_FUNC_INDICES,
                 VecAttr::create(
-                    func_names
+                    all_func_syms
                         .into_iter()
-                        .map(|name| StringAttr::create(name.into()))
+                        .map(|func_sym| StringAttr::create(func_sym.into()))
+                        .collect(),
+                ),
+            );
+            opref.attributes.insert(
+                Self::ATTR_KEY_IMPORT_FUNC_TYPES,
+                VecAttr::create(
+                    import_func_types
+                        .into_iter()
+                        .map(TypeAttr::create)
+                        .collect(),
+                ),
+            );
+            opref.attributes.insert(
+                Self::ATTR_KEY_IMPORT_FUNC_MODULES,
+                VecAttr::create(
+                    import_func_modules
+                        .into_iter()
+                        .map(StringAttr::create)
                         .collect(),
                 ),
             );
@@ -123,12 +150,29 @@ impl ModuleOp {
         let block = BasicBlock::new(ctx, None, vec![]);
         block.insert_at_front(region, ctx);
 
+        for func_op in functions {
+            opop.append_function(ctx, func_op);
+        }
+
         opop
     }
 
     /// Add an [Operation] into this module.
-    pub fn add_operation(&self, ctx: &mut Context, op: Ptr<Operation>) {
-        self.append_operation(ctx, op, 0)
+    pub fn append_function(&self, ctx: &mut Context, func_op: FuncOp) {
+        {
+            let mut self_op = self.get_operation().deref_mut(ctx);
+            #[allow(clippy::expect_used)]
+            let func_indices_attr = self_op
+                .attributes
+                .get_mut(Self::ATTR_KEY_FUNC_INDICES)
+                .expect("ModuleOp has no function symbols vector attribute")
+                .downcast_mut::<VecAttr>()
+                .expect("ModuleOp function symbols vector attribute is not a VecAttr");
+            func_indices_attr
+                .0
+                .push(StringAttr::create(func_op.get_symbol_name(ctx)));
+        }
+        self.append_operation(ctx, func_op.get_operation(), 0)
     }
 
     /// Return the start function symbol name
@@ -160,7 +204,7 @@ impl ModuleOp {
         );
         let v_attr = self_op
             .attributes
-            .get(Self::ATTR_KEY_VEC_FUNC_SYMS)
+            .get(Self::ATTR_KEY_FUNC_INDICES)
             .expect("ModuleOp has no function symbols vector attribute");
         let func_sym: String = v_attr
             .downcast_ref::<VecAttr>()
@@ -180,12 +224,6 @@ impl OneRegionInterface for ModuleOp {}
 impl SingleBlockRegionInterface for ModuleOp {}
 #[cast_to]
 impl SymbolOpInterface for ModuleOp {}
-
-#[derive(Debug, Clone)]
-pub struct ImportFuncLabel {
-    pub module: String,
-    pub name: String,
-}
 
 declare_op!(
     /// An operation with a name containing a single region.
