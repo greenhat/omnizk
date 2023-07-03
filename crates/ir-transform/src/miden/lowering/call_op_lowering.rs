@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use ozk_miden_dialect::ops as miden;
 use ozk_wasm_dialect::ops as wasm;
 use pliron::context::Context;
@@ -65,10 +66,13 @@ impl RewritePattern for CallOpLowering {
                 if let Ok(call_op) = op.deref(ctx).get_op(ctx).downcast::<wasm::CallOp>() {
                     call_ops.push(call_op);
                 }
-                pliron::operation::WalkResut::Advance
+                pliron::operation::WalkResult::Advance
             });
         for call_op in call_ops {
-            let callee_sym = module_op.get_func_sym(ctx, call_op.get_func_index(ctx));
+            let func_index = call_op.get_func_index(ctx);
+            let callee_sym = module_op
+                .get_func_sym(ctx, func_index)
+                .ok_or_else(|| anyhow!("no function with index {}", func_index))?;
             let miden_exec_op = miden::ExecOp::new_unlinked(ctx, callee_sym);
             rewriter.replace_op_with(
                 ctx,

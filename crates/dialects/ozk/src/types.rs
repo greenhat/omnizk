@@ -87,3 +87,9 @@ impl AsRef<str> for FuncSym {
         &self.0
     }
 }
+
+impl From<&str> for FuncSym {
+    fn from(s: &str) -> Self {
+        Self(s.to_string())
+    }
+}

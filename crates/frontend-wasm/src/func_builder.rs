@@ -1,3 +1,5 @@
+//! FuncOp builder
+
 use ozk_ozk_dialect::types::FuncSym;
 use ozk_wasm_dialect::ops::BlockOp;
 use ozk_wasm_dialect::ops::FuncOp;
@@ -13,6 +15,8 @@ use thiserror::Error;
 
 use crate::op_builder::OpBuilder;
 
+// TODO: move to wasm dialect crate?
+/// FuncOp builder
 pub struct FuncBuilder {
     name: FuncSym,
     sig: Option<Ptr<TypeObj>>,
@@ -21,6 +25,7 @@ pub struct FuncBuilder {
 }
 
 impl FuncBuilder {
+    /// Create a new FuncBuilder
     pub fn new(ctx: &mut Context, name: FuncSym) -> FuncBuilder {
         FuncBuilder {
             name,
@@ -34,33 +39,18 @@ impl FuncBuilder {
         }
     }
 
+    /// Add locals declaration
     pub fn declare_local(&mut self, count: u32, ty: Ptr<TypeObj>) {
         for _ in 0..count {
             self.locals.push(ty);
         }
     }
 
-    pub fn declare_locals(&mut self, locals: Vec<Ptr<TypeObj>>) {
-        self.locals.extend(locals);
-    }
-
+    /// Builds and returns the FuncOp
     pub fn build(mut self, ctx: &mut Context) -> Result<FuncOp, FuncBuilderError> {
         let sig = self.sig.ok_or_else(|| {
             FuncBuilderError::MissingSignature(format!("FuncBuilder for {:?}", self.name))
         })?;
-        // TODO: should be a separate lowering pass
-        // let mut locals_with_params = self.locals.clone();
-        // let mut prepended_ins = self.ins.clone();
-        // for (idx, param) in sig.params.iter().enumerate().rev() {
-        //     locals_with_params.insert(0, *param);
-        //     prepended_ins.insert(
-        //         0,
-        //         Inst::LocalSet {
-        //             local_idx: idx as u32,
-        //         },
-        //     );
-        // }
-
         match self.blocks.pop() {
             Some(BlockBuilder::FuncEntryBlock(entry_bb)) => {
                 let func_op =
@@ -71,10 +61,12 @@ impl FuncBuilder {
         }
     }
 
+    /// Returns an OpBuilder for this FuncBuilder
     pub fn op(&mut self) -> OpBuilder {
         OpBuilder::new(self)
     }
 
+    /// Pushes an operation to the current block
     pub fn push(&mut self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), FuncBuilderError> {
         // dbg!(op.with_ctx(ctx).to_string());
         let opop = &op.deref(ctx).get_op(ctx);
@@ -95,6 +87,7 @@ impl FuncBuilder {
         Ok(())
     }
 
+    /// Closes the current block
     pub fn push_end(&mut self, ctx: &mut Context) -> Result<(), FuncBuilderError> {
         if let Some(ending_block_builder) = self.blocks.pop() {
             match ending_block_builder {
@@ -134,19 +127,19 @@ impl FuncBuilder {
         }
     }
 
-    // pub fn push_insts(&mut self, insts: Vec<Inst>) {
-    //     self.ins.extend(insts);
-    // }
-
+    /// Sets the function signature
     pub fn set_signature(&mut self, signature: Ptr<TypeObj>) {
         self.sig = Some(signature);
     }
 
+    /// Sets the function name
     pub fn set_name(&mut self, clone: FuncSym) {
         self.name = clone;
     }
 }
 
+// Error type for FuncBuilder
+#[allow(missing_docs)]
 #[derive(Debug, Error)]
 pub enum FuncBuilderError {
     #[error("missing function signature")]
@@ -155,13 +148,18 @@ pub enum FuncBuilderError {
     PushOnEmptyBlocks(String),
 }
 
+/// Block kinds for FuncBuilder
 pub enum BlockBuilder {
+    /// Function entry block
     FuncEntryBlock(Ptr<BasicBlock>),
+    /// Block
     Block(BlockOp),
+    /// Loop
     Loop(LoopOp),
 }
 
 impl BlockBuilder {
+    /// Returns the BasicBlock for this BlockBuilder
     pub fn get_bb(&self, ctx: &Context) -> Ptr<BasicBlock> {
         match self {
             BlockBuilder::FuncEntryBlock(bb) => *bb,

@@ -5,6 +5,7 @@ use c2zk_ir_transform::miden::lowering::WasmToMidenArithLoweringPass;
 use c2zk_ir_transform::miden::lowering::WasmToMidenCFLoweringPass;
 use c2zk_ir_transform::miden::lowering::WasmToMidenFinalLoweringPass;
 use c2zk_ir_transform::wasm::explicit_func_args_pass::WasmExplicitFuncArgsPass;
+use c2zk_ir_transform::wasm::globals_to_mem::WasmGlobalsToMemPass;
 use pliron::context::Context;
 use pliron::pass::PassManager;
 
@@ -24,6 +25,7 @@ impl Default for MidenTargetConfig {
         pass_manager.add_pass(Box::<WasmToMidenCallOpLoweringPass>::default());
         pass_manager.add_pass(Box::<WasmToMidenCFLoweringPass>::default());
         pass_manager.add_pass(Box::<WasmToMidenArithLoweringPass>::default());
+        pass_manager.add_pass(Box::new(WasmGlobalsToMemPass::new(memory_layout.globals_start_address)));
         // pass_manager.add_pass(Box::<WasmToMidenFinalLoweringPass>::default());
         Self {
             output_format: MidenOutputFormat::Source,

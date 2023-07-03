@@ -158,8 +158,8 @@ impl ModuleOp {
     }
 
     /// Add an [Operation] into this module.
-    pub fn append_function(&self, ctx: &mut Context, func_op: FuncOp) {
-        {
+    pub fn append_function(&self, ctx: &mut Context, func_op: FuncOp) -> FuncIndex {
+        let func_index = {
             let mut self_op = self.get_operation().deref_mut(ctx);
             #[allow(clippy::expect_used)]
             let func_indices_attr = self_op
@@ -171,8 +171,10 @@ impl ModuleOp {
             func_indices_attr
                 .0
                 .push(StringAttr::create(func_op.get_symbol_name(ctx)));
-        }
-        self.append_operation(ctx, func_op.get_operation(), 0)
+            func_indices_attr.0.len() - 1
+        };
+        self.append_operation(ctx, func_op.get_operation(), 0);
+        func_index.into()
     }
 
     /// Return the start function symbol name
@@ -193,30 +195,29 @@ impl ModuleOp {
     }
 
     #[allow(clippy::expect_used)]
-    pub fn get_func_sym(&self, ctx: &Context, func_index: AttrObj) -> FuncSym {
+    pub fn get_func_sym(&self, ctx: &Context, func_index: FuncIndex) -> Option<FuncSym> {
         let self_op = self.get_operation().deref(ctx);
-        let func_index = apint_to_i32(
-            func_index
-                .downcast_ref::<IntegerAttr>()
-                .expect("ModuleOp function index is not an IntegerAttr")
-                .clone()
-                .into(),
-        );
         let v_attr = self_op
             .attributes
             .get(Self::ATTR_KEY_FUNC_INDICES)
             .expect("ModuleOp has no function symbols vector attribute");
-        let func_sym: String = v_attr
+        v_attr
             .downcast_ref::<VecAttr>()
             .expect("ModuleOp function symbols vector attribute is not a VecAttr")
             .0
-            .get(func_index as usize)
-            .expect("ModuleOp function symbols vector attribute index out of bounds")
-            .downcast_ref::<StringAttr>()
-            .expect("ModuleOp function symbol is not a StringAttr")
-            .clone()
-            .into();
-        func_sym.into()
+            .get(usize::from(func_index))
+            .map(|attr: &AttrObj| {
+                let str: String = attr
+                    .downcast_ref::<StringAttr>()
+                    .expect("ModuleOp function symbol is not a StringAttr")
+                    .clone()
+                    .into();
+                FuncSym::from(str)
+            })
+    }
+
+    pub fn get_func_index(&self, ctx: &Context, func_sym: FuncSym) -> Option<FuncIndex> {
+        todo!()
     }
 }
 
@@ -515,21 +516,29 @@ impl CallOp {
     pub const ATTR_KEY_FUNC_INDEX: &str = "call.func_index";
 
     /// Get the function index
-    pub fn get_func_index(&self, ctx: &Context) -> AttrObj {
+    pub fn get_func_index(&self, ctx: &Context) -> FuncIndex {
         let op = self.get_operation().deref(ctx);
         #[allow(clippy::expect_used)]
         let func_index = op
             .attributes
             .get(Self::ATTR_KEY_FUNC_INDEX)
             .expect("no attribute found");
-        attribute::clone::<IntegerAttr>(func_index)
+        #[allow(clippy::expect_used)]
+        let func_index = apint_to_i32(
+            func_index
+                .downcast_ref::<IntegerAttr>()
+                .expect("ModuleOp function index is not an IntegerAttr")
+                .clone()
+                .into(),
+        ) as u32;
+        func_index.into()
     }
 
     /// Create a new [CallOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, func_index: u32) -> CallOp {
+    pub fn new_unlinked(ctx: &mut Context, func_index: FuncIndex) -> CallOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
-        let func_index_attr = u32_attr(ctx, func_index);
+        let func_index_attr = u32_attr(ctx, func_index.into());
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_FUNC_INDEX, func_index_attr);
@@ -543,19 +552,13 @@ impl DisplayWithContext for CallOp {
             f,
             "{} {}",
             self.get_opid().with_ctx(ctx),
-            self.get_func_index(ctx).with_ctx(ctx)
+            self.get_func_index(ctx)
         )
     }
 }
 
 impl Verify for CallOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
-        let callee_sym = self.get_func_index(ctx);
-        if !callee_sym.is::<StringAttr>() {
-            return Err(CompilerError::VerificationError {
-                msg: "Unexpected callee symbol type".to_string(),
-            });
-        }
         let op = &*self.get_operation().deref(ctx);
         if op.get_opid() != Self::get_opid_static() {
             return Err(CompilerError::VerificationError {

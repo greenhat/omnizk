@@ -3,7 +3,7 @@
 //! Internal dependency of Wasmtime and OmniZK that defines types for
 //! WebAssembly.
 
-use derive_more::{From, Into};
+use derive_more::{Display, From, Into};
 use ozk_ozk_dialect::types::{i32_type, i64_type};
 use pliron::{
     context::{Context, Ptr},
@@ -14,7 +14,7 @@ pub use wasmparser;
 use wasmparser::{BlockType, FuncType, RefType, ValType};
 
 /// Index type of a function (imported or defined) inside the WebAssembly module.
-#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
 pub struct FuncIndex(u32);
 
 /// Index type of a defined function inside the WebAssembly module.
@@ -103,6 +103,18 @@ impl From<MemoryIndex> for EntityIndex {
 impl From<GlobalIndex> for EntityIndex {
     fn from(idx: GlobalIndex) -> EntityIndex {
         EntityIndex::Global(idx)
+    }
+}
+
+impl From<usize> for FuncIndex {
+    fn from(idx: usize) -> FuncIndex {
+        FuncIndex(idx as u32)
+    }
+}
+
+impl From<FuncIndex> for usize {
+    fn from(value: FuncIndex) -> Self {
+        value.0 as usize
     }
 }
 
