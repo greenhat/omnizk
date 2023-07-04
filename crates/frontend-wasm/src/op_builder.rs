@@ -86,7 +86,7 @@ impl<'a> OpBuilder<'a> {
         ctx: &mut Context,
         global_index: u32,
     ) -> Result<(), FuncBuilderError> {
-        let op = GlobalSetOp::new_unlinked(ctx, global_index);
+        let op = GlobalSetOp::new_unlinked(ctx, global_index.into());
         self.fbuilder.push(ctx, op.get_operation())
     }
 
