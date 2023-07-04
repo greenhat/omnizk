@@ -34,10 +34,13 @@ impl Pass for WasmGlobalsToMemPass {
         // TODO: set illegal ops
         let mut patterns = RewritePatternSet::default();
         patterns.add(Box::new(WasmGlobalSetToMem::new(self.start_addr)));
+        patterns.add(Box::new(WasmGlobalGetToMem::new(self.start_addr)));
         apply_partial_conversion(ctx, op, target, patterns)?;
         Ok(())
     }
 }
+
+const MAX_GLOBAL_VAR_SIZE_BYTES: u32 = 8; // i64
 
 pub struct WasmGlobalSetToMem {
     start_addr: MemAddress,
@@ -75,21 +78,68 @@ impl RewritePattern for WasmGlobalSetToMem {
             .downcast::<wasm::GlobalSetOp>() else {
             panic!("unexpected op {}", op.deref(ctx).with_ctx(ctx));
         };
-        let max_global_var_size_bytes = 8; // i64
-        let offset: u32 = u32::from(global_set_op.get_index(ctx)) * max_global_var_size_bytes;
+        let offset: u32 = u32::from(global_set_op.get_index(ctx)) * MAX_GLOBAL_VAR_SIZE_BYTES;
         let address = u32::from(self.start_addr) - offset;
         let constant_op = wasm::ConstantOp::new_i32_unlinked(ctx, address as i32);
-        let i64store_op = wasm::StoreOp::new_unlinked(ctx, wasm::StoreOpValueType::I64);
+        let i64store_op = wasm::StoreOp::new_unlinked(ctx, wasm::MemAccessOpValueType::I64);
+        rewriter.insert_before(ctx, constant_op.get_operation())?;
+        let swap_op = ozk::SwapOp::new_unlinked(ctx, Ord16::ST1);
+        rewriter.insert_before(ctx, swap_op.get_operation())?;
         rewriter.replace_op_with(
             ctx,
             global_set_op.get_operation(),
             i64store_op.get_operation(),
         )?;
-        // TODO: add rewriter.insert_after/before?
-        rewriter.set_insertion_point(i64store_op.get_operation());
-        rewriter.insert(ctx, constant_op.get_operation())?;
-        let swap_op = ozk::SwapOp::new_unlinked(ctx, Ord16::ST1);
-        rewriter.insert(ctx, swap_op.get_operation())?;
+        Ok(())
+    }
+}
+
+pub struct WasmGlobalGetToMem {
+    start_addr: MemAddress,
+}
+
+impl WasmGlobalGetToMem {
+    pub fn new(start_addr: MemAddress) -> Self {
+        Self { start_addr }
+    }
+}
+
+impl RewritePattern for WasmGlobalGetToMem {
+    fn name(&self) -> String {
+        "WasmGlobalGetToMem".to_string()
+    }
+
+    fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
+        Ok(op
+            .deref(ctx)
+            .get_op(ctx)
+            .downcast_ref::<wasm::GlobalGetOp>()
+            .is_some())
+    }
+
+    #[allow(clippy::panic)]
+    fn rewrite(
+        &self,
+        ctx: &mut Context,
+        op: Ptr<Operation>,
+        rewriter: &mut dyn PatternRewriter,
+    ) -> Result<(), anyhow::Error> {
+        let Ok(global_get_op) = op
+            .deref(ctx)
+            .get_op(ctx)
+            .downcast::<wasm::GlobalGetOp>() else {
+            panic!("unexpected op {}", op.deref(ctx).with_ctx(ctx));
+        };
+        let offset: u32 = u32::from(global_get_op.get_index(ctx)) * MAX_GLOBAL_VAR_SIZE_BYTES;
+        let address = u32::from(self.start_addr) - offset;
+        let constant_op = wasm::ConstantOp::new_i32_unlinked(ctx, address as i32);
+        let i64load_op = wasm::LoadOp::new_unlinked(ctx, wasm::MemAccessOpValueType::I64);
+        rewriter.insert_before(ctx, constant_op.get_operation())?;
+        rewriter.replace_op_with(
+            ctx,
+            global_get_op.get_operation(),
+            i64load_op.get_operation(),
+        )?;
         Ok(())
     }
 }
@@ -148,7 +198,8 @@ mod tests {
                         wasm.const 0x1000: si32
                         ozk.swap 1
                         wasm.store I64
-                        wasm.global.get 0x0: ui32
+                        wasm.const 0x1000: si32
+                        wasm.load I64
                         wasm.return
                     }
                 }"#]],

@@ -1110,14 +1110,21 @@ impl GlobalGetOp {
     pub const ATTR_KEY_INDEX: &str = "global.get.index";
 
     /// Get the index of the global variable.
-    pub fn get_index(&self, ctx: &Context) -> AttrObj {
+    pub fn get_index(&self, ctx: &Context) -> GlobalIndex {
         let op = self.get_operation().deref(ctx);
         #[allow(clippy::expect_used)]
         let value = op
             .attributes
             .get(Self::ATTR_KEY_INDEX)
-            .expect("no attribute found");
-        attribute::clone::<IntegerAttr>(value)
+            .expect("no attribute for index found");
+        let value_u32 = apint_to_i32(
+            value
+                .downcast_ref::<IntegerAttr>()
+                .expect("index is not an IntegerAttr")
+                .clone()
+                .into(),
+        ) as u32;
+        value_u32.into()
     }
 
     /// Create a new [GlobalGetOp].
@@ -1138,26 +1145,13 @@ impl DisplayWithContext for GlobalGetOp {
             f,
             "{} {}",
             self.get_opid().with_ctx(ctx),
-            self.get_index(ctx).with_ctx(ctx)
+            self.get_index(ctx),
         )
     }
 }
 
 impl Verify for GlobalGetOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
-        let index = self.get_index(ctx);
-        if let Ok(index_attr) = index.downcast::<IntegerAttr>() {
-            #[allow(clippy::unwrap_used)]
-            if index_attr.get_type() != u32_type_unwrapped(ctx) {
-                return Err(CompilerError::VerificationError {
-                    msg: "Expected u32 for index".to_string(),
-                });
-            }
-        } else {
-            return Err(CompilerError::VerificationError {
-                msg: "Unexpected index type".to_string(),
-            });
-        };
         let op = &*self.get_operation().deref(ctx);
         if op.get_opid() != Self::get_opid_static() {
             return Err(CompilerError::VerificationError {
@@ -1173,6 +1167,12 @@ impl Verify for GlobalGetOp {
     }
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Display)]
+pub enum MemAccessOpValueType {
+    I32,
+    I64,
+}
+
 declare_op!(
     /// Pops the i32 or i64 value and i32 addresss from stack and save the value at the address.
     ///
@@ -1181,22 +1181,16 @@ declare_op!(
     "wasm"
 );
 
-#[derive(Debug, Copy, Clone, PartialEq, Display)]
-pub enum StoreOpValueType {
-    I32,
-    I64,
-}
-
 impl StoreOp {
     pub const ATTR_KEY_VALUE_TYPE: &str = "store.value.type";
 
     /// Create a new [StoreOp].
-    pub fn new_unlinked(ctx: &mut Context, ty: StoreOpValueType) -> StoreOp {
+    pub fn new_unlinked(ctx: &mut Context, ty: MemAccessOpValueType) -> StoreOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
 
         let value_type_attr = match ty {
-            StoreOpValueType::I32 => i32_type(ctx),
-            StoreOpValueType::I64 => i64_type(ctx),
+            MemAccessOpValueType::I32 => i32_type(ctx),
+            MemAccessOpValueType::I64 => i64_type(ctx),
         };
         op.deref_mut(ctx)
             .attributes
@@ -1204,7 +1198,7 @@ impl StoreOp {
         StoreOp { op }
     }
 
-    pub fn get_value_type(&self, ctx: &Context) -> StoreOpValueType {
+    pub fn get_value_type(&self, ctx: &Context) -> MemAccessOpValueType {
         let op = self.get_operation().deref(ctx);
         let value = op
             .attributes
@@ -1220,8 +1214,8 @@ impl StoreOp {
             .expect("Expected IntegerType");
         assert!(int_ty.get_signedness() == Signedness::Signed);
         match int_ty.get_width() {
-            32 => StoreOpValueType::I32,
-            64 => StoreOpValueType::I64,
+            32 => MemAccessOpValueType::I32,
+            64 => MemAccessOpValueType::I64,
             _ => panic!("Unexpected bitwidth"),
         }
     }
@@ -1255,6 +1249,81 @@ impl Verify for StoreOp {
     }
 }
 
+declare_op!(
+    /// push the i32 or i64 value loaded from i32 addresss poped from the stack
+    ///
+    LoadOp,
+    "load",
+    "wasm"
+);
+
+impl LoadOp {
+    pub const ATTR_KEY_VALUE_TYPE: &str = "store.value.type";
+
+    /// Create a new [LoadOp].
+    pub fn new_unlinked(ctx: &mut Context, ty: MemAccessOpValueType) -> LoadOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+
+        let value_type_attr = match ty {
+            MemAccessOpValueType::I32 => i32_type(ctx),
+            MemAccessOpValueType::I64 => i64_type(ctx),
+        };
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_VALUE_TYPE, TypeAttr::create(value_type_attr));
+        LoadOp { op }
+    }
+
+    pub fn get_value_type(&self, ctx: &Context) -> MemAccessOpValueType {
+        let op = self.get_operation().deref(ctx);
+        let value = op
+            .attributes
+            .get(Self::ATTR_KEY_VALUE_TYPE)
+            .expect("no attribute found");
+        let ty = value
+            .downcast_ref::<TypeAttr>()
+            .expect("Expected TypeAttr")
+            .get_type()
+            .deref(ctx);
+        let int_ty = ty
+            .downcast_ref::<IntegerType>()
+            .expect("Expected IntegerType");
+        assert!(int_ty.get_signedness() == Signedness::Signed);
+        match int_ty.get_width() {
+            32 => MemAccessOpValueType::I32,
+            64 => MemAccessOpValueType::I64,
+            _ => panic!("Unexpected bitwidth"),
+        }
+    }
+}
+
+impl DisplayWithContext for LoadOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "{} {}",
+            self.get_opid().with_ctx(ctx),
+            self.get_value_type(ctx)
+        )
+    }
+}
+
+impl Verify for LoadOp {
+    fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+        let op = &*self.get_operation().deref(ctx);
+        if op.get_opid() != Self::get_opid_static() {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect OpId".to_string(),
+            });
+        }
+        if op.get_num_results() != 0 || op.get_num_operands() != 0 {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect number of results or operands".to_string(),
+            });
+        }
+        Ok(())
+    }
+}
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ModuleOp::register(ctx, dialect);
     ConstantOp::register(ctx, dialect);
@@ -1269,4 +1338,5 @@ pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     GlobalSetOp::register(ctx, dialect);
     GlobalGetOp::register(ctx, dialect);
     StoreOp::register(ctx, dialect);
+    LoadOp::register(ctx, dialect);
 }
