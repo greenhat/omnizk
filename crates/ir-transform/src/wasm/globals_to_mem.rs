@@ -1,3 +1,5 @@
+use ozk_ozk_dialect::ops as ozk;
+use ozk_ozk_dialect::ord_n::Ord16;
 use ozk_wasm_dialect::ops as wasm;
 use ozk_wasm_dialect::types::MemAddress;
 use pliron::context::Context;
@@ -73,11 +75,10 @@ impl RewritePattern for WasmGlobalSetToMem {
             .downcast::<wasm::GlobalSetOp>() else {
             panic!("unexpected op {}", op.deref(ctx).with_ctx(ctx));
         };
-        let global_var_size_bytes = 8;
-        let offset: u32 = u32::from(global_set_op.get_index(ctx)) * global_var_size_bytes;
+        let max_global_var_size_bytes = 8; // i64
+        let offset: u32 = u32::from(global_set_op.get_index(ctx)) * max_global_var_size_bytes;
         let address = u32::from(self.start_addr) - offset;
         let constant_op = wasm::ConstantOp::new_i32_unlinked(ctx, address as i32);
-        // TODO: get the global var type
         let i64store_op = wasm::StoreOp::new_unlinked(ctx, wasm::StoreOpValueType::I64);
         rewriter.replace_op_with(
             ctx,
@@ -87,7 +88,8 @@ impl RewritePattern for WasmGlobalSetToMem {
         // TODO: add rewriter.insert_after/before?
         rewriter.set_insertion_point(i64store_op.get_operation());
         rewriter.insert(ctx, constant_op.get_operation())?;
-        // todo!("value to store should be on top, add swap op");
+        let swap_op = ozk::SwapOp::new_unlinked(ctx, Ord16::ST1);
+        rewriter.insert(ctx, swap_op.get_operation())?;
         Ok(())
     }
 }
@@ -108,6 +110,7 @@ mod tests {
         let mut ctx = Context::default();
         let frontend_config = WasmFrontendConfig::default();
         ozk_wasm_dialect::register(&mut ctx);
+        ozk_ozk_dialect::register(&mut ctx);
         frontend_config.register(&mut ctx);
         let wasm_module_op =
             ozk_frontend_wasm::parse_module(&mut ctx, &source, &frontend_config).unwrap();
@@ -143,6 +146,7 @@ mod tests {
                       entry():
                         wasm.const 0x9: si32
                         wasm.const 0x1000: si32
+                        ozk.swap 1
                         wasm.store I64
                         wasm.global.get 0x0: ui32
                         wasm.return

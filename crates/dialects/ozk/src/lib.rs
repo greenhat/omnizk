@@ -20,6 +20,7 @@
 
 pub mod attributes;
 pub mod ops;
+pub mod ord_n;
 pub mod types;
 
 use pliron::context::Context;
