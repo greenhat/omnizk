@@ -112,22 +112,19 @@ impl RewritePattern for WasmGlobalsToMem {
             .unwrap_or_else(|| module_op.append_function(ctx, global_set_func_op));
         for op in global_ops {
             let deref_op = &op.deref(ctx).get_op(ctx);
-            let Some(global_set_op) =  deref_op
-                .downcast_ref::<wasm::GlobalSetOp>()
-               else
-            {
-                panic!();
-            };
-            let global_set_op_index = global_set_op.get_index(ctx);
-            let constant_op = wasm::ConstantOp::new_unlinked(ctx, global_set_op_index);
-            let call_op = wasm::CallOp::new_unlinked(ctx, global_set_func_index);
-            rewriter.replace_op_with(
-                ctx,
-                global_set_op.get_operation(),
-                call_op.get_operation(),
-            )?;
-            rewriter.set_insertion_point(call_op.get_operation());
-            rewriter.insert(ctx, constant_op.get_operation())?;
+            if let Some(global_set_op) = deref_op.downcast_ref::<wasm::GlobalSetOp>() {
+                let global_set_op_index = global_set_op.get_index(ctx);
+                let constant_op = wasm::ConstantOp::new_unlinked(ctx, global_set_op_index);
+                let call_op = wasm::CallOp::new_unlinked(ctx, global_set_func_index);
+                rewriter.replace_op_with(
+                    ctx,
+                    global_set_op.get_operation(),
+                    call_op.get_operation(),
+                )?;
+                // TODO: add rewriter.insert_after/before?
+                rewriter.set_insertion_point(call_op.get_operation());
+                rewriter.insert(ctx, constant_op.get_operation())?;
+            }
         }
         Ok(())
     }
@@ -143,6 +140,7 @@ fn global_set_func(ctx: &mut Context, start_addr: i32) -> wasm::FuncOp {
     let inputs = vec![u32_type(ctx)];
     let sig = FunctionType::get(ctx, inputs, vec![]);
     func_builder.set_signature(sig);
+    func_builder.push(ctx, op)
     func_builder.build(ctx).unwrap()
 }
 
@@ -194,9 +192,13 @@ mod tests {
                     wasm.func @main() -> () {
                       entry():
                         wasm.const 0x9: si32
-                        wasm.global.set 0x0: ui32
+                        wasm.const 0x0: ui32
+                        wasm.call 2
                         wasm.global.get 0x0: ui32
                         wasm.return
+                    }
+                    wasm.func @omnizk_globals_set(ui32) -> () {
+                      entry():
                     }
                 }"#]],
         );

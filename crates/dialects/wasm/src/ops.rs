@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+#![allow(clippy::expect_used)]
 
 use std::collections::HashMap;
 
@@ -82,10 +83,10 @@ impl Verify for ModuleOp {
 impl ModuleOp {
     /// Attribute key for the the start function symbol.
     pub const ATTR_KEY_START_FUNC_SYM: &str = "module.start_func_sym";
-    /// Attribute key for the import functions dictionary (function name -> type)
-    pub const ATTR_KEY_DICT_IMPORT_FUNCTION_TYPE: &str = "module.dict_import_function_type";
-    /// Attribute key for the import functions dictionary (function name -> module name)
-    pub const ATTR_KEY_DICT_IMPORT_FUNCTION_MODULE: &str = "module.dict_import_function_module";
+    // /// Attribute key for the import functions dictionary (function name -> type)
+    // pub const ATTR_KEY_DICT_IMPORT_FUNCTION_TYPE: &str = "module.dict_import_function_type";
+    // /// Attribute key for the import functions dictionary (function name -> module name)
+    // pub const ATTR_KEY_DICT_IMPORT_FUNCTION_MODULE: &str = "module.dict_import_function_module";
     /// Attribute key for all function (defined + imports) symbols
     pub const ATTR_KEY_FUNC_INDICES: &str = "module.func_indices";
     /// Attribute key for the import function types.
@@ -178,7 +179,6 @@ impl ModuleOp {
     }
 
     /// Return the start function symbol name
-    #[allow(clippy::expect_used)]
     pub fn get_start_func_sym(&self, ctx: &Context) -> FuncSym {
         let self_op = self.get_operation().deref(ctx);
         let s_attr = self_op
@@ -194,8 +194,7 @@ impl ModuleOp {
         .into()
     }
 
-    #[allow(clippy::expect_used)]
-    pub fn get_func_sym(&self, ctx: &Context, func_index: FuncIndex) -> Option<FuncSym> {
+    fn get_func_syms(&self, ctx: &Context) -> Vec<FuncSym> {
         let self_op = self.get_operation().deref(ctx);
         let v_attr = self_op
             .attributes
@@ -205,7 +204,7 @@ impl ModuleOp {
             .downcast_ref::<VecAttr>()
             .expect("ModuleOp function symbols vector attribute is not a VecAttr")
             .0
-            .get(usize::from(func_index))
+            .iter()
             .map(|attr: &AttrObj| {
                 let str: String = attr
                     .downcast_ref::<StringAttr>()
@@ -214,10 +213,20 @@ impl ModuleOp {
                     .into();
                 FuncSym::from(str)
             })
+            .collect()
+    }
+
+    pub fn get_func_sym(&self, ctx: &Context, func_index: FuncIndex) -> Option<FuncSym> {
+        self.get_func_syms(ctx)
+            .get(usize::from(func_index))
+            .cloned()
     }
 
     pub fn get_func_index(&self, ctx: &Context, func_sym: FuncSym) -> Option<FuncIndex> {
-        todo!()
+        self.get_func_syms(ctx)
+            .iter()
+            .position(|sym| *sym == func_sym)
+            .map(Into::into)
     }
 }
 
