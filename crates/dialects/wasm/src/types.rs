@@ -69,6 +69,10 @@ pub struct TypeIndex(u32);
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
 pub struct TagIndex(u32);
 
+/// Address in the linear memory
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
+pub struct MemAddress(u32);
+
 /// An index of an entity.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
 pub enum EntityIndex {

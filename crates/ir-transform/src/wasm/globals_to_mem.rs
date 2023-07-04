@@ -1,30 +1,23 @@
-use ozk_frontend_wasm::func_builder::FuncBuilder;
-use ozk_ozk_dialect::types::u32_type;
 use ozk_wasm_dialect::ops as wasm;
+use ozk_wasm_dialect::types::MemAddress;
 use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::dialect_conversion::apply_partial_conversion;
 use pliron::dialect_conversion::ConversionTarget;
-use pliron::dialects::builtin::types::FunctionType;
 use pliron::op::Op;
 use pliron::operation::Operation;
-use pliron::operation::WalkOrder;
-use pliron::operation::WalkResult;
 use pliron::pass::Pass;
 use pliron::pattern_match::PatternRewriter;
 use pliron::pattern_match::RewritePattern;
 use pliron::rewrite::RewritePatternSet;
 use pliron::with_context::AttachContext;
 
-const GLOBALS_GET_FUNC_NAME: &str = "omnizk_globals_get";
-const GLOBALS_SET_FUNC_NAME: &str = "omnizk_globals_set";
-
 pub struct WasmGlobalsToMemPass {
-    start_addr: i32,
+    start_addr: MemAddress,
 }
 
 impl WasmGlobalsToMemPass {
-    pub fn new(start_addr: i32) -> Self {
+    pub fn new(start_addr: MemAddress) -> Self {
         Self { start_addr }
     }
 }
@@ -38,32 +31,32 @@ impl Pass for WasmGlobalsToMemPass {
         let target = ConversionTarget::default();
         // TODO: set illegal ops
         let mut patterns = RewritePatternSet::default();
-        patterns.add(Box::new(WasmGlobalsToMem::new(self.start_addr)));
+        patterns.add(Box::new(WasmGlobalSetToMem::new(self.start_addr)));
         apply_partial_conversion(ctx, op, target, patterns)?;
         Ok(())
     }
 }
 
-pub struct WasmGlobalsToMem {
-    start_addr: i32,
+pub struct WasmGlobalSetToMem {
+    start_addr: MemAddress,
 }
 
-impl WasmGlobalsToMem {
-    pub fn new(start_addr: i32) -> Self {
+impl WasmGlobalSetToMem {
+    pub fn new(start_addr: MemAddress) -> Self {
         Self { start_addr }
     }
 }
 
-impl RewritePattern for WasmGlobalsToMem {
+impl RewritePattern for WasmGlobalSetToMem {
     fn name(&self) -> String {
-        "WasmGlobalsToMem".to_string()
+        "WasmGlobalSetToMem".to_string()
     }
 
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)
             .get_op(ctx)
-            .downcast_ref::<wasm::ModuleOp>()
+            .downcast_ref::<wasm::GlobalSetOp>()
             .is_some())
     }
 
@@ -74,74 +67,29 @@ impl RewritePattern for WasmGlobalsToMem {
         op: Ptr<Operation>,
         rewriter: &mut dyn PatternRewriter,
     ) -> Result<(), anyhow::Error> {
-        let Ok(module_op) = op
+        let Ok(global_set_op) = op
             .deref(ctx)
             .get_op(ctx)
-            .downcast::<wasm::ModuleOp>() else {
+            .downcast::<wasm::GlobalSetOp>() else {
             panic!("unexpected op {}", op.deref(ctx).with_ctx(ctx));
         };
-
-        let mut global_ops: Vec<Ptr<Operation>> = vec![];
-        op.walk(ctx, WalkOrder::PreOrder, &mut |op| {
-            if op
-                .deref(ctx)
-                .get_op(ctx)
-                .downcast_ref::<wasm::GlobalGetOp>()
-                .is_some()
-            {
-                global_ops.push(op);
-            };
-            if op
-                .deref(ctx)
-                .get_op(ctx)
-                .downcast_ref::<wasm::GlobalSetOp>()
-                .is_some()
-            {
-                global_ops.push(op);
-            };
-            WalkResult::Advance
-        });
-
-        if global_ops.is_empty() {
-            return Ok(());
-        }
-
-        let global_set_func_op = global_set_func(ctx, self.start_addr);
-        let global_set_func_index = module_op
-            .get_func_index(ctx, GLOBALS_SET_FUNC_NAME.into())
-            .unwrap_or_else(|| module_op.append_function(ctx, global_set_func_op));
-        for op in global_ops {
-            let deref_op = &op.deref(ctx).get_op(ctx);
-            if let Some(global_set_op) = deref_op.downcast_ref::<wasm::GlobalSetOp>() {
-                let global_set_op_index = global_set_op.get_index(ctx);
-                let constant_op = wasm::ConstantOp::new_unlinked(ctx, global_set_op_index);
-                let call_op = wasm::CallOp::new_unlinked(ctx, global_set_func_index);
-                rewriter.replace_op_with(
-                    ctx,
-                    global_set_op.get_operation(),
-                    call_op.get_operation(),
-                )?;
-                // TODO: add rewriter.insert_after/before?
-                rewriter.set_insertion_point(call_op.get_operation());
-                rewriter.insert(ctx, constant_op.get_operation())?;
-            }
-        }
+        let global_var_size_bytes = 8;
+        let offset: u32 = u32::from(global_set_op.get_index(ctx)) * global_var_size_bytes;
+        let address = u32::from(self.start_addr) - offset;
+        let constant_op = wasm::ConstantOp::new_i32_unlinked(ctx, address as i32);
+        // TODO: get the global var type
+        let i64store_op = wasm::StoreOp::new_unlinked(ctx, wasm::StoreOpValueType::I64);
+        rewriter.replace_op_with(
+            ctx,
+            global_set_op.get_operation(),
+            i64store_op.get_operation(),
+        )?;
+        // TODO: add rewriter.insert_after/before?
+        rewriter.set_insertion_point(i64store_op.get_operation());
+        rewriter.insert(ctx, constant_op.get_operation())?;
+        // todo!("value to store should be on top, add swap op");
         Ok(())
     }
-}
-
-fn global_get_func(ctx: &mut Context, start_addr: i32) -> wasm::FuncOp {
-    todo!()
-}
-
-#[allow(clippy::unwrap_used)]
-fn global_set_func(ctx: &mut Context, start_addr: i32) -> wasm::FuncOp {
-    let mut func_builder = FuncBuilder::new(ctx, GLOBALS_SET_FUNC_NAME.into());
-    let inputs = vec![u32_type(ctx)];
-    let sig = FunctionType::get(ctx, inputs, vec![]);
-    func_builder.set_signature(sig);
-    func_builder.push(ctx, op)
-    func_builder.build(ctx).unwrap()
 }
 
 #[allow(clippy::unwrap_used)]
@@ -170,7 +118,9 @@ mod tests {
 
     #[test]
     fn globals_get_set() {
-        let pass = WasmGlobalsToMemPass { start_addr: 0x1000 };
+        let pass = WasmGlobalsToMemPass {
+            start_addr: 0x1000.into(),
+        };
         check_pass(
             &pass,
             r#"
@@ -192,13 +142,10 @@ mod tests {
                     wasm.func @main() -> () {
                       entry():
                         wasm.const 0x9: si32
-                        wasm.const 0x0: ui32
-                        wasm.call 2
+                        wasm.const 0x1000: si32
+                        wasm.store I64
                         wasm.global.get 0x0: ui32
                         wasm.return
-                    }
-                    wasm.func @omnizk_globals_set(ui32) -> () {
-                      entry():
                     }
                 }"#]],
         );

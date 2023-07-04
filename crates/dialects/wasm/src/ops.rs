@@ -1,11 +1,17 @@
 #![allow(unused_imports)]
 #![allow(clippy::expect_used)]
+#![allow(clippy::panic)]
 
 use std::collections::HashMap;
+use std::ops::Deref;
 
+use derive_more::Display;
 use intertrait::cast_to;
 use ozk_ozk_dialect::attributes::apint_to_i32;
+use ozk_ozk_dialect::attributes::i32_attr;
 use ozk_ozk_dialect::attributes::u32_attr;
+use ozk_ozk_dialect::types::i32_type;
+use ozk_ozk_dialect::types::i64_type;
 use ozk_ozk_dialect::types::u32_type_unwrapped;
 use ozk_ozk_dialect::types::FuncSym;
 use pliron::attribute;
@@ -407,6 +413,17 @@ impl ConstantOp {
         op.deref_mut(ctx)
             .attributes
             .insert(Self::ATTR_KEY_VALUE, val);
+        ConstantOp { op }
+    }
+
+    /// Create a new i32 [ConstOp]. The underlying [Operation] is not linked to a
+    /// [BasicBlock](crate::basic_block::BasicBlock).
+    pub fn new_i32_unlinked(ctx: &mut Context, val: i32) -> ConstantOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        let val_attr = i32_attr(ctx, val);
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_VALUE, val_attr);
         ConstantOp { op }
     }
 }
@@ -1156,6 +1173,88 @@ impl Verify for GlobalGetOp {
     }
 }
 
+declare_op!(
+    /// Pops the i32 or i64 value and i32 addresss from stack and save the value at the address.
+    ///
+    StoreOp,
+    "store",
+    "wasm"
+);
+
+#[derive(Debug, Copy, Clone, PartialEq, Display)]
+pub enum StoreOpValueType {
+    I32,
+    I64,
+}
+
+impl StoreOp {
+    pub const ATTR_KEY_VALUE_TYPE: &str = "store.value.type";
+
+    /// Create a new [StoreOp].
+    pub fn new_unlinked(ctx: &mut Context, ty: StoreOpValueType) -> StoreOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+
+        let value_type_attr = match ty {
+            StoreOpValueType::I32 => i32_type(ctx),
+            StoreOpValueType::I64 => i64_type(ctx),
+        };
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_VALUE_TYPE, TypeAttr::create(value_type_attr));
+        StoreOp { op }
+    }
+
+    pub fn get_value_type(&self, ctx: &Context) -> StoreOpValueType {
+        let op = self.get_operation().deref(ctx);
+        let value = op
+            .attributes
+            .get(Self::ATTR_KEY_VALUE_TYPE)
+            .expect("no attribute found");
+        let ty = value
+            .downcast_ref::<TypeAttr>()
+            .expect("Expected TypeAttr")
+            .get_type()
+            .deref(ctx);
+        let int_ty = ty
+            .downcast_ref::<IntegerType>()
+            .expect("Expected IntegerType");
+        assert!(int_ty.get_signedness() == Signedness::Signed);
+        match int_ty.get_width() {
+            32 => StoreOpValueType::I32,
+            64 => StoreOpValueType::I64,
+            _ => panic!("Unexpected bitwidth"),
+        }
+    }
+}
+
+impl DisplayWithContext for StoreOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "{} {}",
+            self.get_opid().with_ctx(ctx),
+            self.get_value_type(ctx)
+        )
+    }
+}
+
+impl Verify for StoreOp {
+    fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+        let op = &*self.get_operation().deref(ctx);
+        if op.get_opid() != Self::get_opid_static() {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect OpId".to_string(),
+            });
+        }
+        if op.get_num_results() != 0 || op.get_num_operands() != 0 {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect number of results or operands".to_string(),
+            });
+        }
+        Ok(())
+    }
+}
+
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ModuleOp::register(ctx, dialect);
     ConstantOp::register(ctx, dialect);
@@ -1169,4 +1268,5 @@ pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     LocalSetOp::register(ctx, dialect);
     GlobalSetOp::register(ctx, dialect);
     GlobalGetOp::register(ctx, dialect);
+    StoreOp::register(ctx, dialect);
 }
