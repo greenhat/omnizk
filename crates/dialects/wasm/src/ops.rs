@@ -5,6 +5,7 @@
 use std::collections::HashMap;
 use std::ops::Deref;
 
+use apint::ApInt;
 use derive_more::Display;
 use intertrait::cast_to;
 use ozk_ozk_dialect::attributes::apint_to_i32;

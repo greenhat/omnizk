@@ -44,7 +44,7 @@ pub fn translate_operator(
         Operator::I32Const { value } => func_builder.op().i32const(ctx, *value)?,
         Operator::I64Const { value } => func_builder.op().i64const(ctx, *value)?,
         Operator::I32Add => func_builder.op().i32add(ctx)?,
-        Operator::I32Eqz => func_builder.op().i32eqz(ctx),
+        Operator::I32Eqz => func_builder.op().i32eqz(ctx)?,
         Operator::I32WrapI64 => func_builder.op().i32wrapi64(ctx),
         Operator::I32GeU => func_builder.op().i32geu(ctx),
         Operator::I32And => func_builder.op().i32and(ctx),

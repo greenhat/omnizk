@@ -51,8 +51,12 @@ impl RewritePattern for ConstantOpLowering {
                 rewriter.replace_op_with(ctx, op, imm_op.get_operation())?;
                 // todo!("cell ofsset can be determined only by analyzing the entire function(track stack depth?");
                 // TODO: moreover, we need to know stack depth in runtime for every wasm op
-                // prepend every wasm op with an op that will update the current stack depth stored in the local var?
-                // and define for each wasm op how many elements it pops from and pushes to the stack
+                // walk the functions ops and attach to every wasm op the stack depth before that op
+                // i.e. for add op if the stack deptch is N we set valida operands to fp(N) and fp(N - 1)
+                // and set the result to fp((N - 2) + 1).
+                // make a pass that stores stack depths for every op in FuncOp itself? No, to every op in FuncOp.
+                // We can attach to an op this info in valida lowering pass itself
+                // before calling the convertion patterns.
             } else {
                 return Err(anyhow!("only integer constants are supported"));
             }

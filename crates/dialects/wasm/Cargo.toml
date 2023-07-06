@@ -22,5 +22,6 @@ indent = { workspace = true }
 paste = { workspace = true }
 inventory = { workspace = true }
 wasmparser = { workspace = true }
+apint = { workspace = true }
 
 [dev-dependencies]
