@@ -17,7 +17,7 @@ pub trait TrackedStackDepth: Op {
         let value = self_op
             .attributes
             .get(Self::ATTR_KEY_STACK_DEPTH)
-            .expect("no attribute found");
+            .expect("no stack depth attribute found, expected it to be set by the special pass");
         let attr = attribute::clone::<IntegerAttr>(value);
         let apint: ApInt = attr
             .downcast_ref::<IntegerAttr>()

@@ -13,6 +13,7 @@ use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::pattern_match::PatternRewriter;
 use pliron::pattern_match::RewritePattern;
+use wasm::op_interfaces::TrackedStackDepth;
 
 #[derive(Default)]
 pub struct ConstantOpLowering {}
@@ -42,21 +43,19 @@ impl RewritePattern for ConstantOpLowering {
             let value = const_op.get_value(ctx);
             if let Ok(value_attr) = value.downcast::<IntegerAttr>() {
                 let value = p231m1_field_elem_from_int_attr(ctx, *value_attr)?;
-                let cell_offset = p231m1_field_elem_from_int(ctx, 0);
+                // TODO: add pass to set the current stack depth for all ops in a function
+                // walk the functions ops and attach to every wasm op the stack depth before that op
+                // i.e. for add op if the stack deptch is N we set valida operands to fp(N) and fp(N - 1)
+                // and set the result to fp((N - 2) + 1).
+                let wasm_stack_depth_before_op = const_op.get_stack_depth(ctx);
+                let cell_offset_raw = -((wasm_stack_depth_before_op as i32 + 1) * 4);
+                let cell_offset = p231m1_field_elem_from_int(ctx, cell_offset_raw);
                 let zero = p231m1_field_elem_from_int(ctx, 0);
                 let b = zero.clone();
                 let c = zero.clone();
                 let d = zero;
                 let imm_op = valida::ops::Imm32Op::new_unlinked(ctx, cell_offset, b, c, d, value);
                 rewriter.replace_op_with(ctx, op, imm_op.get_operation())?;
-                // todo!("cell ofsset can be determined only by analyzing the entire function(track stack depth?");
-                // TODO: moreover, we need to know stack depth in runtime for every wasm op
-                // walk the functions ops and attach to every wasm op the stack depth before that op
-                // i.e. for add op if the stack deptch is N we set valida operands to fp(N) and fp(N - 1)
-                // and set the result to fp((N - 2) + 1).
-                // make a pass that stores stack depths for every op in FuncOp itself? No, to every op in FuncOp.
-                // We can attach to an op this info in valida lowering pass itself
-                // before calling the convertion patterns.
             } else {
                 return Err(anyhow!("only integer constants are supported"));
             }
