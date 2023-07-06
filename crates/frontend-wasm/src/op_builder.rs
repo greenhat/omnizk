@@ -11,6 +11,8 @@ use ozk_wasm_dialect::ops::ConstantOp;
 use ozk_wasm_dialect::ops::GlobalGetOp;
 use ozk_wasm_dialect::ops::GlobalSetOp;
 use ozk_wasm_dialect::ops::LocalGetOp;
+use ozk_wasm_dialect::ops::LocalSetOp;
+use ozk_wasm_dialect::ops::LocalTeeOp;
 use ozk_wasm_dialect::ops::LoopOp;
 use ozk_wasm_dialect::ops::ReturnOp;
 use ozk_wasm_dialect::types::from_block_type;
@@ -110,12 +112,22 @@ impl<'a> OpBuilder<'a> {
         self.fbuilder.push(ctx, op.get_operation())
     }
 
-    pub fn local_tee(&mut self, ctx: &mut Context, local_index: u32) {
-        todo!();
+    pub fn local_tee(
+        &mut self,
+        ctx: &mut Context,
+        local_index: u32,
+    ) -> Result<(), FuncBuilderError> {
+        let op = LocalTeeOp::new_unlinked(ctx, local_index);
+        self.fbuilder.push(ctx, op.get_operation())
     }
 
-    pub fn local_set(&mut self, ctx: &mut Context, local_index: u32) {
-        todo!();
+    pub fn local_set(
+        &mut self,
+        ctx: &mut Context,
+        local_index: u32,
+    ) -> Result<(), FuncBuilderError> {
+        let op = LocalSetOp::new_unlinked(ctx, local_index);
+        self.fbuilder.push(ctx, op.get_operation())
     }
 
     pub fn i32add(&mut self, ctx: &mut Context) -> Result<(), FuncBuilderError> {
