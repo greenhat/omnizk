@@ -34,7 +34,7 @@ pub fn translate_operator(
             func_builder.op().br_if(ctx, *relative_depth);
         }
         Operator::Br { relative_depth } => {
-            func_builder.op().br(ctx, *relative_depth);
+            func_builder.op().br(ctx, *relative_depth)?;
         }
         Operator::GlobalSet { global_index } => func_builder.op().global_set(ctx, *global_index)?,
         Operator::GlobalGet { global_index } => func_builder.op().global_get(ctx, *global_index)?,

@@ -73,6 +73,10 @@ pub struct TagIndex(u32);
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
 pub struct MemAddress(u32);
 
+/// Relative depth in Br* ops
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
+pub struct RelativeDepth(u32);
+
 /// An index of an entity.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug)]
 pub enum EntityIndex {

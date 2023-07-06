@@ -46,6 +46,7 @@ use pliron::with_context::AttachContext;
 
 use crate::types::FuncIndex;
 use crate::types::GlobalIndex;
+use crate::types::RelativeDepth;
 
 declare_op!(
     /// Represents a Wasm module, a top level container operation.
@@ -1324,6 +1325,75 @@ impl Verify for LoadOp {
         Ok(())
     }
 }
+
+declare_op!(
+    /// Branch op. Transfer control to the end of outer block relative_depth levels up.
+    ///
+    BrOp,
+    "br",
+    "wasm"
+);
+
+impl BrOp {
+    pub const ATTR_KEY_RELATIVE_DEPTH: &str = "bf.relative_depth";
+
+    /// Get the function index
+    pub fn get_relative_depth(&self, ctx: &Context) -> RelativeDepth {
+        let op = self.get_operation().deref(ctx);
+        #[allow(clippy::expect_used)]
+        let attr = op
+            .attributes
+            .get(Self::ATTR_KEY_RELATIVE_DEPTH)
+            .expect("no attribute found");
+        #[allow(clippy::expect_used)]
+        let attr_val = apint_to_i32(
+            attr.downcast_ref::<IntegerAttr>()
+                .expect("expected IntegerAttr")
+                .clone()
+                .into(),
+        ) as u32;
+        attr_val.into()
+    }
+
+    /// Create a new [BrOp]. The underlying [Operation] is not linked to a
+    /// [BasicBlock](crate::basic_block::BasicBlock).
+    pub fn new_unlinked(ctx: &mut Context, relative_depth: RelativeDepth) -> BrOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        let attr = u32_attr(ctx, relative_depth.into());
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_RELATIVE_DEPTH, attr);
+        BrOp { op }
+    }
+}
+
+impl DisplayWithContext for BrOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "{} {}",
+            self.get_opid().with_ctx(ctx),
+            self.get_relative_depth(ctx)
+        )
+    }
+}
+
+impl Verify for BrOp {
+    fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+        let op = &*self.get_operation().deref(ctx);
+        if op.get_opid() != Self::get_opid_static() {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect OpId".to_string(),
+            });
+        }
+        if op.get_num_results() != 0 || op.get_num_operands() != 0 {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect number of results or operands".to_string(),
+            });
+        }
+        Ok(())
+    }
+}
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ModuleOp::register(ctx, dialect);
     ConstantOp::register(ctx, dialect);
@@ -1339,4 +1409,5 @@ pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     GlobalGetOp::register(ctx, dialect);
     StoreOp::register(ctx, dialect);
     LoadOp::register(ctx, dialect);
+    BrOp::register(ctx, dialect);
 }
