@@ -108,7 +108,7 @@ impl ModuleBuilder {
             let start_func_name = self
                 .get_func_name(start_func_idx)
                 .ok_or(ModuleBuilderError::FuncNameNotFound(start_func_idx))?;
-            let import_func_types = self
+            let _import_func_types = self
                 .import_functions
                 .iter()
                 .map(|(label, ty_idx)| self.get_type(*ty_idx).map(|ty| (label.clone(), ty)))

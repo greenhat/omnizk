@@ -3,7 +3,6 @@ use sem_tests::check_miden;
 
 mod sem_tests;
 
-#[ignore]
 #[test]
 fn test_globals_set_get() {
     let input = vec![];

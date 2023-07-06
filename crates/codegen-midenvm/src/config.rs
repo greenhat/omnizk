@@ -24,8 +24,10 @@ impl Default for MidenTargetConfig {
         pass_manager.add_pass(Box::<WasmExplicitFuncArgsPass>::default());
         pass_manager.add_pass(Box::<WasmToMidenCallOpLoweringPass>::default());
         pass_manager.add_pass(Box::<WasmToMidenCFLoweringPass>::default());
+        pass_manager.add_pass(Box::new(WasmGlobalsToMemPass::new(
+            memory_layout.globals_start_address,
+        )));
         pass_manager.add_pass(Box::<WasmToMidenArithLoweringPass>::default());
-        pass_manager.add_pass(Box::new(WasmGlobalsToMemPass::new(memory_layout.globals_start_address)));
         // pass_manager.add_pass(Box::<WasmToMidenFinalLoweringPass>::default());
         Self {
             output_format: MidenOutputFormat::Source,
