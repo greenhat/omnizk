@@ -31,7 +31,7 @@ pub fn translate_operator(
             func_builder.op().block(ctx, blockty)?;
         }
         Operator::BrIf { relative_depth } => {
-            func_builder.op().br_if(ctx, *relative_depth);
+            func_builder.op().br_if(ctx, *relative_depth)?;
         }
         Operator::Br { relative_depth } => {
             func_builder.op().br(ctx, *relative_depth)?;

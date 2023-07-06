@@ -4,6 +4,7 @@ use ozk_ozk_dialect::types::i32_type;
 use ozk_ozk_dialect::types::i64_type;
 use ozk_wasm_dialect::ops::AddOp;
 use ozk_wasm_dialect::ops::BlockOp;
+use ozk_wasm_dialect::ops::BrIfOp;
 use ozk_wasm_dialect::ops::BrOp;
 use ozk_wasm_dialect::ops::CallOp;
 use ozk_wasm_dialect::ops::ConstantOp;
@@ -183,8 +184,13 @@ impl<'a> OpBuilder<'a> {
         todo!();
     }
 
-    pub fn br_if(&mut self, ctx: &mut Context, relative_depth: u32) {
-        todo!();
+    pub fn br_if(
+        &mut self,
+        ctx: &mut Context,
+        relative_depth: u32,
+    ) -> Result<(), FuncBuilderError> {
+        let op = BrIfOp::new_unlinked(ctx, relative_depth.into());
+        self.fbuilder.push(ctx, op.get_operation())
     }
 
     pub fn br(&mut self, ctx: &mut Context, relative_depth: u32) -> Result<(), FuncBuilderError> {
