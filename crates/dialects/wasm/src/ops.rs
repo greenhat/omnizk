@@ -1541,6 +1541,46 @@ impl Verify for BrIfOp {
     }
 }
 
+declare_op!(
+    /// Pops the i32 value from the stack and if its zero pushes 1 otherwise pushes 0 to the stack.
+    ///
+    I32EqzOp,
+    "i32.eqz",
+    "wasm"
+);
+
+impl I32EqzOp {
+    /// Create a new [I32Eqz]. The underlying [Operation] is not linked to a
+    /// [BasicBlock](crate::basic_block::BasicBlock).
+    pub fn new_unlinked(ctx: &mut Context) -> ConstantOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        ConstantOp { op }
+    }
+}
+
+impl DisplayWithContext for I32EqzOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.get_opid().with_ctx(ctx),)
+    }
+}
+
+impl Verify for I32EqzOp {
+    fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
+        let op = &*self.get_operation().deref(ctx);
+        if op.get_opid() != Self::get_opid_static() {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect OpId".to_string(),
+            });
+        }
+        if op.get_num_results() != 0 || op.get_num_operands() != 0 {
+            return Err(CompilerError::VerificationError {
+                msg: "Incorrect number of results or operands".to_string(),
+            });
+        }
+        Ok(())
+    }
+}
+
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     ModuleOp::register(ctx, dialect);
     ConstantOp::register(ctx, dialect);
@@ -1559,4 +1599,5 @@ pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     LoadOp::register(ctx, dialect);
     BrOp::register(ctx, dialect);
     BrIfOp::register(ctx, dialect);
+    I32EqzOp::register(ctx, dialect);
 }

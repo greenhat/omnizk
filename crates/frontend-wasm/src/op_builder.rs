@@ -10,6 +10,7 @@ use ozk_wasm_dialect::ops::CallOp;
 use ozk_wasm_dialect::ops::ConstantOp;
 use ozk_wasm_dialect::ops::GlobalGetOp;
 use ozk_wasm_dialect::ops::GlobalSetOp;
+use ozk_wasm_dialect::ops::I32EqzOp;
 use ozk_wasm_dialect::ops::LocalGetOp;
 use ozk_wasm_dialect::ops::LocalSetOp;
 use ozk_wasm_dialect::ops::LocalTeeOp;
@@ -136,8 +137,9 @@ impl<'a> OpBuilder<'a> {
         self.fbuilder.push(ctx, op)
     }
 
-    pub fn i32eqz(&mut self, ctx: &mut Context) {
-        todo!();
+    pub fn i32eqz(&mut self, ctx: &mut Context) -> Result<(), FuncBuilderError> {
+        let op = I32EqzOp::new_unlinked(ctx).get_operation();
+        self.fbuilder.push(ctx, op)
     }
 
     pub fn i32wrapi64(&mut self, ctx: &mut Context) {
