@@ -1,3 +1,5 @@
+//! Attributes for the wasm dialect.
+
 // use pliron::attribute::AttrObj;
 // use pliron::attribute::Attribute;
 // use pliron::common_traits::DisplayWithContext;

@@ -1,3 +1,7 @@
+//! This module defines the interfaces for the operations in the wasm dialect.
+
+#![allow(clippy::expect_used)]
+
 use apint::ApInt;
 use ozk_ozk_dialect::attributes::u32_attr;
 use pliron::attribute;
@@ -6,12 +10,15 @@ use pliron::dialects::builtin::attributes::IntegerAttr;
 use pliron::error::CompilerError;
 use pliron::op::Op;
 
+use crate::ops::AddOp;
 use crate::ops::ConstantOp;
 
+/// An interface for operations that have a stack depth calculated.
 pub trait TrackedStackDepth: Op {
+    /// The attribute key for the stack depth.
     const ATTR_KEY_STACK_DEPTH: &'static str = "tracked_stack_depth";
 
-    #[allow(clippy::expect_used)]
+    /// Get the stack depth before this operation.
     fn get_stack_depth(&self, ctx: &Context) -> u32 {
         let self_op = self.get_operation().deref(ctx);
         let value = self_op
@@ -36,6 +43,7 @@ pub trait TrackedStackDepth: Op {
             .insert(Self::ATTR_KEY_STACK_DEPTH, name_attr);
     }
 
+    /// Verify that the operation is valid.
     fn verify(_op: &dyn Op, _ctx: &Context) -> Result<(), CompilerError>
     where
         Self: Sized,
@@ -45,3 +53,25 @@ pub trait TrackedStackDepth: Op {
 }
 
 impl TrackedStackDepth for ConstantOp {}
+
+/// An interface for operations to get a stack depth change.
+pub trait StackDepthChange {
+    /// Get the stack depth change for this operation.
+    fn get_stack_depth_change(&self, ctx: &Context) -> i32;
+}
+
+macro_rules! stack_depth_change {
+    ($op:ty, $change:expr) => {
+        impl StackDepthChange for $op {
+            fn get_stack_depth_change(&self, _ctx: &Context) -> i32 {
+                $change
+            }
+        }
+    };
+}
+
+stack_depth_change!(ConstantOp, 1);
+stack_depth_change!(AddOp, -1);
+
+// TODO: CallOp has a stack depth change based on the signature of the function
+// A special pass (or ModuleBuilder) can put function signature as CallOp attribute

@@ -1,4 +1,4 @@
-//! Wasm OmniZK dialect
+//! Wasm dialect
 
 // Coding conventions
 // #![deny(unsafe_code)]
@@ -27,6 +27,7 @@ use pliron::context::Context;
 use pliron::dialect::Dialect;
 use pliron::dialect::DialectName;
 
+/// Register the dialect in the context.
 pub fn register(ctx: &mut Context) {
     let mut dialect = Dialect::new(WASM_DIALECT_NAME());
     ops::register(ctx, &mut dialect);
@@ -35,11 +36,13 @@ pub fn register(ctx: &mut Context) {
     dialect.register(ctx);
 }
 
+/// Returns the name of the dialect.
 #[allow(non_snake_case)]
 pub fn WASM_DIALECT_NAME() -> DialectName {
     DialectName::new("wasm")
 }
 
+/// Returns the dialect.
 #[allow(non_snake_case)]
 pub fn WASM_DIALECT(ctx: &Context) -> &Dialect {
     #[allow(clippy::expect_used)]

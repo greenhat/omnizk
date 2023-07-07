@@ -251,6 +251,7 @@ impl From<wasmparser::TagType> for Tag {
     }
 }
 
+/// Convert a `wasmparser` type to a pliron type.
 pub fn from_block_type(ctx: &mut Context, block_type: &BlockType) -> Ptr<TypeObj> {
     match block_type {
         BlockType::Empty => FunctionType::get(ctx, Vec::new(), Vec::new()),
@@ -262,6 +263,7 @@ pub fn from_block_type(ctx: &mut Context, block_type: &BlockType) -> Ptr<TypeObj
     }
 }
 
+/// Convert a `wasmparser` type to a pliron type.
 #[allow(clippy::unimplemented)]
 pub fn from_val_type(ctx: &mut Context, val_type: &ValType) -> Ptr<TypeObj> {
     match val_type {
@@ -274,6 +276,7 @@ pub fn from_val_type(ctx: &mut Context, val_type: &ValType) -> Ptr<TypeObj> {
     }
 }
 
+///  Convert a `wasmparser` type to a pliron type.
 pub fn from_func_type(ctx: &mut Context, func_type: &FuncType) -> Ptr<TypeObj> {
     let params = func_type
         .params()

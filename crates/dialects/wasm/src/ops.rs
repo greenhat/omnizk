@@ -1,3 +1,5 @@
+//! This module contains the definitions of the operations of the Wasm dialect.
+
 #![allow(unused_imports)]
 #![allow(clippy::expect_used)]
 #![allow(clippy::panic)]
@@ -225,12 +227,14 @@ impl ModuleOp {
             .collect()
     }
 
+    /// Return the function symbol name for the given function index.
     pub fn get_func_sym(&self, ctx: &Context, func_index: FuncIndex) -> Option<FuncSym> {
         self.get_func_syms(ctx)
             .get(usize::from(func_index))
             .cloned()
     }
 
+    /// Return the function index for the given function symbol name.
     pub fn get_func_index(&self, ctx: &Context, func_sym: FuncSym) -> Option<FuncIndex> {
         self.get_func_syms(ctx)
             .iter()
@@ -494,6 +498,7 @@ impl AddOp {
         ConstantOp { op }
     }
 
+    /// Get the type of the operands and the result of this operation.
     pub fn get_type(&self, ctx: &Context) -> Ptr<TypeObj> {
         let opref = self.get_operation().deref(ctx);
         #[allow(clippy::expect_used)]
@@ -542,7 +547,7 @@ declare_op!(
 );
 
 impl CallOp {
-    pub const ATTR_KEY_FUNC_INDEX: &str = "call.func_index";
+    const ATTR_KEY_FUNC_INDEX: &str = "call.func_index";
 
     /// Get the function index
     pub fn get_func_index(&self, ctx: &Context) -> FuncIndex {
@@ -1245,9 +1250,12 @@ impl Verify for GlobalGetOp {
     }
 }
 
+/// The type of a [StoreOp] or [LoadOp]
 #[derive(Debug, Copy, Clone, PartialEq, Display)]
 pub enum MemAccessOpValueType {
+    /// i32
     I32,
+    /// i64
     I64,
 }
 
@@ -1260,7 +1268,7 @@ declare_op!(
 );
 
 impl StoreOp {
-    pub const ATTR_KEY_VALUE_TYPE: &str = "store.value.type";
+    const ATTR_KEY_VALUE_TYPE: &str = "store.value.type";
 
     /// Create a new [StoreOp].
     pub fn new_unlinked(ctx: &mut Context, ty: MemAccessOpValueType) -> StoreOp {
@@ -1276,6 +1284,7 @@ impl StoreOp {
         StoreOp { op }
     }
 
+    /// Get the type of the value.
     pub fn get_value_type(&self, ctx: &Context) -> MemAccessOpValueType {
         let op = self.get_operation().deref(ctx);
         let value = op
@@ -1336,7 +1345,7 @@ declare_op!(
 );
 
 impl LoadOp {
-    pub const ATTR_KEY_VALUE_TYPE: &str = "store.value.type";
+    const ATTR_KEY_VALUE_TYPE: &str = "store.value.type";
 
     /// Create a new [LoadOp].
     pub fn new_unlinked(ctx: &mut Context, ty: MemAccessOpValueType) -> LoadOp {
@@ -1352,6 +1361,7 @@ impl LoadOp {
         LoadOp { op }
     }
 
+    /// Get the type of the value.
     pub fn get_value_type(&self, ctx: &Context) -> MemAccessOpValueType {
         let op = self.get_operation().deref(ctx);
         let value = op
@@ -1412,7 +1422,7 @@ declare_op!(
 );
 
 impl BrOp {
-    pub const ATTR_KEY_RELATIVE_DEPTH: &str = "br.relative_depth";
+    const ATTR_KEY_RELATIVE_DEPTH: &str = "br.relative_depth";
 
     /// Get the function index
     pub fn get_relative_depth(&self, ctx: &Context) -> RelativeDepth {
@@ -1482,7 +1492,7 @@ declare_op!(
 );
 
 impl BrIfOp {
-    pub const ATTR_KEY_RELATIVE_DEPTH: &str = "br_if.relative_depth";
+    const ATTR_KEY_RELATIVE_DEPTH: &str = "br_if.relative_depth";
 
     /// Get the function index
     pub fn get_relative_depth(&self, ctx: &Context) -> RelativeDepth {
