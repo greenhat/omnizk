@@ -56,3 +56,11 @@
 // pub(crate) fn register(dialect: &mut pliron::dialect::Dialect) {
 //     FieldElemType::register_type_in_dialect(dialect);
 // }
+
+use derive_more::Display;
+use derive_more::From;
+use derive_more::Into;
+
+/// Frame pointer offset
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
+pub struct FramePointer(i32);

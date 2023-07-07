@@ -19,6 +19,8 @@ use pliron::pattern_match::PatternRewriter;
 use pliron::pattern_match::RewritePattern;
 use pliron::rewrite::RewritePatternSet;
 
+use crate::valida::fp_from_wasm_stack;
+
 #[derive(Default)]
 pub struct WasmToValidaArithLoweringPass;
 
@@ -67,13 +69,9 @@ impl RewritePattern for ConstantOpLowering {
             if let Ok(value_attr) = value.downcast::<IntegerAttr>() {
                 // TODO: Note that because a full 32-bit value does not fit within one field element, we assume that values have been decomposed into 4 8-byte elements
                 let value = p231m1_field_elem_from_int_attr(ctx, *value_attr)?;
-                // TODO: add pass to set the current stack depth for all ops in a function
-                // walk the functions ops and attach to every wasm op the stack depth before that op
-                // i.e. for add op if the stack deptch is N we set valida operands to fp(N) and fp(N - 1)
-                // and set the result to fp((N - 2) + 1).
                 let wasm_stack_depth_before_op = const_op.get_stack_depth(ctx);
-                let a_fp_offset = -(wasm_stack_depth_before_op.next() * 4);
-                let a = p231m1_field_elem_from_int(ctx, a_fp_offset);
+                let a_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.next());
+                let a = p231m1_field_elem_from_int(ctx, a_fp.into());
                 let zero = p231m1_field_elem_from_int(ctx, 0);
                 let b = zero.clone();
                 let c = zero.clone();
@@ -114,12 +112,12 @@ impl RewritePattern for ArithOpLowering {
         let opop = &op.deref(ctx).get_op(ctx);
         if let Some(wasm_add_op) = opop.downcast_ref::<wasm::ops::AddOp>() {
             let wasm_stack_depth_before_op = wasm_add_op.get_stack_depth(ctx);
-            let a_cell_offset_raw = -(wasm_stack_depth_before_op.next() * 4);
-            let b_cell_offset_raw = -(wasm_stack_depth_before_op.top() * 4);
-            let c_cell_offset_raw = -(wasm_stack_depth_before_op.minus1() * 4);
-            let a = p231m1_field_elem_from_int(ctx, a_cell_offset_raw);
-            let b = p231m1_field_elem_from_int(ctx, b_cell_offset_raw);
-            let c = p231m1_field_elem_from_int(ctx, c_cell_offset_raw);
+            let a_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.next());
+            let b_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.top());
+            let c_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.minus1());
+            let a = p231m1_field_elem_from_int(ctx, a_fp.into());
+            let b = p231m1_field_elem_from_int(ctx, b_fp.into());
+            let c = p231m1_field_elem_from_int(ctx, c_fp.into());
             let zero = p231m1_field_elem_from_int(ctx, 0);
             let d = zero.clone();
             let e = zero;

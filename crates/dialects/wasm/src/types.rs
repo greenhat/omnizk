@@ -297,23 +297,29 @@ pub struct StackDepth(u32);
 
 impl StackDepth {
     /// Returns the depth for the top of the stack.
-    pub fn top(&self) -> i32 {
-        self.0 as i32
+    pub fn top(&self) -> StackDepth {
+        self.0.into()
     }
 
     /// Returns the depth for the item one level below the top of the stack.
-    pub fn minus1(&self) -> i32 {
-        self.0 as i32 - 1
+    pub fn minus1(&self) -> StackDepth {
+        (self.0 - 1).into()
     }
 
     /// Returns the stack depth with one element pushed on top of the stack.
-    pub fn next(&self) -> i32 {
-        self.0 as i32 + 1
+    pub fn next(&self) -> StackDepth {
+        (self.0 + 1).into()
     }
 }
 
 impl From<i32> for StackDepth {
     fn from(value: i32) -> Self {
         StackDepth(value as u32)
+    }
+}
+
+impl From<StackDepth> for i32 {
+    fn from(value: StackDepth) -> Self {
+        value.0 as i32
     }
 }
