@@ -290,3 +290,30 @@ pub fn from_func_type(ctx: &mut Context, func_type: &FuncType) -> Ptr<TypeObj> {
         .collect();
     FunctionType::get(ctx, params, results)
 }
+
+/// Stack depth at a given point in the function
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
+pub struct StackDepth(u32);
+
+impl StackDepth {
+    /// Returns the depth for the top of the stack.
+    pub fn top(&self) -> i32 {
+        self.0 as i32
+    }
+
+    /// Returns the depth for the item one level below the top of the stack.
+    pub fn minus1(&self) -> i32 {
+        self.0 as i32 - 1
+    }
+
+    /// Returns the stack depth with one element pushed on top of the stack.
+    pub fn next(&self) -> i32 {
+        self.0 as i32 + 1
+    }
+}
+
+impl From<i32> for StackDepth {
+    fn from(value: i32) -> Self {
+        StackDepth(value as u32)
+    }
+}

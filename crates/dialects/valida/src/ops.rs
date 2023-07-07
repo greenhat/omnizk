@@ -254,8 +254,113 @@ impl Verify for FuncOp {
     }
 }
 
+declare_op!(
+    /// add two values
+    /// Compute the unchecked addition of the U32 values at cell offsets b and c and write the sum to cell offset a .
+    /// Note that because a full 32-bit value does not fit within one field element,
+    /// we assume that values have been decomposed into 4 8-byte elements. The summed output is stored at cell offset a.
+    AddOp,
+    "add",
+    "valida"
+);
+
+impl AddOp {
+    /// Attribute key for operands.
+    pub const ATTR_KEY_OPERAND_A: &str = "imm32.a";
+    pub const ATTR_KEY_OPERAND_B: &str = "imm32.b";
+    pub const ATTR_KEY_OPERAND_C: &str = "imm32.c";
+    pub const ATTR_KEY_OPERAND_D: &str = "imm32.d";
+    pub const ATTR_KEY_OPERAND_E: &str = "imm32.e";
+
+    /// Create a new [ConstantOp]. The underlying [Operation] is not linked to a
+    /// [BasicBlock](crate::basic_block::BasicBlock).
+    pub fn new_unlinked(
+        ctx: &mut Context,
+        a: FieldElemAttr,
+        b: FieldElemAttr,
+        c: FieldElemAttr,
+        d: FieldElemAttr,
+        e: FieldElemAttr,
+    ) -> AddOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_OPERAND_A, Box::new(a));
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_OPERAND_B, Box::new(b));
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_OPERAND_C, Box::new(c));
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_OPERAND_D, Box::new(d));
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_OPERAND_E, Box::new(e));
+        AddOp { op }
+    }
+
+    fn get_operand(&self, ctx: &Context, operand_name: &str) -> AttrObj {
+        let op = self.get_operation().deref(ctx);
+        #[allow(clippy::panic)]
+        let value = op.attributes.get(operand_name).unwrap_or_else(|| {
+            panic!("no attribute for operand '{}' found", operand_name);
+        });
+        #[allow(clippy::panic)]
+        if value.is::<FieldElemAttr>() {
+            attribute::clone::<FieldElemAttr>(value)
+        } else {
+            panic!("expected FieldElemAttr, found {}", value.with_ctx(ctx));
+        }
+    }
+
+    pub fn get_operand_a(&self, ctx: &Context) -> AttrObj {
+        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_A)
+    }
+
+    pub fn get_operand_b(&self, ctx: &Context) -> AttrObj {
+        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_B)
+    }
+
+    pub fn get_operand_c(&self, ctx: &Context) -> AttrObj {
+        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_C)
+    }
+
+    pub fn get_operand_d(&self, ctx: &Context) -> AttrObj {
+        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_D)
+    }
+
+    pub fn get_operand_e(&self, ctx: &Context) -> AttrObj {
+        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_E)
+    }
+}
+
+impl DisplayWithContext for AddOp {
+    #[allow(clippy::expect_used)]
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "{} {}(fp) {}(fp) {}(fp) {} {}",
+            self.get_opid().with_ctx(ctx),
+            self.get_operand_a(ctx).with_ctx(ctx),
+            self.get_operand_b(ctx).with_ctx(ctx),
+            self.get_operand_c(ctx).with_ctx(ctx),
+            self.get_operand_d(ctx).with_ctx(ctx),
+            self.get_operand_e(ctx).with_ctx(ctx)
+        )
+    }
+}
+
+impl Verify for AddOp {
+    fn verify(&self, _ctx: &Context) -> Result<(), CompilerError> {
+        todo!()
+    }
+}
+
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     Imm32Op::register(ctx, dialect);
     ProgramOp::register(ctx, dialect);
     FuncOp::register(ctx, dialect);
+    AddOp::register(ctx, dialect);
 }

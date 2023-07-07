@@ -12,6 +12,7 @@ use pliron::op::Op;
 
 use crate::ops::AddOp;
 use crate::ops::ConstantOp;
+use crate::types::StackDepth;
 
 /// The attribute key for the stack depth.
 const ATTR_KEY_STACK_DEPTH: &str = "tracked_stack_depth";
@@ -19,7 +20,7 @@ const ATTR_KEY_STACK_DEPTH: &str = "tracked_stack_depth";
 /// An interface for operations that have a stack depth calculated.
 pub trait TrackedStackDepth: Op {
     /// Get the stack depth before this operation.
-    fn get_stack_depth(&self, ctx: &Context) -> u32 {
+    fn get_stack_depth(&self, ctx: &Context) -> StackDepth {
         let self_op = self.get_operation().deref(ctx);
         let value = self_op
             .attributes
@@ -31,12 +32,12 @@ pub trait TrackedStackDepth: Op {
             .expect("IntegerAttr expected")
             .clone()
             .into();
-        apint.try_to_u32().expect("expected u32")
+        apint.try_to_u32().expect("expected u32").into()
     }
 
     /// Set a name for the symbol defined by this operation.
-    fn set_stack_depth(&self, ctx: &mut Context, depth: u32) {
-        let depth_attr = u32_attr(ctx, depth);
+    fn set_stack_depth(&self, ctx: &mut Context, depth: StackDepth) {
+        let depth_attr = u32_attr(ctx, depth.into());
         let mut self_op = self.get_operation().deref_mut(ctx);
         self_op.attributes.insert(ATTR_KEY_STACK_DEPTH, depth_attr);
     }
@@ -52,6 +53,9 @@ pub trait TrackedStackDepth: Op {
 
 #[intertrait::cast_to]
 impl TrackedStackDepth for ConstantOp {}
+
+#[intertrait::cast_to]
+impl TrackedStackDepth for AddOp {}
 
 /// An interface for operations to get a stack depth change.
 pub trait StackDepthChange: Op {

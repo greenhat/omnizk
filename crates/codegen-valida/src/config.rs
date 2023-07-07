@@ -1,7 +1,7 @@
 #![allow(unused_imports)]
 
-use c2zk_ir_transform::valida::lowering::WasmToValidaArithLoweringPass;
 use c2zk_ir_transform::valida::lowering::WasmToValidaFinalLoweringPass;
+use c2zk_ir_transform::valida::lowering::arith_op_lowering::WasmToValidaArithLoweringPass;
 use c2zk_ir_transform::wasm::track_stack_depth::WasmTrackStackDepthPass;
 use pliron::context::Context;
 use pliron::pass::PassManager;

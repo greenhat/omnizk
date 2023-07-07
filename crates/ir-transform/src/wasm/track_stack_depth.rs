@@ -71,7 +71,7 @@ impl RewritePattern for WasmWriteStackDepth {
         for op in ops {
             let op_op = op.deref(ctx).get_op(ctx);
             if let Some(tracked_op) = op_cast::<dyn TrackedStackDepth>(op_op.as_ref()) {
-                tracked_op.set_stack_depth(ctx, stack_depth as u32);
+                tracked_op.set_stack_depth(ctx, stack_depth.into());
             }
             if let Some(stack_change_op) = op_cast::<dyn StackDepthChange>(op_op.as_ref()) {
                 stack_depth += stack_change_op.get_stack_depth_change(ctx);

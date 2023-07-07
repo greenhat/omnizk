@@ -10,31 +10,7 @@ use pliron::operation::Operation;
 use pliron::pass::Pass;
 use pliron::rewrite::RewritePatternSet;
 
-// use self::arith_op_lowering::ArithOpLowering;
-use self::constant_op_lowering::ConstantOpLowering;
-
-// pub mod arith_op_lowering;
-pub mod constant_op_lowering;
-
-#[derive(Default)]
-pub struct WasmToValidaArithLoweringPass;
-
-impl Pass for WasmToValidaArithLoweringPass {
-    fn name(&self) -> &str {
-        "WasmToValidaArithLoweringPass"
-    }
-
-    fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
-        let mut target = ConversionTarget::default();
-        target.add_legal_dialect(VALIDA_DIALECT(ctx));
-        // TODO: set illegal ops
-        let mut patterns = RewritePatternSet::default();
-        patterns.add(Box::<ConstantOpLowering>::default());
-        // patterns.add(Box::<ArithOpLowering>::default());
-        apply_partial_conversion(ctx, op, target, patterns)?;
-        Ok(())
-    }
-}
+pub mod arith_op_lowering;
 
 /// The pass that ensures there are no Wasm ops left.
 #[derive(Default)]
