@@ -355,6 +355,7 @@ impl Verify for ExecOp {
     }
 }
 
+#[intertrait::cast_to]
 impl CallOpInterface for ExecOp {
     fn get_callee_sym(&self, ctx: &Context) -> String {
         self.get_callee_sym(ctx)

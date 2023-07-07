@@ -34,7 +34,7 @@ pub type ValidaFieldElem = u32;
 // pub struct FieldElem(u64);
 pub enum FieldElem {
     Oxfoi(BaseElement),
-    P231m1(u32),
+    P231m1(i32),
 }
 
 /// An attribute containing a FieldElement.
@@ -121,7 +121,7 @@ pub fn p231m1_field_elem_from_int_attr(
 
 pub fn p231m1_field_elem_from_int(ctx: &mut Context, v: i32) -> FieldElemAttr {
     let field_elem_type = FieldElemType::get(ctx, Field::P231m1);
-    FieldElemAttr::create(field_elem_type, FieldElem::P231m1(v as u32))
+    FieldElemAttr::create(field_elem_type, FieldElem::P231m1(v))
 }
 
 #[derive(Debug, Error)]
@@ -150,7 +150,7 @@ pub fn apint_to_p231m1(value: ApInt) -> FieldElem {
     let i = Int::from(value);
     #[allow(clippy::expect_used)]
     let raw = i.try_to_i32().expect("32-bit integer");
-    (raw as u32).into()
+    raw.into()
 }
 
 pub fn u32_attr(ctx: &mut Context, value: u32) -> AttrObj {

@@ -3,7 +3,6 @@ use crate::sem_tests::check_valida;
 
 use expect_test::expect;
 
-#[ignore]
 #[test]
 fn test_smoke_add_wo_imports() {
     let input = vec![];
@@ -11,9 +10,9 @@ fn test_smoke_add_wo_imports() {
     let expected_output = vec![2];
     check_valida(
         r#"
-(module 
+(module
     (start $main)
-    (func $main 
+    (func $main
         i32.const 1
         i32.const 2
         i32.add
