@@ -1,0 +1,6 @@
+[submodule "vendor/valida"]
+	path = vendor/valida
+	url = git@github.com:valida-xyz/valida.git
+[submodule "vendor/Plonky3"]
+	path = vendor/Plonky3
+	url = git@github.com:Plonky3/Plonky3.git
