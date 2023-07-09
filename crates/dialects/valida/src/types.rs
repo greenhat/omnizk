@@ -64,3 +64,21 @@ use derive_more::Into;
 /// Frame pointer offset
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
 pub struct FramePointer(i32);
+
+#[derive(Copy, Clone, Default)]
+pub struct Mersenne31(u32);
+
+#[derive(Copy, Clone, Default)]
+pub struct Operands([Mersenne31; 5]);
+
+impl From<Operands> for valida_machine::Operands<i32> {
+    fn from(value: Operands) -> Self {
+        valida_machine::Operands([
+            value.0[0].0 as i32,
+            value.0[1].0 as i32,
+            value.0[2].0 as i32,
+            value.0[3].0 as i32,
+            value.0[4].0 as i32,
+        ])
+    }
+}

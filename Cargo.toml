@@ -19,7 +19,7 @@ members = [
   "crates/rust-wasm-tests/bundle1",
   "crates/rust-wasm-tests-helper",
 ]
-exclude = ["crates/rust-wasm-tests/bundle1-bin"]
+exclude = ["crates/rust-wasm-tests/bundle1-bin", "vendor"]
 resolver = "2"
 
 [workspace.package]

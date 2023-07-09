@@ -23,4 +23,7 @@ paste = { workspace = true }
 inventory = { workspace = true }
 indent = { workspace = true }
 
+# valida
+valida-machine = { path = "../../../vendor/valida/machine" }
+
 [dev-dependencies]

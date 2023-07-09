@@ -19,6 +19,8 @@ use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::with_context::AttachContext;
 
+use crate::types::Operands;
+
 declare_op!(
     /// Write the immediate values b,c,d,e to the cell located at offset a.
     Imm32Op,
@@ -95,6 +97,11 @@ impl Imm32Op {
 
     pub fn get_operand_e(&self, ctx: &Context) -> AttrObj {
         self.get_operand(ctx, Self::ATTR_KEY_OPERAND_E)
+    }
+
+    // TODO: should be a trait HasOperandsOP with getter and setter and oneline implementation
+    pub fn get_operands(&self, ctx: &Context) -> Operands {
+        todo!()
     }
 }
 

@@ -2,6 +2,8 @@ use thiserror::Error;
 
 use crate::ValidaTargetConfig;
 
+mod emit_instr;
+
 #[derive(Debug, Error)]
 pub enum EmitError {}
 

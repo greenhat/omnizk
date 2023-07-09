@@ -5,7 +5,6 @@
 #![allow(dead_code)]
 
 use ozk_codegen_valida::ValidaTargetConfig;
-use ozk_compiler::compile;
 use ozk_frontend_wasm::WasmFrontendConfig;
 use wasmtime::*;
 
@@ -34,7 +33,7 @@ pub fn check_valida(
     let frontend_config = WasmFrontendConfig::default();
     let target_config = ValidaTargetConfig::default();
     let wasm = wat::parse_str(source).unwrap();
-    let program_bytes = compile(&wasm, frontend_config.into(), target_config.into()).unwrap();
+    let program_bytes = todo!("codegen");
     let program = String::from_utf8(program_bytes).unwrap();
     expected_valida.assert_eq(&program);
 }
