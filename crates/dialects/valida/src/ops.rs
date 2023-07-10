@@ -19,6 +19,7 @@ use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::with_context::AttachContext;
 
+use crate::op_interfaces::HasOperands;
 use crate::types::Operands;
 
 declare_op!(
@@ -365,9 +366,62 @@ impl Verify for AddOp {
     }
 }
 
+declare_op!(
+    /// jump to variable and link
+    /// Store the pc + 1 to local stack variable at offset "a" then set pc to field element "b".
+    /// Set fp to fp + c.
+    JalvOp,
+    "jalv",
+    "valida"
+);
+
+impl JalvOp {
+    /// Create a new [JalvOp]. The underlying [Operation] is not linked to a
+    /// [BasicBlock](crate::basic_block::BasicBlock).
+    pub fn new_return_pseudo_op(ctx: &mut Context) -> JalvOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        let jalv_op = JalvOp { op };
+        let operands = Operands::new_i32(
+            -4, // pc + 1
+            0,  // pc
+            8,  // fp + 8
+            0, 0,
+        );
+        jalv_op.set_operands(ctx, operands);
+        jalv_op
+    }
+}
+
+impl DisplayWithContext for JalvOp {
+    #[allow(clippy::expect_used)]
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let operands = self.get_operands(ctx);
+        write!(
+            f,
+            "{} {}(fp) {}(fp) {}(fp) {} {}",
+            self.get_opid().with_ctx(ctx),
+            operands.a(),
+            operands.b(),
+            operands.c(),
+            operands.d(),
+            operands.e()
+        )
+    }
+}
+
+impl Verify for JalvOp {
+    fn verify(&self, _ctx: &Context) -> Result<(), CompilerError> {
+        todo!()
+    }
+}
+
+#[intertrait::cast_to]
+impl HasOperands for JalvOp {}
+
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     Imm32Op::register(ctx, dialect);
     ProgramOp::register(ctx, dialect);
     FuncOp::register(ctx, dialect);
     AddOp::register(ctx, dialect);
+    JalvOp::register(ctx, dialect);
 }

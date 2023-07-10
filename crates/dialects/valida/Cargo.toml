@@ -22,6 +22,7 @@ linkme = { workspace = true }
 paste = { workspace = true }
 inventory = { workspace = true }
 indent = { workspace = true }
+apint = { workspace = true }
 
 # valida
 valida-machine = { path = "../../../vendor/valida/machine" }
