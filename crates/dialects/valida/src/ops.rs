@@ -1,7 +1,4 @@
 use intertrait::cast_to;
-use ozk_ozk_dialect::attributes::FieldElemAttr;
-use pliron::attribute;
-use pliron::attribute::AttrObj;
 use pliron::basic_block::BasicBlock;
 use pliron::common_traits::DisplayWithContext;
 use pliron::common_traits::Verify;
@@ -30,94 +27,32 @@ declare_op!(
 );
 
 impl Imm32Op {
-    /// Attribute key for operands.
-    pub const ATTR_KEY_OPERAND_A: &str = "imm32.a";
-    pub const ATTR_KEY_OPERAND_B: &str = "imm32.b";
-    pub const ATTR_KEY_OPERAND_C: &str = "imm32.c";
-    pub const ATTR_KEY_OPERAND_D: &str = "imm32.d";
-    pub const ATTR_KEY_OPERAND_E: &str = "imm32.e";
-
-    /// Create a new [ConstantOp]. The underlying [Operation] is not linked to a
+    /// Create a new [Imm32Op]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(
-        ctx: &mut Context,
-        a: FieldElemAttr,
-        b: FieldElemAttr,
-        c: FieldElemAttr,
-        d: FieldElemAttr,
-        e: FieldElemAttr,
-    ) -> Imm32Op {
+    pub fn new_unlinked(ctx: &mut Context, operands: Operands) -> Imm32Op {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
-        op.deref_mut(ctx)
-            .attributes
-            .insert(Self::ATTR_KEY_OPERAND_A, Box::new(a));
-        op.deref_mut(ctx)
-            .attributes
-            .insert(Self::ATTR_KEY_OPERAND_B, Box::new(b));
-        op.deref_mut(ctx)
-            .attributes
-            .insert(Self::ATTR_KEY_OPERAND_C, Box::new(c));
-        op.deref_mut(ctx)
-            .attributes
-            .insert(Self::ATTR_KEY_OPERAND_D, Box::new(d));
-        op.deref_mut(ctx)
-            .attributes
-            .insert(Self::ATTR_KEY_OPERAND_E, Box::new(e));
-        Imm32Op { op }
-    }
-
-    fn get_operand(&self, ctx: &Context, operand_name: &str) -> AttrObj {
-        let op = self.get_operation().deref(ctx);
-        #[allow(clippy::panic)]
-        let value = op.attributes.get(operand_name).unwrap_or_else(|| {
-            panic!("no attribute for operand '{}' found", operand_name);
-        });
-        #[allow(clippy::panic)]
-        if value.is::<FieldElemAttr>() {
-            attribute::clone::<FieldElemAttr>(value)
-        } else {
-            panic!("expected FieldElemAttr, found {}", value.with_ctx(ctx));
-        }
-    }
-
-    pub fn get_operand_a(&self, ctx: &Context) -> AttrObj {
-        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_A)
-    }
-
-    pub fn get_operand_b(&self, ctx: &Context) -> AttrObj {
-        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_B)
-    }
-
-    pub fn get_operand_c(&self, ctx: &Context) -> AttrObj {
-        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_C)
-    }
-
-    pub fn get_operand_d(&self, ctx: &Context) -> AttrObj {
-        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_D)
-    }
-
-    pub fn get_operand_e(&self, ctx: &Context) -> AttrObj {
-        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_E)
-    }
-
-    // TODO: should be a trait HasOperandsOP with getter and setter and oneline implementation
-    pub fn get_operands(&self, ctx: &Context) -> Operands {
-        todo!()
+        let op_op = Imm32Op { op };
+        op_op.set_operands(ctx, operands);
+        op_op
     }
 }
+
+#[intertrait::cast_to]
+impl HasOperands for Imm32Op {}
 
 impl DisplayWithContext for Imm32Op {
     #[allow(clippy::expect_used)]
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let operands = self.get_operands(ctx);
         write!(
             f,
             "{} {}(fp) {} {} {} {}",
             self.get_opid().with_ctx(ctx),
-            self.get_operand_a(ctx).with_ctx(ctx),
-            self.get_operand_b(ctx).with_ctx(ctx),
-            self.get_operand_c(ctx).with_ctx(ctx),
-            self.get_operand_d(ctx).with_ctx(ctx),
-            self.get_operand_e(ctx).with_ctx(ctx)
+            operands.a(),
+            operands.b(),
+            operands.c(),
+            operands.d(),
+            operands.e(),
         )
     }
 }
@@ -273,89 +208,29 @@ declare_op!(
 );
 
 impl AddOp {
-    /// Attribute key for operands.
-    pub const ATTR_KEY_OPERAND_A: &str = "imm32.a";
-    pub const ATTR_KEY_OPERAND_B: &str = "imm32.b";
-    pub const ATTR_KEY_OPERAND_C: &str = "imm32.c";
-    pub const ATTR_KEY_OPERAND_D: &str = "imm32.d";
-    pub const ATTR_KEY_OPERAND_E: &str = "imm32.e";
-
-    /// Create a new [ConstantOp]. The underlying [Operation] is not linked to a
+    /// Create a new [AddOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(
-        ctx: &mut Context,
-        a: FieldElemAttr,
-        b: FieldElemAttr,
-        c: FieldElemAttr,
-        d: FieldElemAttr,
-        e: FieldElemAttr,
-    ) -> AddOp {
+    pub fn new_unlinked(ctx: &mut Context, operands: Operands) -> AddOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
-        op.deref_mut(ctx)
-            .attributes
-            .insert(Self::ATTR_KEY_OPERAND_A, Box::new(a));
-        op.deref_mut(ctx)
-            .attributes
-            .insert(Self::ATTR_KEY_OPERAND_B, Box::new(b));
-        op.deref_mut(ctx)
-            .attributes
-            .insert(Self::ATTR_KEY_OPERAND_C, Box::new(c));
-        op.deref_mut(ctx)
-            .attributes
-            .insert(Self::ATTR_KEY_OPERAND_D, Box::new(d));
-        op.deref_mut(ctx)
-            .attributes
-            .insert(Self::ATTR_KEY_OPERAND_E, Box::new(e));
-        AddOp { op }
-    }
-
-    fn get_operand(&self, ctx: &Context, operand_name: &str) -> AttrObj {
-        let op = self.get_operation().deref(ctx);
-        #[allow(clippy::panic)]
-        let value = op.attributes.get(operand_name).unwrap_or_else(|| {
-            panic!("no attribute for operand '{}' found", operand_name);
-        });
-        #[allow(clippy::panic)]
-        if value.is::<FieldElemAttr>() {
-            attribute::clone::<FieldElemAttr>(value)
-        } else {
-            panic!("expected FieldElemAttr, found {}", value.with_ctx(ctx));
-        }
-    }
-
-    pub fn get_operand_a(&self, ctx: &Context) -> AttrObj {
-        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_A)
-    }
-
-    pub fn get_operand_b(&self, ctx: &Context) -> AttrObj {
-        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_B)
-    }
-
-    pub fn get_operand_c(&self, ctx: &Context) -> AttrObj {
-        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_C)
-    }
-
-    pub fn get_operand_d(&self, ctx: &Context) -> AttrObj {
-        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_D)
-    }
-
-    pub fn get_operand_e(&self, ctx: &Context) -> AttrObj {
-        self.get_operand(ctx, Self::ATTR_KEY_OPERAND_E)
+        let op_op = AddOp { op };
+        op_op.set_operands(ctx, operands);
+        op_op
     }
 }
 
 impl DisplayWithContext for AddOp {
     #[allow(clippy::expect_used)]
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let operands = self.get_operands(ctx);
         write!(
             f,
             "{} {}(fp) {}(fp) {}(fp) {} {}",
             self.get_opid().with_ctx(ctx),
-            self.get_operand_a(ctx).with_ctx(ctx),
-            self.get_operand_b(ctx).with_ctx(ctx),
-            self.get_operand_c(ctx).with_ctx(ctx),
-            self.get_operand_d(ctx).with_ctx(ctx),
-            self.get_operand_e(ctx).with_ctx(ctx)
+            operands.a(),
+            operands.b(),
+            operands.c(),
+            operands.d(),
+            operands.e(),
         )
     }
 }
@@ -365,6 +240,9 @@ impl Verify for AddOp {
         todo!()
     }
 }
+
+#[intertrait::cast_to]
+impl HasOperands for AddOp {}
 
 declare_op!(
     /// jump to variable and link
@@ -381,7 +259,7 @@ impl JalvOp {
     pub fn new_return_pseudo_op(ctx: &mut Context) -> JalvOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         let jalv_op = JalvOp { op };
-        let operands = Operands::new_i32(
+        let operands = Operands::from_i32(
             -4, // pc + 1
             0,  // pc
             8,  // fp + 8

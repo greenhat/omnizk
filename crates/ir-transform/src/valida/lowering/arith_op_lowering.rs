@@ -2,8 +2,6 @@
 #![allow(dead_code)]
 
 use anyhow::anyhow;
-use ozk_ozk_dialect::attributes::p231m1_field_elem_from_int;
-use ozk_ozk_dialect::attributes::p231m1_field_elem_from_int_attr;
 use ozk_valida_dialect as valida;
 use ozk_wasm_dialect as wasm;
 use ozk_wasm_dialect::op_interfaces::TrackedStackDepth;
@@ -18,6 +16,8 @@ use pliron::pass::Pass;
 use pliron::pattern_match::PatternRewriter;
 use pliron::pattern_match::RewritePattern;
 use pliron::rewrite::RewritePatternSet;
+use valida::types::Mersenne31;
+use valida::types::Operands;
 
 use crate::valida::fp_from_wasm_stack;
 
@@ -68,15 +68,17 @@ impl RewritePattern for ConstantOpLowering {
             let value = const_op.get_value(ctx);
             if let Ok(value_attr) = value.downcast::<IntegerAttr>() {
                 // TODO: Note that because a full 32-bit value does not fit within one field element, we assume that values have been decomposed into 4 8-byte elements
-                let value = p231m1_field_elem_from_int_attr(ctx, *value_attr)?;
+                let value: Mersenne31 = value_attr.as_ref().try_into()?;
                 let wasm_stack_depth_before_op = const_op.get_stack_depth(ctx);
                 let a_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.next());
-                let a = p231m1_field_elem_from_int(ctx, a_fp.into());
-                let zero = p231m1_field_elem_from_int(ctx, 0);
-                let b = zero.clone();
-                let c = zero.clone();
-                let d = zero;
-                let imm_op = valida::ops::Imm32Op::new_unlinked(ctx, a, b, c, d, value);
+                let a = a_fp.into();
+                let b = 0;
+                let c = 0;
+                let d = 0;
+                let imm_op = valida::ops::Imm32Op::new_unlinked(
+                    ctx,
+                    Operands::from_i32(a, b, c, d, value.as_i32()),
+                );
                 rewriter.replace_op_with(ctx, op, imm_op.get_operation())?;
             } else {
                 return Err(anyhow!("only integer constants are supported"));
@@ -115,13 +117,12 @@ impl RewritePattern for ArithOpLowering {
             let a_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.next());
             let b_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.top());
             let c_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.minus1());
-            let a = p231m1_field_elem_from_int(ctx, a_fp.into());
-            let b = p231m1_field_elem_from_int(ctx, b_fp.into());
-            let c = p231m1_field_elem_from_int(ctx, c_fp.into());
-            let zero = p231m1_field_elem_from_int(ctx, 0);
-            let d = zero.clone();
-            let e = zero;
-            let add_op = valida::ops::AddOp::new_unlinked(ctx, a, b, c, d, e);
+            let a = a_fp.into();
+            let b = b_fp.into();
+            let c = c_fp.into();
+            let d = 0;
+            let e = 0;
+            let add_op = valida::ops::AddOp::new_unlinked(ctx, Operands::from_i32(a, b, c, d, e));
             rewriter.replace_op_with(ctx, op, add_op.get_operation())?;
         }
         Ok(())

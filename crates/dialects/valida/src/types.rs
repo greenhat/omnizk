@@ -63,6 +63,7 @@ use derive_more::From;
 use derive_more::Into;
 use pliron::dialects::builtin::attributes::IntegerAttr;
 use pliron::dialects::builtin::attributes::VecAttr;
+use thiserror::Error;
 
 /// Frame pointer offset
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
@@ -77,11 +78,32 @@ impl Mersenne31 {
     }
 }
 
+#[derive(Clone, Error, Debug)]
+pub enum Mersenne31Error {
+    #[error("invalid value: {0}")]
+    InvalidValue(String),
+}
+
+impl TryFrom<&IntegerAttr> for Mersenne31 {
+    type Error = Mersenne31Error;
+
+    fn try_from(attr: &IntegerAttr) -> Result<Self, Self::Error> {
+        let value = ApInt::from(attr.clone())
+            .try_to_i32()
+            .map_err(|e| Mersenne31Error::InvalidValue(format!("failed to get i32: {:?}", e)))?;
+        Ok(Mersenne31(value))
+    }
+}
+
 #[derive(Copy, Clone, Default)]
 pub struct Operands([Mersenne31; 5]);
 
 impl Operands {
-    pub fn new_i32(a: i32, b: i32, c: i32, d: i32, e: i32) -> Self {
+    pub fn new<T: Into<Mersenne31>>(a: T, b: T, c: T, d: T, e: T) -> Self {
+        Self([a.into(), b.into(), c.into(), d.into(), e.into()])
+    }
+
+    pub fn from_i32(a: i32, b: i32, c: i32, d: i32, e: i32) -> Self {
         Self([
             Mersenne31(a),
             Mersenne31(b),
@@ -187,6 +209,6 @@ impl TryFrom<&VecAttr> for Operands {
         )
         .try_to_i32()
         .map_err(|_| "expected i32")?;
-        Ok(Operands::new_i32(a, b, c, d, e))
+        Ok(Operands::from_i32(a, b, c, d, e))
     }
 }

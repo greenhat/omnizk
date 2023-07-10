@@ -1,3 +1,4 @@
+use ozk_valida_dialect::op_interfaces::HasOperands;
 use ozk_valida_dialect::ops::Imm32Op;
 use pliron::context::Context;
 use pliron::op::Op;
