@@ -134,7 +134,7 @@ impl FuncOp {
     /// Create a new [FuncOp].
     /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
     /// The returned function has a single region with an empty `entry` block.
-    pub fn new_unlinked(ctx: &mut Context, name: &str) -> FuncOp {
+    pub fn new_unlinked(ctx: &mut Context, name: String) -> FuncOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
         let opop = FuncOp { op };
         // Create an empty entry block.
@@ -142,7 +142,7 @@ impl FuncOp {
         let region = opop.get_region(ctx);
         let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
         body.insert_at_front(region, ctx);
-        opop.set_symbol_name(ctx, name);
+        opop.set_symbol_name(ctx, &name);
         opop
     }
 
