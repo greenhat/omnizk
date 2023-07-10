@@ -4,9 +4,63 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
+use ozk_codegen_valida::emit_op;
+use ozk_codegen_valida::ValidaInstrBuilder;
 use ozk_codegen_valida::ValidaTargetConfig;
 use ozk_frontend_wasm::WasmFrontendConfig;
+use ozk_valida_dialect::ops::ProgramOp;
+use ozk_wasm_dialect::ops::ModuleOp;
+use pliron::context::Context;
+use pliron::context::Ptr;
+use pliron::dialects::builtin;
+use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
+use pliron::linked_list::ContainsLinkedList;
+use pliron::op::Op;
+use pliron::operation::Operation;
+use pliron::with_context::AttachContext;
 use wasmtime::*;
+
+pub fn check_ir(input: &str, expected_tree: expect_test::Expect) {
+    let source = wat::parse_str(input).unwrap();
+    let mut ctx = Context::default();
+    let target_config = ValidaTargetConfig::default();
+    let frontend_config = WasmFrontendConfig::default();
+    frontend_config.register(&mut ctx);
+    target_config.register(&mut ctx);
+    let wasm_module_op =
+        ozk_frontend_wasm::parse_module(&mut ctx, &source, &frontend_config).unwrap();
+    let miden_prog = run_conversion_passes(&mut ctx, wasm_module_op, &target_config);
+    expected_tree.assert_eq(miden_prog.with_ctx(&ctx).to_string().as_str());
+}
+
+fn run_conversion_passes(
+    ctx: &mut Context,
+    wasm_module: ModuleOp,
+    target_config: &ValidaTargetConfig,
+) -> ProgramOp {
+    // we need to wrap the wasm in an op because passes cannot replace the root op
+    let wrapper_module = builtin::ops::ModuleOp::new(ctx, "wrapper");
+    wasm_module
+        .get_operation()
+        .insert_at_back(wrapper_module.get_body(ctx, 0), ctx);
+    target_config
+        .pass_manager
+        .run(ctx, wrapper_module.get_operation())
+        .unwrap();
+    let inner_module = wrapper_module
+        .get_body(ctx, 0)
+        .deref(ctx)
+        .iter(ctx)
+        .collect::<Vec<Ptr<Operation>>>()
+        .first()
+        .cloned()
+        .unwrap();
+    *inner_module
+        .deref(ctx)
+        .get_op(ctx)
+        .downcast::<ProgramOp>()
+        .unwrap_or_else(|_| panic!("Expected ProgramOp"))
+}
 
 pub fn check_wasm(
     source: &[u8],
@@ -30,12 +84,31 @@ pub fn check_valida(
     expected_output: Vec<u64>,
     expected_valida: expect_test::Expect,
 ) {
-    let frontend_config = WasmFrontendConfig::default();
-    let target_config = ValidaTargetConfig::default();
     let wasm = wat::parse_str(source).unwrap();
-    let program_bytes = todo!("codegen");
-    let program = String::from_utf8(program_bytes).unwrap();
+    let mut ctx = Context::default();
+    let program = compile(&mut ctx, &wasm);
     expected_valida.assert_eq(&program);
+    todo!("run valida program");
+}
+
+pub fn compile(ctx: &mut Context, source: &[u8]) -> String {
+    let target_config = ValidaTargetConfig::default();
+    let prog_op = compile_to_valida_dialect(ctx, source, &target_config);
+    let mut builder = ValidaInstrBuilder::new();
+    emit_op(ctx, prog_op.get_operation(), &mut builder).unwrap();
+    builder.pretty_print()
+}
+
+pub fn compile_to_valida_dialect(
+    ctx: &mut Context,
+    source: &[u8],
+    target_config: &ValidaTargetConfig,
+) -> ProgramOp {
+    let frontend_config = WasmFrontendConfig::default();
+    frontend_config.register(ctx);
+    target_config.register(ctx);
+    let wasm_module_op = ozk_frontend_wasm::parse_module(ctx, source, &frontend_config).unwrap();
+    run_conversion_passes(ctx, wasm_module_op, target_config)
 }
 
 pub fn check_wat(

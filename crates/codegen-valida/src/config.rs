@@ -15,7 +15,7 @@ impl Default for ValidaTargetConfig {
         let mut pass_manager = PassManager::new();
         pass_manager.add_pass(Box::<WasmTrackStackDepthPass>::default());
         pass_manager.add_pass(Box::<WasmToValidaArithLoweringPass>::default());
-        pass_manager.add_pass(Box::<WasmToValidaFinalLoweringPass>::default());
+        // pass_manager.add_pass(Box::<WasmToValidaFinalLoweringPass>::default());
         Self { pass_manager }
     }
 }

@@ -23,4 +23,12 @@ impl ValidaInstrBuilder {
             operands: operands.into(),
         });
     }
+
+    pub fn pretty_print(&self) -> String {
+        let mut sink = String::new();
+        for instr in &self.sink {
+            sink.push_str(&format!("{:?}\n", instr.opcode));
+        }
+        sink
+    }
 }
