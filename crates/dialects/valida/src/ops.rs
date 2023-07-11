@@ -6,7 +6,6 @@ use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::declare_op;
 use pliron::dialect::Dialect;
-use pliron::dialects::builtin::attributes::StringAttr;
 use pliron::dialects::builtin::op_interfaces::OneRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SymbolOpInterface;
@@ -90,26 +89,17 @@ impl Verify for ProgramOp {
 }
 
 impl ProgramOp {
-    /// Attribute key for the main function symbol.
-    pub const ATTR_KEY_MAIN_FUNC_SYM: &'static str = "program.main_func_sym";
-
     /// Create a new [ProgramOP].
     /// The returned programm has a single [crate::region::Region] with a single (BasicBlock)[crate::basic_block::BasicBlock].
-    pub fn new(ctx: &mut Context, main_func: FuncOp) -> ProgramOp {
+    pub fn new(ctx: &mut Context, funcs: Vec<Ptr<Operation>>) -> ProgramOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
-        let main_func_name = main_func.get_symbol_name(ctx);
-        {
-            let opref = &mut *op.deref_mut(ctx);
-            opref.attributes.insert(
-                Self::ATTR_KEY_MAIN_FUNC_SYM,
-                StringAttr::create(main_func_name),
-            );
-        }
         let opop = ProgramOp { op };
         // Create an empty block.
         let region = opop.get_region(ctx);
         let block = BasicBlock::new(ctx, None, vec![]);
-        main_func.get_operation().insert_at_back(block, ctx);
+        for op in funcs {
+            op.insert_at_back(block, ctx);
+        }
         block.insert_at_front(region, ctx);
         opop
     }

@@ -12,6 +12,7 @@ use pliron::rewrite::RewritePatternSet;
 
 pub mod arith_op_lowering;
 pub mod func_lowering;
+pub mod module_lowering;
 
 /// The pass that ensures there are no Wasm ops left.
 #[derive(Default)]
