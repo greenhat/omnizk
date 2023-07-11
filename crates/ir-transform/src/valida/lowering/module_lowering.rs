@@ -62,6 +62,7 @@ impl RewritePattern for ModuleLowering {
         for func_op in wasm_module_op.get_body(ctx, 0).deref(ctx).iter(ctx) {
             func_ops.push(func_op);
         }
+        // TODO: reverse toposort should bubble main func on top
         for op in &func_ops {
             op.unlink(ctx);
         }

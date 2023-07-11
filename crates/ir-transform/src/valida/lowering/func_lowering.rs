@@ -11,6 +11,10 @@ use pliron::pass::Pass;
 use pliron::pattern_match::PatternRewriter;
 use pliron::pattern_match::RewritePattern;
 use pliron::rewrite::RewritePatternSet;
+use valida::types::Operands;
+use wasm::op_interfaces::TrackedStackDepth;
+
+use crate::valida::fp_from_wasm_stack;
 
 #[derive(Default)]
 pub struct WasmToValidaFuncLoweringPass;
@@ -59,7 +63,17 @@ impl RewritePattern for ReturnOpLowering {
         let Some(return_op) = opop.downcast_ref::<wasm::ops::ReturnOp>() else {
             panic!("expected ReturnOp");
         };
+
+        let wasm_stack_depth_before_op = return_op.get_stack_depth(ctx);
+        let last_value_fp_offset = fp_from_wasm_stack(wasm_stack_depth_before_op);
+        let return_value_fp_offset = 4;
+        let sw_op = valida::ops::SwOp::new_unlinked(
+            ctx,
+            Operands::from_i32(0, return_value_fp_offset, last_value_fp_offset.into(), 0, 0),
+        );
+
         let ret_op = valida::ops::JalvOp::new_return_pseudo_op(ctx);
+        rewriter.insert_before(ctx, sw_op.get_operation())?;
         rewriter.replace_op_with(ctx, return_op.get_operation(), ret_op.get_operation())?;
         Ok(())
     }

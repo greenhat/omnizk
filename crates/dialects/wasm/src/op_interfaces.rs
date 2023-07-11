@@ -12,6 +12,7 @@ use pliron::op::Op;
 
 use crate::ops::AddOp;
 use crate::ops::ConstantOp;
+use crate::ops::ReturnOp;
 use crate::types::StackDepth;
 
 /// The attribute key for the stack depth.
@@ -57,6 +58,9 @@ impl TrackedStackDepth for ConstantOp {}
 #[intertrait::cast_to]
 impl TrackedStackDepth for AddOp {}
 
+#[intertrait::cast_to]
+impl TrackedStackDepth for ReturnOp {}
+
 /// An interface for operations to get a stack depth change.
 pub trait StackDepthChange: Op {
     /// Get the stack depth change for this operation.
@@ -76,6 +80,7 @@ macro_rules! stack_depth_change {
 
 stack_depth_change!(ConstantOp, 1);
 stack_depth_change!(AddOp, -1);
+stack_depth_change!(ReturnOp, 0);
 
 // TODO: CallOp has a stack depth change based on the signature of the function
 // A special pass (or ModuleBuilder) can put function signature as CallOp attribute

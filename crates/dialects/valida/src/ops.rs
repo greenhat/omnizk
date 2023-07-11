@@ -286,10 +286,56 @@ impl Verify for JalvOp {
 #[intertrait::cast_to]
 impl HasOperands for JalvOp {}
 
+declare_op!(
+    /// Write the 4 byte values beginning at the address stroed at offset c to those beginning at offset b.
+    /// Operand a is unused, but is constrained to [c] in the trace.
+    SwOp,
+    "sw",
+    "valida"
+);
+
+impl SwOp {
+    /// Create a new [SwOp]. The underlying [Operation] is not linked to a
+    /// [BasicBlock](crate::basic_block::BasicBlock).
+    pub fn new_unlinked(ctx: &mut Context, operands: Operands) -> SwOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        let op_op = SwOp { op };
+        op_op.set_operands(ctx, operands);
+        op_op
+    }
+}
+
+impl DisplayWithContext for SwOp {
+    #[allow(clippy::expect_used)]
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let operands = self.get_operands(ctx);
+        write!(
+            f,
+            "{} {} {}(fp) {}(fp) {} {}",
+            self.get_opid().with_ctx(ctx),
+            operands.a(),
+            operands.b(),
+            operands.c(),
+            operands.d(),
+            operands.e()
+        )
+    }
+}
+
+impl Verify for SwOp {
+    fn verify(&self, _ctx: &Context) -> Result<(), CompilerError> {
+        todo!()
+    }
+}
+
+#[intertrait::cast_to]
+impl HasOperands for SwOp {}
+
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     Imm32Op::register(ctx, dialect);
     ProgramOp::register(ctx, dialect);
     FuncOp::register(ctx, dialect);
     AddOp::register(ctx, dialect);
     JalvOp::register(ctx, dialect);
+    SwOp::register(ctx, dialect);
 }

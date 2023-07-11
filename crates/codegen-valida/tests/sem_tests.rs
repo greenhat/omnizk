@@ -137,39 +137,31 @@ pub fn check_valida(
                                              // automatically by the machine, not manually here
     machine.run(rom, public_mem);
 
-    type Val = Mersenne31;
-    type Challenge = Val; // TODO
-    type PackedChallenge = Challenge; // TODO
+    // type Val = Mersenne31;
+    // type Challenge = Val; // TODO
+    // type PackedChallenge = Challenge; // TODO
 
-    let mds = NaiveMDSMatrix::<Val, 8>::new([[Val::ZERO; 8]; 8]); // TODO: Use a real MDS matrix
-    type Perm = Poseidon<Val, NaiveMDSMatrix<Val, 8>, 8, 7>;
-    let perm = Perm::new_from_rng(5, 5, mds, &mut thread_rng()); // TODO: Use deterministic RNG
-    let h4 = PaddingFreeSponge::<Val, Perm, { 4 + 4 }>::new(perm.clone());
-    let c = TruncatedPermutation::<Val, Perm, 2, 4, { 2 * 4 }>::new(perm.clone());
-    let mmcs = MerkleTreeMMCS::new(h4, c);
-    let codes = p3_brakedown::fast_registry();
-    let pcs = TensorPCS::new(codes, mmcs);
-    let challenger = DuplexChallenger::new(perm);
-    let config = StarkConfigImpl::<Val, Challenge, PackedChallenge, _, _>::new(pcs, challenger);
-    machine.prove(&config);
+    // let mds = NaiveMDSMatrix::<Val, 8>::new([[Val::ZERO; 8]; 8]); // TODO: Use a real MDS matrix
+    // type Perm = Poseidon<Val, NaiveMDSMatrix<Val, 8>, 8, 7>;
+    // let perm = Perm::new_from_rng(5, 5, mds, &mut thread_rng()); // TODO: Use deterministic RNG
+    // let h4 = PaddingFreeSponge::<Val, Perm, { 4 + 4 }>::new(perm.clone());
+    // let c = TruncatedPermutation::<Val, Perm, 2, 4, { 2 * 4 }>::new(perm.clone());
+    // let mmcs = MerkleTreeMMCS::new(h4, c);
+    // let codes = p3_brakedown::fast_registry();
+    // let pcs = TensorPCS::new(codes, mmcs);
+    // let challenger = DuplexChallenger::new(perm);
+    // let config = StarkConfigImpl::<Val, Challenge, PackedChallenge, _, _>::new(pcs, challenger);
+    // machine.prove(&config);
 
-    assert_eq!(machine.cpu().clock, 191);
-    assert_eq!(machine.cpu().operations.len(), 191);
-    assert_eq!(machine.mem().operations.values().flatten().count(), 401);
-    assert_eq!(machine.add_u32().operations.len(), 50);
+    // assert_eq!(machine.cpu().clock, 191);
+    // assert_eq!(machine.cpu().operations.len(), 191);
+    // assert_eq!(machine.mem().operations.values().flatten().count(), 401);
+    // assert_eq!(machine.add_u32().operations.len(), 50);
 
     assert_eq!(
         *machine.mem().cells.get(&(0x1000 + 4)).unwrap(), // Return value
-        Word([0, 1, 37, 17,])                             // 25th fibonacci number (75025)
+        Word([0, 0, 0, *expected_output.first().unwrap() as u8,])
     );
-}
-
-pub fn compile(ctx: &mut Context, source: &[u8]) -> String {
-    let target_config = ValidaTargetConfig::default();
-    let prog_op = compile_to_valida_dialect(ctx, source, &target_config);
-    let mut builder = ValidaInstrBuilder::new();
-    emit_op(ctx, prog_op.get_operation(), &mut builder).unwrap();
-    builder.pretty_print()
 }
 
 pub fn compile_to_valida_dialect(

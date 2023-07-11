@@ -114,7 +114,9 @@ impl RewritePattern for ArithOpLowering {
         let opop = &op.deref(ctx).get_op(ctx);
         if let Some(wasm_add_op) = opop.downcast_ref::<wasm::ops::AddOp>() {
             let wasm_stack_depth_before_op = wasm_add_op.get_stack_depth(ctx);
-            let a_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.next());
+            // add wasm pops 2 values and pushes 1,
+            // so the result ends up on the first argument stack slot
+            let a_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.minus1());
             let b_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.top());
             let c_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.minus1());
             let a = a_fp.into();
