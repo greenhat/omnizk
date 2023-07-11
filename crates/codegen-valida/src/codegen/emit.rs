@@ -21,7 +21,7 @@ pub fn emit_op(
 ) -> Result<(), EmitError> {
     #[allow(clippy::panic)] // all ops should be emitable
     if let Some(emitable_op) = op_cast::<dyn EmitInstr>(op.deref(ctx).get_op(ctx).as_ref()) {
-        emitable_op.emit_instr_word(ctx, b);
+        emitable_op.emit_instr(ctx, b);
     } else {
         panic!("cannot emit op: {}", op.with_ctx(ctx));
     }

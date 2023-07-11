@@ -29,8 +29,8 @@ pub fn check_ir(input: &str, expected_tree: expect_test::Expect) {
     target_config.register(&mut ctx);
     let wasm_module_op =
         ozk_frontend_wasm::parse_module(&mut ctx, &source, &frontend_config).unwrap();
-    let miden_prog = run_conversion_passes(&mut ctx, wasm_module_op, &target_config);
-    expected_tree.assert_eq(miden_prog.with_ctx(&ctx).to_string().as_str());
+    let prog = run_conversion_passes(&mut ctx, wasm_module_op, &target_config);
+    expected_tree.assert_eq(prog.with_ctx(&ctx).to_string().as_str());
 }
 
 fn run_conversion_passes(
@@ -68,12 +68,12 @@ pub fn check_wasm(
     secret_input: Vec<u64>,
     expected_output: Vec<u64>,
     expected_wat: expect_test::Expect,
-    expected_miden: expect_test::Expect,
+    expected_valida: expect_test::Expect,
 ) {
     let wat = wasmprinter::print_bytes(source).unwrap();
     expected_wat.assert_eq(&wat);
 
-    check_valida(wat, input, secret_input, expected_output, expected_miden);
+    check_valida(wat, input, secret_input, expected_output, expected_valida);
 }
 
 #[allow(unreachable_code)]
@@ -86,8 +86,12 @@ pub fn check_valida(
 ) {
     let wasm = wat::parse_str(source).unwrap();
     let mut ctx = Context::default();
-    let program = compile(&mut ctx, &wasm);
-    expected_valida.assert_eq(&program);
+    let source: &[u8] = &wasm;
+    let target_config = ValidaTargetConfig::default();
+    let prog_op = compile_to_valida_dialect(&mut ctx, source, &target_config);
+    expected_valida.assert_eq(&prog_op.with_ctx(&ctx).to_string());
+    let mut builder = ValidaInstrBuilder::new();
+    emit_op(&ctx, prog_op.get_operation(), &mut builder).unwrap();
     todo!("run valida program");
 }
 
@@ -116,7 +120,7 @@ pub fn check_wat(
     input: Vec<u64>,
     secret_input: Vec<u64>,
     expected_output: Vec<u64>,
-    expected_miden: expect_test::Expect,
+    expected_valida: expect_test::Expect,
 ) {
     struct Io {
         input: Vec<u64>,
@@ -159,6 +163,6 @@ pub fn check_wat(
         input,
         secret_input,
         expected_output,
-        expected_miden,
+        expected_valida,
     );
 }

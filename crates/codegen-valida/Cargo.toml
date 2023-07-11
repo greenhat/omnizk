@@ -18,12 +18,15 @@ ozk-valida-dialect = { workspace = true }
 ozk-wasm-dialect = { workspace = true }
 ozk-ozk-dialect = { workspace = true }
 pliron = { workspace = true }
+intertrait = { workspace = true }
+# Required by intertrait
+linkme = { workspace = true }
 derive_more = { workspace = true }
 thiserror = { workspace = true }
 anyhow = { workspace = true }
 
 # valida
-# valida-alu-u32 = { path = "../../vendor/valida/alu_u32" }
+valida-alu-u32 = { path = "../../vendor/valida/alu_u32" }
 valida-bus = { path = "../../vendor/valida/bus" }
 valida-cpu = { path = "../../vendor/valida/cpu" }
 # valida-derive = { path = "../../vendor/valida/derive" }

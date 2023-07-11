@@ -30,7 +30,6 @@ fn test_smoke_ir() {
     );
 }
 
-#[ignore]
 #[test]
 fn test_smoke_add_wo_imports() {
     let input = vec![];
@@ -51,6 +50,15 @@ fn test_smoke_add_wo_imports() {
         secret_input,
         expected_output,
         expect![[r#"
-        "#]],
+            valida.program {
+              block_0_1():
+                valida.func @main {
+                  entry():
+                    valida.imm32 -4(fp) 0 0 0 1
+                    valida.imm32 -8(fp) 0 0 0 2
+                    valida.add -12(fp) -8(fp) -4(fp) 0 0
+                    valida.jalv -4(fp) 0(fp) 8(fp) 0 0
+                }
+            }"#]],
     );
 }

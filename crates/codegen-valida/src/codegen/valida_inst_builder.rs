@@ -1,6 +1,8 @@
 use ozk_valida_dialect::types::Operands;
+use valida_alu_u32::add::Add32Instruction;
 use valida_basic::BasicMachine;
 use valida_cpu::Imm32Instruction;
+use valida_cpu::JalvInstruction;
 use valida_machine::Instruction;
 use valida_machine::InstructionWord;
 
@@ -17,13 +19,6 @@ impl ValidaInstrBuilder {
         self.sink
     }
 
-    pub fn imm32(&mut self, operands: Operands) {
-        self.sink.push(InstructionWord {
-            opcode: <Imm32Instruction as Instruction<BasicMachine>>::OPCODE,
-            operands: operands.into(),
-        });
-    }
-
     pub fn pretty_print(&self) -> String {
         let mut sink = String::new();
         for instr in &self.sink {
@@ -32,3 +27,20 @@ impl ValidaInstrBuilder {
         sink
     }
 }
+
+macro_rules! impl_op {
+    ($op:ident, $valida_op:ty) => {
+        impl ValidaInstrBuilder {
+            pub fn $op(&mut self, operands: Operands) {
+                self.sink.push(InstructionWord {
+                    opcode: <$valida_op as Instruction<BasicMachine>>::OPCODE,
+                    operands: operands.into(),
+                });
+            }
+        }
+    };
+}
+
+impl_op!(add, Add32Instruction);
+impl_op!(imm32, Imm32Instruction);
+impl_op!(jalv, JalvInstruction);
