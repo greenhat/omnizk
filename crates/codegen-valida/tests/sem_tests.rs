@@ -18,6 +18,7 @@ use pliron::linked_list::ContainsLinkedList;
 use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::with_context::AttachContext;
+use valida_basic::BasicMachine;
 use wasmtime::*;
 
 pub fn check_ir(input: &str, expected_tree: expect_test::Expect) {
@@ -92,7 +93,75 @@ pub fn check_valida(
     expected_valida.assert_eq(&prog_op.with_ctx(&ctx).to_string());
     let mut builder = ValidaInstrBuilder::new();
     emit_op(&ctx, prog_op.get_operation(), &mut builder).unwrap();
-    todo!("run valida program");
+
+    let program = builder.build();
+
+    use valida_alu_u32::{
+        add::{Add32Chip, Add32Instruction, MachineWithAdd32Chip},
+        mul::{MachineWithMul32Chip, Mul32Chip, Mul32Instruction},
+    };
+    use valida_bus::{MachineWithGeneralBus, MachineWithMemBus, MachineWithRangeBus8};
+    use valida_cpu::{
+        BeqInstruction, BneInstruction, Imm32Instruction, JalInstruction, JalvInstruction,
+        Load32Instruction, Store32Instruction,
+    };
+    use valida_cpu::{CpuChip, MachineWithCpuChip};
+    use valida_derive::Machine;
+    use valida_machine::{
+        AbstractExtensionField, AbstractField, BusArgument, Chip, Instruction, Machine, ProgramROM,
+        PublicMemory,
+    };
+    use valida_memory::{MachineWithMemoryChip, MemoryChip};
+    use valida_range::{MachineWithRangeChip, RangeCheckerChip};
+
+    use p3_challenger::DuplexChallenger;
+    use p3_maybe_rayon::*;
+    use p3_merkle_tree::MerkleTreeMMCS;
+    use p3_mersenne_31::Mersenne31;
+    use p3_poseidon::Poseidon;
+    use p3_symmetric::compression::TruncatedPermutation;
+    use p3_symmetric::mds::NaiveMDSMatrix;
+    use p3_symmetric::sponge::PaddingFreeSponge;
+    use p3_tensor_pcs::TensorPCS;
+    use rand::thread_rng;
+    use valida_machine::config::StarkConfigImpl;
+    use valida_machine::Operands;
+    use valida_machine::{InstructionWord, Word};
+
+    // run valida program and check expected output
+    let mut machine = BasicMachine::default();
+    let rom = ProgramROM::new(program);
+    let public_mem = PublicMemory::default();
+    machine.cpu_mut().fp = 0x1000;
+    machine.cpu_mut().save_register_state(); // TODO: Initial register state should be saved
+                                             // automatically by the machine, not manually here
+    machine.run(rom, public_mem);
+
+    type Val = Mersenne31;
+    type Challenge = Val; // TODO
+    type PackedChallenge = Challenge; // TODO
+
+    let mds = NaiveMDSMatrix::<Val, 8>::new([[Val::ZERO; 8]; 8]); // TODO: Use a real MDS matrix
+    type Perm = Poseidon<Val, NaiveMDSMatrix<Val, 8>, 8, 7>;
+    let perm = Perm::new_from_rng(5, 5, mds, &mut thread_rng()); // TODO: Use deterministic RNG
+    let h4 = PaddingFreeSponge::<Val, Perm, { 4 + 4 }>::new(perm.clone());
+    let c = TruncatedPermutation::<Val, Perm, 2, 4, { 2 * 4 }>::new(perm.clone());
+    let mmcs = MerkleTreeMMCS::new(h4, c);
+    let codes = p3_brakedown::fast_registry();
+    let pcs = TensorPCS::new(codes, mmcs);
+    let challenger = DuplexChallenger::new(perm);
+    let config = StarkConfigImpl::<Val, Challenge, PackedChallenge, _, _>::new(pcs, challenger);
+    machine.prove(&config);
+
+    assert_eq!(machine.cpu().clock, 191);
+    assert_eq!(machine.cpu().operations.len(), 191);
+    assert_eq!(machine.mem().operations.values().flatten().count(), 401);
+    assert_eq!(machine.add_u32().operations.len(), 50);
+
+    assert_eq!(
+        *machine.mem().cells.get(&(0x1000 + 4)).unwrap(), // Return value
+        Word([0, 1, 37, 17,])                             // 25th fibonacci number (75025)
+    );
 }
 
 pub fn compile(ctx: &mut Context, source: &[u8]) -> String {
