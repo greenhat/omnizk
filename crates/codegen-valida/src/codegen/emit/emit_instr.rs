@@ -58,28 +58,6 @@ impl EmitInstr for ProgramOp {
         for func_op in self.get_funcs_block(ctx).deref(ctx).iter(ctx) {
             func_ops.push(func_op);
         }
-
-        /* Moved to wasm module lowering pass
-
-        // call the main function
-        let size_of_current_stack = 16;
-        let call_frame_size = 12;
-        // call label is a pseudo op which consist of:
-        // imm32 (-b+8)(fp), 0, 0, 0, b(fp)
-        // jal -b(fp), label, -b(fp)
-        // , where b is the size of the current stack frame plus the call frame size for instantiating a call to label
-        let b = size_of_current_stack + call_frame_size;
-        let main_func_pc = 4;
-        // pc == 0
-        builder.imm32(Operands::from_i32(-b + 8, 0, 0, 0, b));
-        // pc == 1
-        builder.jal(Operands::from_i32(-b, main_func_pc, -b, 0, 0));
-        // pc == 2
-        builder.sw(Operands::from_i32(0, 4, -24, 0, 0));
-        // pc == 3
-        builder.exit();
-        // pc == 4 the start of the next(main) function
-        */
         for func_op in func_ops {
             emit_op(ctx, func_op, builder);
         }
