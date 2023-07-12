@@ -63,8 +63,8 @@ spin = "0.9.4"
 itertools = "0.10.5"
 indexmap = "1.9"
 topological-sort = "0.2"
-# pliron = { git = "https://github.com/greenhat/pliron", rev = "28a177519e29315575c5133d6416739f233fe857" }
-pliron = { path = "../pliron" }
+pliron = { git = "https://github.com/greenhat/pliron", rev = "11d08910f6e762fc63db902ac504e868728b367b" }
+# pliron = { path = "../pliron" }
 apint = "0.2.0"
 paste = "1.0"
 inventory = "0.3"
