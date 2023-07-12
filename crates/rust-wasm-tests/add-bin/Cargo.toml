@@ -1,9 +1,8 @@
 [package]
-name = "c2zk-rust-wasm-tests-bundle1-bin"
+name = "c2zk-rust-wasm-tests-add-bin"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 c2zk-stdlib = { path = "../../stdlib", features = [] }
-c2zk-rust-wasm-tests-bundle1 = { path = "../bundle1" }
-
+c2zk-rust-wasm-tests-add = { path = "../add" }

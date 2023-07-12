@@ -16,10 +16,15 @@ members = [
   "crates/codegen-shared",
   "crates/compiler",
   "crates/stdlib",
-  "crates/rust-wasm-tests/bundle1",
+  "crates/rust-wasm-tests/fib",
+  "crates/rust-wasm-tests/add",
   "crates/rust-wasm-tests-helper",
 ]
-exclude = ["crates/rust-wasm-tests/bundle1-bin", "vendor"]
+exclude = [
+  "crates/rust-wasm-tests/fib-bin",
+  "crates/rust-wasm-tests/add-bin",
+  "vendor",
+]
 resolver = "2"
 
 [workspace.package]
@@ -48,7 +53,8 @@ c2zk-codegen-tritonvm = { path = "crates/codegen-tritonvm" }
 ozk-codegen-midenvm = { path = "crates/codegen-midenvm" }
 ozk-codegen-valida = { path = "crates/codegen-valida" }
 c2zk-stdlib = { path = "crates/stdlib" }
-c2zk-rust-wasm-tests-bundle1 = { path = "crates/rust-wasm-tests/bundle1" }
+c2zk-rust-wasm-tests-fib = { path = "crates/rust-wasm-tests/fib" }
+c2zk-rust-wasm-tests-add = { path = "crates/rust-wasm-tests/add" }
 c2zk-rust-wasm-tests-helper = { path = "crates/rust-wasm-tests-helper" }
 wasmparser = { version = "0.102" }
 log = { version = "0.4.8", default-features = false }
