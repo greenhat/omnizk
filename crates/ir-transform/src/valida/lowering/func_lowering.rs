@@ -67,6 +67,7 @@ impl RewritePattern for ReturnOpLowering {
         let wasm_stack_depth_before_op = return_op.get_stack_depth(ctx);
         let last_value_fp_offset = fp_from_wasm_stack(wasm_stack_depth_before_op);
         let return_value_fp_offset = 4;
+        // TODO: check func signature if there is a return value
         let sw_op = valida::ops::SwOp::new_unlinked(
             ctx,
             Operands::from_i32(0, return_value_fp_offset, last_value_fp_offset.into(), 0, 0),
