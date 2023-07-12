@@ -90,7 +90,9 @@ impl TryFrom<u64> for Ord16 {
     type Error = String;
 
     fn try_from(n: u64) -> Result<Self, Self::Error> {
-        let n: u32 = n.try_into().map_err(|_| format!("{n} is out of range for Ord16"))?;
+        let n: u32 = n
+            .try_into()
+            .map_err(|_| format!("{n} is out of range for Ord16"))?;
         n.try_into()
     }
 }

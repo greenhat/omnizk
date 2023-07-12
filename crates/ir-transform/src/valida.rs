@@ -5,5 +5,5 @@ pub mod lowering;
 
 pub fn fp_from_wasm_stack(stack_depth: StackDepth) -> FramePointer {
     let v: i32 = stack_depth.into();
-   (-v * 4).into()
+    (-v * 4).into()
 }
