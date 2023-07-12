@@ -111,7 +111,7 @@ fn exec_valida(program: Vec<valida_machine::InstructionWord<i32>>, expected_outp
     machine.cpu_mut().save_register_state();
     machine.run(rom, public_mem);
 
-    todo!("expected output should be a Word");
+    // todo!("expected output should be a Word");
     assert_eq!(
         *machine.mem().cells.get(&(0x1000 + 4)).unwrap(), // Return value
         Word([0, 0, 0, *expected_output.first().unwrap() as u8,])
