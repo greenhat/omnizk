@@ -1,22 +1,31 @@
 use ozk_valida_dialect::op_interfaces::HasOperands;
 use ozk_valida_dialect::ops::AddOp;
+use ozk_valida_dialect::ops::ExitOp;
 use ozk_valida_dialect::ops::FuncOp;
 use ozk_valida_dialect::ops::Imm32Op;
+use ozk_valida_dialect::ops::JalOp;
 use ozk_valida_dialect::ops::JalvOp;
 use ozk_valida_dialect::ops::ProgramOp;
 use ozk_valida_dialect::ops::SwOp;
-use ozk_valida_dialect::types::Operands;
 use pliron::context::Context;
-use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
+use pliron::context::Ptr;
 use pliron::linked_list::ContainsLinkedList;
 use pliron::op::op_cast;
 use pliron::op::Op;
+use pliron::operation::Operation;
 use pliron::with_context::AttachContext;
 
 use crate::codegen::valida_inst_builder::ValidaInstrBuilder;
 
 pub trait EmitInstr: Op {
     fn emit_instr(&self, ctx: &Context, builder: &mut ValidaInstrBuilder);
+}
+
+#[intertrait::cast_to]
+impl EmitInstr for ExitOp {
+    fn emit_instr(&self, _ctx: &Context, builder: &mut ValidaInstrBuilder) {
+        builder.exit();
+    }
 }
 
 macro_rules! emit_instr {
@@ -30,18 +39,37 @@ macro_rules! emit_instr {
     };
 }
 
+fn emit_op(ctx: &Context, op: Ptr<Operation>, builder: &mut ValidaInstrBuilder) {
+    let deref = op.deref(ctx).get_op(ctx);
+    #[allow(clippy::panic)]
+    let emitable_op = op_cast::<dyn EmitInstr>(deref.as_ref())
+        .unwrap_or_else(|| panic!("missing EmitInstr impl for {}", op.with_ctx(ctx)));
+    emitable_op.emit_instr(ctx, builder);
+}
+
 emit_instr!(Imm32Op, imm32);
 emit_instr!(AddOp, add);
 emit_instr!(JalvOp, jalv);
+emit_instr!(JalOp, jal);
 emit_instr!(SwOp, sw);
 
 #[intertrait::cast_to]
 impl EmitInstr for ProgramOp {
     fn emit_instr(&self, ctx: &Context, builder: &mut ValidaInstrBuilder) {
+        let mut entry_block_ops = Vec::new();
+        for op in self.get_entry_block(ctx).deref(ctx).iter(ctx) {
+            entry_block_ops.push(op);
+        }
+        for op in entry_block_ops {
+            emit_op(ctx, op, builder);
+        }
         let mut func_ops = Vec::new();
-        for func_op in self.get_body(ctx, 0).deref(ctx).iter(ctx) {
+        for func_op in self.get_funcs_block(ctx).deref(ctx).iter(ctx) {
             func_ops.push(func_op);
         }
+
+        /* Moved to wasm module lowering pass
+
         // call the main function
         let size_of_current_stack = 16;
         let call_frame_size = 12;
@@ -60,12 +88,9 @@ impl EmitInstr for ProgramOp {
         // pc == 3
         builder.exit();
         // pc == 4 the start of the next(main) function
+        */
         for func_op in func_ops {
-            let deref = func_op.deref(ctx).get_op(ctx);
-            #[allow(clippy::panic)]
-            let emitable_op = op_cast::<dyn EmitInstr>(deref.as_ref())
-                .unwrap_or_else(|| panic!("missing EmitInstr impl for {}", func_op.with_ctx(ctx)));
-            emitable_op.emit_instr(ctx, builder);
+            emit_op(ctx, func_op, builder);
         }
     }
 }

@@ -18,7 +18,12 @@ fn test_smoke_ir() {
 )"#,
         expect![[r#"
             valida.program {
-              block_0_1():
+              entry():
+                valida.imm32 -20(fp) 0 0 0 28
+                valida.jal -28(fp) 4 -28 0 0
+                valida.sw 0 4(fp) -24(fp) 0 0
+                valida.exit
+              block_4_1():
                 valida.func @main {
                   entry():
                     valida.imm32 -4(fp) 0 0 0 1
@@ -52,7 +57,12 @@ fn test_smoke_add_wo_imports() {
         expected_output,
         expect![[r#"
             valida.program {
-              block_0_1():
+              entry():
+                valida.imm32 -20(fp) 0 0 0 28
+                valida.jal -28(fp) 4 -28 0 0
+                valida.sw 0 4(fp) -24(fp) 0 0
+                valida.exit
+              block_4_1():
                 valida.func @main {
                   entry():
                     valida.imm32 -4(fp) 0 0 0 3

@@ -7,7 +7,6 @@ use pliron::context::Ptr;
 use pliron::declare_op;
 use pliron::dialect::Dialect;
 use pliron::dialects::builtin::op_interfaces::OneRegionInterface;
-use pliron::dialects::builtin::op_interfaces::SingleBlockRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SymbolOpInterface;
 use pliron::error::CompilerError;
 use pliron::linked_list::ContainsLinkedList;
@@ -90,28 +89,39 @@ impl Verify for ProgramOp {
 
 impl ProgramOp {
     /// Create a new [ProgramOP].
-    /// The returned programm has a single [crate::region::Region] with a single (BasicBlock)[crate::basic_block::BasicBlock].
-    pub fn new(ctx: &mut Context, funcs: Vec<Ptr<Operation>>) -> ProgramOp {
+    /// The returned programm has a single [crate::region::Region] with an entry block (BasicBlock)[crate::basic_block::BasicBlock] and block with function definitions.
+    pub fn new(
+        ctx: &mut Context,
+        entry_block: Ptr<BasicBlock>,
+        funcs: Vec<Ptr<Operation>>,
+    ) -> ProgramOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
         let opop = ProgramOp { op };
         // Create an empty block.
         let region = opop.get_region(ctx);
-        let block = BasicBlock::new(ctx, None, vec![]);
+        entry_block.insert_at_front(region, ctx);
+        let funcs_block = BasicBlock::new(ctx, None, vec![]);
         for op in funcs {
-            op.insert_at_back(block, ctx);
+            op.insert_at_back(funcs_block, ctx);
         }
-        block.insert_at_front(region, ctx);
+        funcs_block.insert_at_back(region, ctx);
         opop
     }
 
-    /// Add an [Operation] into this module.
-    pub fn add_operation(&self, ctx: &mut Context, op: Ptr<Operation>) {
-        self.append_operation(ctx, op, 0)
+    /// Returns the entry block of this program.
+    pub fn get_entry_block(&self, ctx: &Context) -> Ptr<BasicBlock> {
+        #[allow(clippy::unwrap_used)]
+        self.get_region(ctx).deref(ctx).get_head().unwrap()
+    }
+
+    /// Returns the block with function definitions.
+    pub fn get_funcs_block(&self, ctx: &Context) -> Ptr<BasicBlock> {
+        #[allow(clippy::unwrap_used)]
+        self.get_region(ctx).deref(ctx).get_tail().unwrap()
     }
 }
 
 impl OneRegionInterface for ProgramOp {}
-impl SingleBlockRegionInterface for ProgramOp {}
 
 declare_op!(
     /// An operation representing a function in Valida
@@ -331,6 +341,79 @@ impl Verify for SwOp {
 #[intertrait::cast_to]
 impl HasOperands for SwOp {}
 
+declare_op!(
+    /// jump to address and link
+    /// Store the pc + 1 to local stack variable at offset "a" then set pc to field element "b".
+    /// Set fp to fp + c.
+    JalOp,
+    "jal",
+    "valida"
+);
+
+impl JalOp {
+    /// Create a new [JalOp]. The underlying [Operation] is not linked to a
+    /// [BasicBlock](crate::basic_block::BasicBlock).
+    pub fn new_unlinked(ctx: &mut Context, operands: Operands) -> JalOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        let jalv_op = JalOp { op };
+        jalv_op.set_operands(ctx, operands);
+        jalv_op
+    }
+}
+
+impl DisplayWithContext for JalOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let operands = self.get_operands(ctx);
+        write!(
+            f,
+            "{} {}(fp) {} {} {} {}",
+            self.get_opid().with_ctx(ctx),
+            operands.a(),
+            operands.b(),
+            operands.c(),
+            operands.d(),
+            operands.e()
+        )
+    }
+}
+
+impl Verify for JalOp {
+    fn verify(&self, _ctx: &Context) -> Result<(), CompilerError> {
+        todo!()
+    }
+}
+
+#[intertrait::cast_to]
+impl HasOperands for JalOp {}
+
+declare_op!(
+    /// Exit the program (halts execution)
+    ExitOp,
+    "exit",
+    "valida"
+);
+
+impl ExitOp {
+    /// Create a new [ExitOp]. The underlying [Operation] is not linked to a
+    /// [BasicBlock](crate::basic_block::BasicBlock).
+    pub fn new_unlinked(ctx: &mut Context) -> ExitOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        ExitOp { op }
+    }
+}
+
+impl DisplayWithContext for ExitOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.get_opid().with_ctx(ctx),)
+    }
+}
+
+impl Verify for ExitOp {
+    fn verify(&self, _ctx: &Context) -> Result<(), CompilerError> {
+        Ok(())
+    }
+}
+
 pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     Imm32Op::register(ctx, dialect);
     ProgramOp::register(ctx, dialect);
@@ -338,4 +421,6 @@ pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     AddOp::register(ctx, dialect);
     JalvOp::register(ctx, dialect);
     SwOp::register(ctx, dialect);
+    JalOp::register(ctx, dialect);
+    ExitOp::register(ctx, dialect);
 }

@@ -1,5 +1,6 @@
 use ozk_valida_dialect as valida;
 use ozk_wasm_dialect as wasm;
+use pliron::basic_block::BasicBlock;
 use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::dialect_conversion::apply_partial_conversion;
@@ -12,6 +13,7 @@ use pliron::pass::Pass;
 use pliron::pattern_match::PatternRewriter;
 use pliron::pattern_match::RewritePattern;
 use pliron::rewrite::RewritePatternSet;
+use valida::types::Operands;
 
 #[derive(Default)]
 pub struct WasmToValidaModuleLoweringPass;
@@ -66,8 +68,41 @@ impl RewritePattern for ModuleLowering {
         for op in &func_ops {
             op.unlink(ctx);
         }
-        let prog_op = valida::ops::ProgramOp::new(ctx, func_ops);
+        let entry_block = build_prog_entry_block(ctx);
+        let prog_op = valida::ops::ProgramOp::new(ctx, entry_block, func_ops);
         rewriter.replace_op_with(ctx, wasm_module_op.get_operation(), prog_op.get_operation())?;
         Ok(())
     }
+}
+
+fn build_prog_entry_block(ctx: &mut Context) -> Ptr<BasicBlock> {
+    let bb = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
+    // call the main function
+    let size_of_current_stack = 16;
+    let call_frame_size = 12;
+    // call label is a pseudo op which consist of:
+    // imm32 (-b+8)(fp), 0, 0, 0, b(fp)
+    // jal -b(fp), label, -b(fp)
+    // , where b is the size of the current stack frame plus the call frame size for instantiating a call to label
+    let b = size_of_current_stack + call_frame_size;
+    let main_func_pc = 4;
+    // pc == 0
+    let imm32_op = valida::ops::Imm32Op::new_unlinked(ctx, Operands::from_i32(-b + 8, 0, 0, 0, b));
+    imm32_op.get_operation().insert_at_back(bb, ctx);
+    // builder.imm32(Operands::from_i32(-b + 8, 0, 0, 0, b));
+    // pc == 1
+    let jal_op =
+        valida::ops::JalOp::new_unlinked(ctx, Operands::from_i32(-b, main_func_pc, -b, 0, 0));
+    jal_op.get_operation().insert_at_back(bb, ctx);
+    // builder.jal(Operands::from_i32(-b, main_func_pc, -b, 0, 0));
+    // pc == 2
+    let sw_op = valida::ops::SwOp::new_unlinked(ctx, Operands::from_i32(0, 4, -24, 0, 0));
+    sw_op.get_operation().insert_at_back(bb, ctx);
+    // builder.sw(Operands::from_i32(0, 4, -24, 0, 0));
+    // pc == 3
+    let exit_op = valida::ops::ExitOp::new_unlinked(ctx);
+    exit_op.get_operation().insert_at_back(bb, ctx);
+    // builder.exit();
+    // pc == 4 the start of the next(main) function
+    bb
 }
