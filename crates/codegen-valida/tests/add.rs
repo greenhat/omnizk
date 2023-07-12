@@ -10,10 +10,10 @@ fn test_add() {
     let secret_input = vec![3];
     let expected_output = vec![21];
     let native_output = c2zk_rust_wasm_tests_helper::wrap_main_with_io(
-        &c2zk_rust_wasm_tests_bundle1::add::main,
+        &c2zk_rust_wasm_tests_add::add::main_add,
     )(input.clone(), secret_input.clone());
     assert_eq!(native_output, expected_output);
-    let wasm_bytes = c2zk_rust_wasm_tests_helper::compile_rust_wasm_tests_bundle1_bin("add");
+    let wasm_bytes = c2zk_rust_wasm_tests_helper::compile_rust_wasm_tests("add-bin", "add");
     check_wasm(
         &wasm_bytes,
         input,

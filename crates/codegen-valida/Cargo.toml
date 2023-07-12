@@ -52,7 +52,8 @@ rand = { version = "0.8.4", features = ["std"] }
 c2zk-frontend = { workspace = true }
 ozk-frontend-wasm = { workspace = true }
 c2zk-rust-wasm-tests-helper = { workspace = true }
-c2zk-rust-wasm-tests-bundle1 = { workspace = true }
+c2zk-rust-wasm-tests-fib = { workspace = true }
+c2zk-rust-wasm-tests-add = { workspace = true }
 pliron = { workspace = true }
 wat = { workspace = true }
 wasmprinter = { workspace = true }

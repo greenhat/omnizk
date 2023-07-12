@@ -13,10 +13,10 @@ fn test_fib() {
     // let expected_output = vec![2584];
     let expected_output = vec![75025];
     let native_output = c2zk_rust_wasm_tests_helper::wrap_main_with_io(
-        &c2zk_rust_wasm_tests_bundle1::fib::fib_seq,
+        &c2zk_rust_wasm_tests_fib::fib::fib_seq,
     )(input.clone(), secret_input.clone());
     assert_eq!(native_output, expected_output);
-    let wasm_bytes = c2zk_rust_wasm_tests_helper::compile_rust_wasm_tests_bundle1_bin("fib");
+    let wasm_bytes = c2zk_rust_wasm_tests_helper::compile_rust_wasm_tests("fib-bin", "fib");
     check_wasm(
         &wasm_bytes,
         input,

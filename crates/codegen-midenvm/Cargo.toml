@@ -33,7 +33,8 @@ miden-stdlib = "0.4"
 miden-processor = "0.5"
 ozk-frontend-wasm = { workspace = true }
 c2zk-rust-wasm-tests-helper = { workspace = true }
-c2zk-rust-wasm-tests-bundle1 = { workspace = true }
+c2zk-rust-wasm-tests-fib = { workspace = true }
+c2zk-rust-wasm-tests-add = { workspace = true }
 pliron = { workspace = true }
 wat = { workspace = true }
 wasmprinter = { workspace = true }
