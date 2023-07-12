@@ -8,14 +8,13 @@ use ozk_valida_dialect::ops::JalvOp;
 use ozk_valida_dialect::ops::ProgramOp;
 use ozk_valida_dialect::ops::SwOp;
 use pliron::context::Context;
-use pliron::context::Ptr;
 use pliron::linked_list::ContainsLinkedList;
 use pliron::op::op_cast;
 use pliron::op::Op;
-use pliron::operation::Operation;
 use pliron::with_context::AttachContext;
 
 use crate::codegen::valida_inst_builder::ValidaInstrBuilder;
+use crate::emit_op;
 
 pub trait EmitInstr: Op {
     fn emit_instr(&self, ctx: &Context, builder: &mut ValidaInstrBuilder);
@@ -37,14 +36,6 @@ macro_rules! emit_instr {
             }
         }
     };
-}
-
-fn emit_op(ctx: &Context, op: Ptr<Operation>, builder: &mut ValidaInstrBuilder) {
-    let deref = op.deref(ctx).get_op(ctx);
-    #[allow(clippy::panic)]
-    let emitable_op = op_cast::<dyn EmitInstr>(deref.as_ref())
-        .unwrap_or_else(|| panic!("missing EmitInstr impl for {}", op.with_ctx(ctx)));
-    emitable_op.emit_instr(ctx, builder);
 }
 
 emit_instr!(Imm32Op, imm32);

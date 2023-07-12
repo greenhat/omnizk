@@ -14,16 +14,10 @@ mod emit_instr;
 #[derive(Debug, Error)]
 pub enum EmitError {}
 
-pub fn emit_op(
-    ctx: &Context,
-    op: Ptr<Operation>,
-    b: &mut ValidaInstrBuilder,
-) -> Result<(), EmitError> {
-    #[allow(clippy::panic)] // all ops should be emitable
-    if let Some(emitable_op) = op_cast::<dyn EmitInstr>(op.deref(ctx).get_op(ctx).as_ref()) {
-        emitable_op.emit_instr(ctx, b);
-    } else {
-        panic!("cannot emit op: {}", op.with_ctx(ctx));
-    }
-    Ok(())
+pub fn emit_op(ctx: &Context, op: Ptr<Operation>, builder: &mut ValidaInstrBuilder) {
+    let deref = op.deref(ctx).get_op(ctx);
+    #[allow(clippy::panic)]
+    let emitable_op = op_cast::<dyn EmitInstr>(deref.as_ref())
+        .unwrap_or_else(|| panic!("missing EmitInstr impl for {}", op.with_ctx(ctx)));
+    emitable_op.emit_instr(ctx, builder);
 }
