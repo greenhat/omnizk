@@ -91,7 +91,7 @@ pub fn check_valida(
     let target_config = ValidaTargetConfig::default();
     let prog_op = compile_to_valida_dialect(&mut ctx, source, &target_config);
     expected_valida.assert_eq(&prog_op.with_ctx(&ctx).to_string());
-    let mut builder = ValidaInstrBuilder::new();
+    let mut builder = ValidaInstrBuilder::default();
     emit_op(&ctx, prog_op.get_operation(), &mut builder).unwrap();
     let program = builder.build();
     exec_valida(program, expected_output);
