@@ -29,7 +29,10 @@ pub fn emit_op(
     if let Some(emitable_op) = op_cast::<dyn EmitMasm>(op.deref(ctx).get_op(ctx).as_ref()) {
         emitable_op.emit_masm(ctx, b);
     } else {
-        panic!("cannot emit op: {}", op.with_ctx(ctx));
+        panic!(
+            "missing EmitMasm impl for op: {}",
+            op.deref(ctx).get_opid().with_ctx(ctx)
+        );
     }
     Ok(())
 }
