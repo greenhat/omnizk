@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 use expect_test::expect;
 
 mod sem_tests;
