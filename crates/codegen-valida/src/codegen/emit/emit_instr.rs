@@ -26,23 +26,6 @@ impl EmitInstr for ExitOp {
     }
 }
 
-macro_rules! emit_instr {
-    ($op:ty, $builder_method:ident) => {
-        #[cast_to]
-        impl EmitInstr for $op {
-            fn emit_instr(&self, ctx: &Context, builder: &mut ValidaInstrBuilder) {
-                builder.$builder_method(self.get_operands(ctx));
-            }
-        }
-    };
-}
-
-emit_instr!(Imm32Op, imm32);
-emit_instr!(AddOp, add);
-emit_instr!(JalvOp, jalv);
-emit_instr!(JalOp, jal);
-emit_instr!(SwOp, sw);
-
 #[cast_to]
 impl EmitInstr for ProgramOp {
     fn emit_instr(&self, ctx: &Context, builder: &mut ValidaInstrBuilder) {
@@ -75,3 +58,20 @@ impl EmitInstr for FuncOp {
         }
     }
 }
+
+macro_rules! emit_instr {
+    ($op:ty, $builder_method:ident) => {
+        #[cast_to]
+        impl EmitInstr for $op {
+            fn emit_instr(&self, ctx: &Context, builder: &mut ValidaInstrBuilder) {
+                builder.$builder_method(self.get_operands(ctx));
+            }
+        }
+    };
+}
+
+emit_instr!(Imm32Op, imm32);
+emit_instr!(AddOp, add);
+emit_instr!(JalvOp, jalv);
+emit_instr!(JalOp, jal);
+emit_instr!(SwOp, sw);
