@@ -83,3 +83,8 @@ once_cell = "1.15.0"
 anyhow = "1.0.44"
 bounded-vec = "0.7.1"
 expect-test = "1.0.1"
+
+[profile.release]
+# Need this for linkme crate to work on macOS
+# see https://github.com/dtolnay/linkme/issues/61
+lto = "thin"
