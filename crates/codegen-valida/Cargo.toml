@@ -27,34 +27,30 @@ anyhow = { workspace = true }
 
 # valida
 valida-alu-u32 = { path = "../../vendor/valida/alu_u32" }
-valida-bus = { path = "../../vendor/valida/bus" }
+# valida-bus = { path = "../../vendor/valida/bus" }
 valida-cpu = { path = "../../vendor/valida/cpu" }
 valida-derive = { path = "../../vendor/valida/derive" }
 valida-machine = { path = "../../vendor/valida/machine" }
 valida-memory = { path = "../../vendor/valida/memory" }
-valida-range = { path = "../../vendor/valida/range" }
+# valida-range = { path = "../../vendor/valida/range" }
 valida-basic = { path = "../../vendor/valida/basic" }
-p3-maybe-rayon = { path = "../../vendor/Plonky3/maybe-rayon" }
-p3-brakedown = { path = "../../vendor/Plonky3/brakedown" }
-p3-challenger = { path = "../../vendor/Plonky3/challenger" }
+# p3-maybe-rayon = { path = "../../vendor/Plonky3/maybe-rayon" }
+# p3-brakedown = { path = "../../vendor/Plonky3/brakedown" }
+# p3-challenger = { path = "../../vendor/Plonky3/challenger" }
 # p3-field = { path = "../../vendor/Plonky3/field" }
-p3-merkle-tree = { path = "../../vendor/Plonky3/merkle-tree" }
-p3-mersenne-31 = { path = "../../vendor/Plonky3/mersenne-31" }
-p3-poseidon = { path = "../../vendor/Plonky3/poseidon" }
-p3-symmetric = { path = "../../vendor/Plonky3/symmetric" }
-p3-tensor-pcs = { path = "../../vendor/Plonky3/tensor-pcs" }
+# p3-merkle-tree = { path = "../../vendor/Plonky3/merkle-tree" }
+# p3-mersenne-31 = { path = "../../vendor/Plonky3/mersenne-31" }
+# p3-poseidon = { path = "../../vendor/Plonky3/poseidon" }
+# p3-symmetric = { path = "../../vendor/Plonky3/symmetric" }
+# p3-tensor-pcs = { path = "../../vendor/Plonky3/tensor-pcs" }
 # valida deps
-rand = { version = "0.8.4", features = ["std"] }
+# rand = { version = "0.8.4", features = ["std"] }
 
 [dev-dependencies]
-# ozk-compiler = { workspace = true }
-# c2zk-codegen = { workspace = true }
-c2zk-frontend = { workspace = true }
 ozk-frontend-wasm = { workspace = true }
 c2zk-rust-wasm-tests-helper = { workspace = true }
 c2zk-rust-wasm-tests-fib = { workspace = true }
 c2zk-rust-wasm-tests-add = { workspace = true }
-pliron = { workspace = true }
 wat = { workspace = true }
 wasmprinter = { workspace = true }
 expect-test = "1.0.1"
