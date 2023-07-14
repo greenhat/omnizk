@@ -57,10 +57,11 @@ c2zk-rust-wasm-tests-fib = { path = "crates/rust-wasm-tests/fib" }
 c2zk-rust-wasm-tests-add = { path = "crates/rust-wasm-tests/add" }
 c2zk-rust-wasm-tests-helper = { path = "crates/rust-wasm-tests-helper" }
 wasmparser = { version = "0.102" }
+wasmprinter = "0.2"
+wat = "1.0.49"
+wasmtime = "7.0.0"
 log = { version = "0.4.8", default-features = false }
 smallvec = { version = "1.6.1", features = ["union"] }
-wat = "1.0.49"
-wasmprinter = "0.2"
 target-lexicon = { version = "0.12.3", default-features = false }
 derive_more = "0.99"
 thiserror = "1.0.40"

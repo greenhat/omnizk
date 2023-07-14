@@ -53,5 +53,5 @@ c2zk-rust-wasm-tests-fib = { workspace = true }
 c2zk-rust-wasm-tests-add = { workspace = true }
 wat = { workspace = true }
 wasmprinter = { workspace = true }
-expect-test = "1.0.1"
-wasmtime = "7.0.0"
+expect-test = { workspace = true }
+wasmtime = { workspace = true }
