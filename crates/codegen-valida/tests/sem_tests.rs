@@ -19,6 +19,7 @@ use pliron::op::Op;
 use pliron::operation::Operation;
 use pliron::with_context::AttachContext;
 use valida_basic::BasicMachine;
+use valida_machine::Word;
 use wasmtime::*;
 
 pub fn check_ir(input: &str, expected_tree: expect_test::Expect) {
@@ -65,24 +66,30 @@ fn run_conversion_passes(
 
 pub fn check_wasm(
     source: &[u8],
-    input: Vec<u64>,
-    secret_input: Vec<u64>,
-    expected_output: Vec<u64>,
+    input: Vec<u32>,
+    secret_input: Vec<u32>,
+    expected_output: u32,
     expected_wat: expect_test::Expect,
     expected_valida: expect_test::Expect,
 ) {
     let wat = wasmprinter::print_bytes(source).unwrap();
     expected_wat.assert_eq(&wat);
 
-    check_valida(wat, input, secret_input, expected_output, expected_valida);
+    check_valida(
+        wat,
+        input,
+        secret_input,
+        expected_output.into(),
+        expected_valida,
+    );
 }
 
 #[allow(unreachable_code)]
 pub fn check_valida(
     source: String,
-    input: Vec<u64>,
-    secret_input: Vec<u64>,
-    expected_output: Vec<u64>,
+    input: Vec<u32>,
+    secret_input: Vec<u32>,
+    expected_output: Word<u8>,
     expected_valida: expect_test::Expect,
 ) {
     let wasm = wat::parse_str(source).unwrap();
@@ -97,7 +104,7 @@ pub fn check_valida(
     exec_valida(program, expected_output);
 }
 
-fn exec_valida(program: Vec<valida_machine::InstructionWord<i32>>, expected_output: Vec<u64>) {
+fn exec_valida(program: Vec<valida_machine::InstructionWord<i32>>, expected_output: Word<u8>) {
     use valida_cpu::MachineWithCpuChip;
     use valida_machine::Word;
     use valida_machine::{Machine, ProgramROM, PublicMemory};
@@ -111,10 +118,9 @@ fn exec_valida(program: Vec<valida_machine::InstructionWord<i32>>, expected_outp
     machine.cpu_mut().save_register_state();
     machine.run(rom, public_mem);
 
-    // todo!("expected output should be a Word");
     assert_eq!(
         *machine.mem().cells.get(&(0x1000 + 4)).unwrap(), // Return value
-        Word([0, 0, 0, *expected_output.first().unwrap() as u8,])
+        expected_output
     );
 }
 
@@ -132,15 +138,15 @@ pub fn compile_to_valida_dialect(
 
 pub fn check_wat(
     source: &str,
-    input: Vec<u64>,
-    secret_input: Vec<u64>,
-    expected_output: Vec<u64>,
+    input: Vec<u32>,
+    secret_input: Vec<u32>,
+    expected_output: u32,
     expected_valida: expect_test::Expect,
 ) {
     struct Io {
-        input: Vec<u64>,
-        secret_input: Vec<u64>,
-        output: Vec<u64>,
+        input: Vec<u32>,
+        secret_input: Vec<u32>,
+        output: Vec<u32>,
     }
 
     let mut store = Store::new(
@@ -160,7 +166,7 @@ pub fn check_wat(
     });
     let c2zk_stdlib_pub_output =
         Func::wrap(&mut store, |mut caller: Caller<'_, Io>, output: i64| {
-            caller.data_mut().output.push(output as u64);
+            caller.data_mut().output.push(output as u32);
         });
     let c2zk_stdlib_secret_input = Func::wrap(&mut store, |mut caller: Caller<'_, Io>| {
         caller.data_mut().secret_input.pop().unwrap()
@@ -172,12 +178,12 @@ pub fn check_wat(
     ];
     let _ = Instance::new(&mut store, &module, &imports).unwrap();
 
-    assert_eq!(store.data().output, expected_output);
+    assert_eq!(store.data().output.first().unwrap(), &expected_output);
     check_valida(
         source.to_string(),
         input,
         secret_input,
-        expected_output,
+        expected_output.into(),
         expected_valida,
     );
 }

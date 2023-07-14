@@ -40,7 +40,7 @@ fn test_smoke_ir() {
 fn test_smoke_add_wo_imports() {
     let input = vec![];
     let secret_input = vec![];
-    let expected_output = vec![7];
+    let expected_output = 7.into();
     check_valida(
         r#"
 (module

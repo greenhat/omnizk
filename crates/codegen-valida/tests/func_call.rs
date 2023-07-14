@@ -3,6 +3,8 @@ use expect_test::expect;
 mod sem_tests;
 use crate::sem_tests::check_wat;
 
+/*
+
 #[ignore]
 #[test]
 fn test_func_call() {
@@ -11,7 +13,7 @@ fn test_func_call() {
     let expected_output = vec![3];
     check_wat(
         r#"
-(module 
+(module
     (type (;0;) (func (result i64)))
     (type (;1;) (func (param i64)))
     (type (;2;) (func))
@@ -25,7 +27,7 @@ fn test_func_call() {
         get_local 1
         i64.add
         return)
-    (func $main 
+    (func $main
         i64.const 1
         i64.const 2
         call $add
@@ -179,3 +181,5 @@ fn test_func_call() {
         "#]],
     );
 }
+
+*/

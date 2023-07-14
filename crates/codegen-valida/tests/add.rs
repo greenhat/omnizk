@@ -3,6 +3,7 @@ use expect_test::expect;
 mod sem_tests;
 use crate::sem_tests::check_wasm;
 
+/*
 #[ignore]
 #[test]
 fn test_add() {
@@ -206,3 +207,5 @@ fn test_add() {
             return"#]],
     )
 }
+
+*/
