@@ -1,5 +1,6 @@
 //! Semantic equivalence tests for the Valida VM codegen.
 
+#![allow(unused_imports)]
 #![allow(clippy::unwrap_used)]
 #![allow(unused_variables)]
 #![allow(dead_code)]
