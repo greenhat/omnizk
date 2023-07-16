@@ -20,10 +20,6 @@ use crate::valida::fp_from_wasm_stack;
 pub struct WasmToValidaFuncLoweringPass;
 
 impl Pass for WasmToValidaFuncLoweringPass {
-    fn name(&self) -> &str {
-        "WasmToValidaFuncLoweringPass"
-    }
-
     fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
         let target = ConversionTarget::default();
         // TODO: set illegal ops
@@ -39,10 +35,6 @@ impl Pass for WasmToValidaFuncLoweringPass {
 pub struct ReturnOpLowering {}
 
 impl RewritePattern for ReturnOpLowering {
-    fn name(&self) -> String {
-        "ReturnOpLowering".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)
@@ -84,10 +76,6 @@ impl RewritePattern for ReturnOpLowering {
 pub struct FuncOpLowering {}
 
 impl RewritePattern for FuncOpLowering {
-    fn name(&self) -> String {
-        "FuncOpLowering".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)
@@ -113,7 +101,6 @@ impl RewritePattern for FuncOpLowering {
             op.unlink(ctx);
             op.insert_at_back(func_op.get_entry_block(ctx), ctx);
         }
-        rewriter.replace_op_with(ctx, wasm_func_op.get_operation(), func_op.get_operation())?;
         Ok(())
     }
 }

@@ -19,10 +19,6 @@ pub mod module_lowering;
 pub struct WasmToValidaFinalLoweringPass;
 
 impl Pass for WasmToValidaFinalLoweringPass {
-    fn name(&self) -> &str {
-        "WasmToValidaFinalLoweringPass"
-    }
-
     fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
         let mut target = ConversionTarget::default();
         target.add_illegal_dialect(WASM_DIALECT(ctx));

@@ -19,10 +19,6 @@ use pliron::with_context::AttachContext;
 pub struct WasmTrackStackDepthPass;
 
 impl Pass for WasmTrackStackDepthPass {
-    fn name(&self) -> &str {
-        "WasmTrackStackDepthPass"
-    }
-
     fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
         let target = ConversionTarget::default();
         let mut patterns = RewritePatternSet::default();
@@ -36,10 +32,6 @@ impl Pass for WasmTrackStackDepthPass {
 pub struct WasmWriteStackDepth;
 
 impl RewritePattern for WasmWriteStackDepth {
-    fn name(&self) -> String {
-        "WasmWriteStackDepth".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)

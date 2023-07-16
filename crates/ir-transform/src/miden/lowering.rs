@@ -25,10 +25,6 @@ pub mod constant_op_lowering;
 pub struct WasmToMidenArithLoweringPass;
 
 impl Pass for WasmToMidenArithLoweringPass {
-    fn name(&self) -> &str {
-        "WasmToMidenArithLoweringPass"
-    }
-
     fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
         let mut target = ConversionTarget::default();
         target.add_legal_dialect(MIDEN_DIALECT(ctx));
@@ -46,10 +42,6 @@ impl Pass for WasmToMidenArithLoweringPass {
 pub struct WasmToMidenFinalLoweringPass;
 
 impl Pass for WasmToMidenFinalLoweringPass {
-    fn name(&self) -> &str {
-        "WasmToMidenFinalLoweringPass"
-    }
-
     fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
         let mut target = ConversionTarget::default();
         target.add_illegal_dialect(WASM_DIALECT(ctx));

@@ -25,10 +25,6 @@ impl WasmGlobalsToMemPass {
 }
 
 impl Pass for WasmGlobalsToMemPass {
-    fn name(&self) -> &str {
-        "WasmGlobalsToMemPass"
-    }
-
     fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
         let target = ConversionTarget::default();
         // TODO: set illegal ops
@@ -53,10 +49,6 @@ impl WasmGlobalSetToMem {
 }
 
 impl RewritePattern for WasmGlobalSetToMem {
-    fn name(&self) -> String {
-        "WasmGlobalSetToMem".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)
@@ -105,10 +97,6 @@ impl WasmGlobalGetToMem {
 }
 
 impl RewritePattern for WasmGlobalGetToMem {
-    fn name(&self) -> String {
-        "WasmGlobalGetToMem".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)

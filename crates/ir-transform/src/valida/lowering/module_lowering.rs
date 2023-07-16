@@ -19,10 +19,6 @@ use valida::types::Operands;
 pub struct WasmToValidaModuleLoweringPass;
 
 impl Pass for WasmToValidaModuleLoweringPass {
-    fn name(&self) -> &str {
-        "WasmToValidaModuleLoweringPass"
-    }
-
     fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
         let target = ConversionTarget::default();
         // TODO: set illegal ops
@@ -37,10 +33,6 @@ impl Pass for WasmToValidaModuleLoweringPass {
 pub struct ModuleLowering {}
 
 impl RewritePattern for ModuleLowering {
-    fn name(&self) -> String {
-        "ModuleLowering".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)

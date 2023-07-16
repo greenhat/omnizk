@@ -13,10 +13,6 @@ use pliron::pattern_match::RewritePattern;
 pub struct ArithOpLowering {}
 
 impl RewritePattern for ArithOpLowering {
-    fn name(&self) -> String {
-        "ArithOpLowering".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)

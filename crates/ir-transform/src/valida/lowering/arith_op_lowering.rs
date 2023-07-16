@@ -25,10 +25,6 @@ use crate::valida::fp_from_wasm_stack;
 pub struct WasmToValidaArithLoweringPass;
 
 impl Pass for WasmToValidaArithLoweringPass {
-    fn name(&self) -> &str {
-        "WasmToValidaArithLoweringPass"
-    }
-
     fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
         let target = ConversionTarget::default();
         // TODO: set illegal ops
@@ -44,10 +40,6 @@ impl Pass for WasmToValidaArithLoweringPass {
 pub struct ConstantOpLowering {}
 
 impl RewritePattern for ConstantOpLowering {
-    fn name(&self) -> String {
-        "ConstantOpLowering".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)
@@ -92,10 +84,6 @@ impl RewritePattern for ConstantOpLowering {
 pub struct ArithOpLowering {}
 
 impl RewritePattern for ArithOpLowering {
-    fn name(&self) -> String {
-        "ArithOpLowering".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)

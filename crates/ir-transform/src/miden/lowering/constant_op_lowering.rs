@@ -14,10 +14,6 @@ use pliron::pattern_match::RewritePattern;
 pub struct ConstantOpLowering {}
 
 impl RewritePattern for ConstantOpLowering {
-    fn name(&self) -> String {
-        "ConstantOpLowering".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)

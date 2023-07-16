@@ -16,10 +16,6 @@ use pliron::with_context::AttachContext;
 pub struct WasmExplicitFuncArgsPass;
 
 impl Pass for WasmExplicitFuncArgsPass {
-    fn name(&self) -> &str {
-        "WasmExplicitFuncArgsPass"
-    }
-
     fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
         let target = ConversionTarget::default();
         // TODO: set illegal ops
@@ -34,10 +30,6 @@ impl Pass for WasmExplicitFuncArgsPass {
 pub struct WasmExplicitFuncArgs;
 
 impl RewritePattern for WasmExplicitFuncArgs {
-    fn name(&self) -> String {
-        "WasmExplicitFuncArgs".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)

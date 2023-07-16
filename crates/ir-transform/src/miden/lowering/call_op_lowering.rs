@@ -17,10 +17,6 @@ use pliron::rewrite::RewritePatternSet;
 pub struct WasmToMidenCallOpLoweringPass;
 
 impl Pass for WasmToMidenCallOpLoweringPass {
-    fn name(&self) -> &str {
-        "WasmToMidenCallOpLoweringPass"
-    }
-
     fn run_on_operation(&self, ctx: &mut Context, op: Ptr<Operation>) -> Result<(), anyhow::Error> {
         let target = ConversionTarget::default();
         // TODO: set illegal ops
@@ -35,10 +31,6 @@ impl Pass for WasmToMidenCallOpLoweringPass {
 pub struct CallOpLowering;
 
 impl RewritePattern for CallOpLowering {
-    fn name(&self) -> String {
-        "CallOpLowering".to_string()
-    }
-
     fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
         Ok(op
             .deref(ctx)

@@ -75,7 +75,6 @@ fn test_smoke_add() {
     );
 }
 
-#[ignore]
 #[test]
 fn test_smoke_func_call() {
     let input = vec![];
@@ -107,13 +106,21 @@ fn test_smoke_func_call() {
                 valida.jal -28(fp) 4 -28 0 0
                 valida.sw 0 4(fp) -24(fp) 0 0
                 valida.exit
-              block_4_1():
+              block_5_2():
+                valida.func @add {
+                  entry():
+                    wasm.local.get 0x0: ui32
+                    wasm.local.get 0x1: ui32
+                    valida.add -4(fp) -8(fp) -4(fp) 0 0
+                    valida.sw 0 4(fp) -4(fp) 0 0
+                    valida.jalv -4(fp) 0(fp) 8(fp) 0 0
+                }
                 valida.func @main {
                   entry():
                     valida.imm32 -4(fp) 0 0 0 3
                     valida.imm32 -8(fp) 0 0 0 4
-                    valida.add -4(fp) -8(fp) -4(fp) 0 0
-                    valida.sw 0 4(fp) -4(fp) 0 0
+                    wasm.call 0
+                    valida.sw 0 4(fp) -8(fp) 0 0
                     valida.jalv -4(fp) 0(fp) 8(fp) 0 0
                 }
             }"#]],
