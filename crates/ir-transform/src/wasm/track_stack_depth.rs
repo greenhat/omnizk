@@ -54,6 +54,10 @@ impl RewritePattern for WasmWriteStackDepth {
             panic!("unexpected op {}", func_op.deref(ctx).with_ctx(ctx));
         };
 
+        // TODO: count local variables (without func args) and set stack depth to that
+        // to reserve stack space for local variables
+        // With this, this rewrite pattern will no longer be tracking pure Wasm stack depth,
+        // but rather the stack depth of the Wasm stack + the stack depth of the local variables
         let mut stack_depth: i32 = 0;
         let mut ops = Vec::new();
         func_op.walk(ctx, WalkOrder::PostOrder, &mut |op| {

@@ -76,31 +76,21 @@ impl RewritePattern for ReturnOpLowering {
 pub struct FuncOpLowering {}
 
 impl RewritePattern for FuncOpLowering {
-    fn match_op(&self, ctx: &Context, op: Ptr<Operation>) -> Result<bool, anyhow::Error> {
-        Ok(op
-            .deref(ctx)
-            .get_op(ctx)
-            .downcast_ref::<wasm::ops::FuncOp>()
-            .is_some())
-    }
-
-    #[allow(clippy::unwrap_used)]
-    fn rewrite(
+    fn match_and_rewrite(
         &self,
         ctx: &mut Context,
         op: Ptr<Operation>,
         rewriter: &mut dyn PatternRewriter,
-    ) -> Result<(), anyhow::Error> {
+    ) -> Result<bool, anyhow::Error> {
         let opop = &op.deref(ctx).get_op(ctx);
-        #[allow(clippy::panic)]
         let Some(wasm_func_op) = opop.downcast_ref::<wasm::ops::FuncOp>() else {
-            panic!("expected FuncOp");
+            return Ok(false);
         };
         let func_op = valida::ops::FuncOp::new_unlinked(ctx, wasm_func_op.get_symbol_name(ctx));
         for op in wasm_func_op.op_iter(ctx) {
             op.unlink(ctx);
             op.insert_at_back(func_op.get_entry_block(ctx), ctx);
         }
-        Ok(())
+        Ok(true)
     }
 }
