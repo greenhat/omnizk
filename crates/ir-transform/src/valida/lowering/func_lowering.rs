@@ -91,6 +91,7 @@ impl RewritePattern for FuncOpLowering {
             op.unlink(ctx);
             op.insert_at_back(func_op.get_entry_block(ctx), ctx);
         }
+        rewriter.replace_op_with(ctx, wasm_func_op.get_operation(), func_op.get_operation())?;
         Ok(true)
     }
 }
