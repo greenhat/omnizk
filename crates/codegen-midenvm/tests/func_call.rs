@@ -78,8 +78,8 @@ fn test_ir_func_call_w_args() {
                   entry():
                     wasm.local.set 0x0: ui32
                     wasm.local.set 0x1: ui32
-                    wasm.local.get 0x0: ui32
-                    wasm.local.get 0x1: ui32
+                    wasm.local.get 0
+                    wasm.local.get 1
                     miden.add
                 }
                 miden.proc @main {

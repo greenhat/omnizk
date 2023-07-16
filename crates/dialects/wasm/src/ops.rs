@@ -49,6 +49,7 @@ use pliron::with_context::AttachContext;
 
 use crate::types::FuncIndex;
 use crate::types::GlobalIndex;
+use crate::types::LocalIndex;
 use crate::types::RelativeDepth;
 
 declare_op!(
@@ -864,7 +865,7 @@ impl LocalGetOp {
     pub const ATTR_KEY_INDEX: &str = "local.get.index";
 
     /// Get the index of the local variable.
-    pub fn get_index(&self, ctx: &Context) -> AttrObj {
+    pub fn get_index_as_attr(&self, ctx: &Context) -> AttrObj {
         let op = self.get_operation().deref(ctx);
         #[allow(clippy::expect_used)]
         let value = op
@@ -884,6 +885,18 @@ impl LocalGetOp {
             .insert(Self::ATTR_KEY_INDEX, index_attr);
         LocalGetOp { op }
     }
+
+    /// Get the index of the local variable.
+    pub fn get_index(&self, ctx: &Context) -> LocalIndex {
+        let attr = self.get_index_as_attr(ctx);
+        let value_u32 = apint_to_i32(
+            attr.downcast_ref::<IntegerAttr>()
+                .expect("index is not an IntegerAttr")
+                .clone()
+                .into(),
+        ) as u32;
+        value_u32.into()
+    }
 }
 
 impl DisplayWithContext for LocalGetOp {
@@ -892,14 +905,14 @@ impl DisplayWithContext for LocalGetOp {
             f,
             "{} {}",
             self.get_opid().with_ctx(ctx),
-            self.get_index(ctx).with_ctx(ctx)
+            self.get_index(ctx)
         )
     }
 }
 
 impl Verify for LocalGetOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
-        let index = self.get_index(ctx);
+        let index = self.get_index_as_attr(ctx);
         if let Ok(index_attr) = index.downcast::<IntegerAttr>() {
             #[allow(clippy::unwrap_used)]
             if index_attr.get_type() != u32_type_unwrapped(ctx) {

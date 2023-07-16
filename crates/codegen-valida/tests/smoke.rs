@@ -50,7 +50,8 @@ fn test_smoke_add() {
         i32.const 4
         i32.add
         return)
-)"#
+)
+"#
         .to_string(),
         input,
         secret_input,
@@ -94,7 +95,8 @@ fn test_smoke_func_call() {
         i32.const 4
         call $add
         return)
-)"#
+)
+"#
         .to_string(),
         input,
         secret_input,
@@ -109,8 +111,8 @@ fn test_smoke_func_call() {
               block_5_2():
                 valida.func @add {
                   entry():
-                    wasm.local.get 0x0: ui32
-                    wasm.local.get 0x1: ui32
+                    valida.sw 0 -4(fp) 12(fp) 0 0
+                    valida.sw 0 -8(fp) 16(fp) 0 0
                     valida.add -4(fp) -8(fp) -4(fp) 0 0
                     valida.sw 0 4(fp) -4(fp) 0 0
                     valida.jalv -4(fp) 0(fp) 8(fp) 0 0

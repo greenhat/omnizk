@@ -137,32 +137,17 @@ impl RewritePattern for WasmGlobalGetToMem {
 mod tests {
 
     use expect_test::expect;
-    use ozk_frontend_wasm::WasmFrontendConfig;
-    use pliron::op::Op;
+
+    use crate::tests_util::check_wasm_pass;
 
     use super::*;
-
-    // TODO: move to crate's test utils
-    pub fn check_pass<T: Pass>(pass: &T, wat: &str, expected: expect_test::Expect) {
-        let source = wat::parse_str(wat).unwrap();
-        let mut ctx = Context::default();
-        let frontend_config = WasmFrontendConfig::default();
-        ozk_wasm_dialect::register(&mut ctx);
-        ozk_ozk_dialect::register(&mut ctx);
-        frontend_config.register(&mut ctx);
-        let wasm_module_op =
-            ozk_frontend_wasm::parse_module(&mut ctx, &source, &frontend_config).unwrap();
-        pass.run_on_operation(&mut ctx, wasm_module_op.get_operation())
-            .unwrap();
-        expected.assert_eq(wasm_module_op.with_ctx(&ctx).to_string().as_str());
-    }
 
     #[test]
     fn globals_get_set() {
         let pass = WasmGlobalsToMemPass {
             start_addr: 0x1000.into(),
         };
-        check_pass(
+        check_wasm_pass(
             &pass,
             r#"
 (module

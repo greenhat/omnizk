@@ -45,6 +45,10 @@ pub struct TableIndex(u32);
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
 pub struct GlobalIndex(u32);
 
+/// Index type of a local variable inside the WebAssembly function.
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
+pub struct LocalIndex(u32);
+
 /// Index type of a linear memory (imported or defined) inside the WebAssembly module.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
 pub struct MemoryIndex(u32);
