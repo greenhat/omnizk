@@ -54,29 +54,27 @@ pub trait TrackedStackDepth: Op {
     }
 }
 
-#[intertrait::cast_to]
-impl TrackedStackDepth for ConstantOp {}
-
-#[intertrait::cast_to]
-impl TrackedStackDepth for AddOp {}
-
-#[intertrait::cast_to]
-impl TrackedStackDepth for ReturnOp {}
-
-#[intertrait::cast_to]
-impl TrackedStackDepth for LocalGetOp {}
-
-#[intertrait::cast_to]
-impl TrackedStackDepth for LocalSetOp {}
-
 /// An interface for operations to get a stack depth change.
 pub trait StackDepthChange: Op {
     /// Get the stack depth change for this operation.
     fn get_stack_depth_change(&self, ctx: &Context) -> i32;
 }
 
+#[intertrait::cast_to]
+impl TrackedStackDepth for ozk_ozk_dialect::ops::CallOp {}
+
+impl StackDepthChange for ozk_ozk_dialect::ops::CallOp {
+    fn get_stack_depth_change(&self, ctx: &Context) -> i32 {
+        let func_type = self.get_func_type(ctx);
+        -(func_type.get_inputs().len() as i32) + func_type.get_results().len() as i32
+    }
+}
+
 macro_rules! stack_depth_change {
     ($op:ty, $change:expr) => {
+        #[intertrait::cast_to]
+        impl TrackedStackDepth for $op {}
+
         #[intertrait::cast_to]
         impl StackDepthChange for $op {
             fn get_stack_depth_change(&self, _ctx: &Context) -> i32 {
@@ -91,6 +89,3 @@ stack_depth_change!(AddOp, -1);
 stack_depth_change!(ReturnOp, 0);
 stack_depth_change!(LocalGetOp, 1);
 stack_depth_change!(LocalSetOp, -1);
-
-// TODO: CallOp has a stack depth change based on the signature of the function
-// A special pass (or ModuleBuilder) can put function signature as CallOp attribute

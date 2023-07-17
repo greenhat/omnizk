@@ -6,6 +6,7 @@ use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::declare_op;
 use pliron::dialect::Dialect;
+use pliron::dialects::builtin::attributes::StringAttr;
 use pliron::dialects::builtin::op_interfaces::OneRegionInterface;
 use pliron::dialects::builtin::op_interfaces::SymbolOpInterface;
 use pliron::error::CompilerError;
@@ -15,6 +16,7 @@ use pliron::operation::Operation;
 use pliron::with_context::AttachContext;
 
 use crate::op_interfaces::HasOperands;
+use crate::types::Mersenne31;
 use crate::types::Operands;
 
 declare_op!(
@@ -385,6 +387,80 @@ impl Verify for JalOp {
 
 #[intertrait::cast_to]
 impl HasOperands for JalOp {}
+
+// TODO: move to ozk dialect?
+declare_op!(
+    /// jump to address and link (symbolic name version)
+    /// Store the pc + 1 to local stack variable at offset "a"
+    /// then set pc to the first instruction of a function with given symbolic name.
+    /// Set fp to fp + c.
+    JalSymOp,
+    "jalsym",
+    "valida"
+);
+
+impl JalSymOp {
+    const ATTR_KEY_FUNC_SYM: &str = "jalsym.func_sym";
+
+    /// Create a new [JalSymOp]. The underlying [Operation] is not linked to a
+    /// [BasicBlock](crate::basic_block::BasicBlock).
+    /// Expected operands.b to be zero (unused) which later to be set to the first instruction pc of the given function.
+    pub fn new_unlinked(ctx: &mut Context, operands: Operands, func_sym: String) -> JalSymOp {
+        assert!(
+            operands.b() == Mersenne31::ZERO,
+            "expected operands.b to be zero"
+        );
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_FUNC_SYM, StringAttr::create(func_sym));
+        let jalv_op = JalSymOp { op };
+        jalv_op.set_operands(ctx, operands);
+        jalv_op
+    }
+
+    /// Get the target function symbol
+    pub fn get_func_sym(&self, ctx: &Context) -> String {
+        let op = self.get_operation().deref(ctx);
+        #[allow(clippy::expect_used)]
+        let func_sym_attr = op
+            .attributes
+            .get(Self::ATTR_KEY_FUNC_SYM)
+            .expect("no attribute found");
+        #[allow(clippy::expect_used)]
+        let func_sym: String = func_sym_attr
+            .downcast_ref::<StringAttr>()
+            .expect("expected StringAttr")
+            .clone()
+            .into();
+        func_sym
+    }
+}
+
+impl DisplayWithContext for JalSymOp {
+    fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let operands = self.get_operands(ctx);
+        write!(
+            f,
+            "{} {}(fp) {} {} {} {}",
+            self.get_opid().with_ctx(ctx),
+            operands.a(),
+            self.get_func_sym(ctx),
+            operands.c(),
+            operands.d(),
+            operands.e()
+        )
+    }
+}
+
+impl Verify for JalSymOp {
+    fn verify(&self, _ctx: &Context) -> Result<(), CompilerError> {
+        todo!()
+    }
+}
+
+#[intertrait::cast_to]
+impl HasOperands for JalSymOp {}
 
 declare_op!(
     /// Exit the program (halts execution)

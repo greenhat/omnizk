@@ -1,3 +1,4 @@
+use ozk_ozk_dialect as ozk;
 use ozk_valida_dialect as valida;
 use ozk_wasm_dialect as wasm;
 use pliron::context::Context;
@@ -110,6 +111,46 @@ impl RewritePattern for FuncOpLowering {
             // }
             let ret_op = valida::ops::JalvOp::new_return_pseudo_op(ctx);
             rewriter.replace_op_with(ctx, return_op.get_operation(), ret_op.get_operation())?;
+        }
+
+        // TODO: extract call op conversion into a function
+        let mut call_ops = Vec::new();
+        wasm_func_op.get_operation().walk_only::<ozk::ops::CallOp>(
+            ctx,
+            WalkOrder::PostOrder,
+            &mut |op| {
+                call_ops.push(*op);
+                WalkResult::Advance
+            },
+        );
+        for call_op in call_ops {
+            let wasm_stack_depth_before_op = call_op.get_stack_depth(ctx);
+            let last_stack_value_fp_offset: i32 =
+                fp_from_wasm_stack(wasm_stack_depth_before_op).into();
+            let imm32_op = valida::ops::Imm32Op::new_unlinked(
+                ctx,
+                Operands::from_i32(
+                    last_stack_value_fp_offset + 8,
+                    0,
+                    0,
+                    0,
+                    last_stack_value_fp_offset,
+                ),
+            );
+            rewriter.set_insertion_point(call_op.get_operation());
+            rewriter.insert_before(ctx, imm32_op.get_operation())?;
+            let jalsym_op = valida::ops::JalSymOp::new_unlinked(
+                ctx,
+                Operands::from_i32(
+                    last_stack_value_fp_offset,
+                    0,
+                    0,
+                    0,
+                    last_stack_value_fp_offset,
+                ),
+                call_op.get_func_sym(ctx),
+            );
+            rewriter.replace_op_with(ctx, call_op.get_operation(), jalsym_op.get_operation())?;
         }
 
         let func_op = valida::ops::FuncOp::new_unlinked(ctx, wasm_func_op.get_symbol_name(ctx));

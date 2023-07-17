@@ -69,10 +69,12 @@ use thiserror::Error;
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
 pub struct FramePointer(i32);
 
-#[derive(Copy, Clone, Default, Display)]
+#[derive(Copy, Clone, Default, Display, PartialEq, Eq)]
 pub struct Mersenne31(i32);
 
 impl Mersenne31 {
+    pub const ZERO: Self = Self(0);
+
     pub fn as_i32(self) -> i32 {
         self.0
     }
