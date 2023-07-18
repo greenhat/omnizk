@@ -1,3 +1,4 @@
+use anyhow::Ok;
 use ozk_ozk_dialect as ozk;
 use ozk_valida_dialect as valida;
 use ozk_wasm_dialect as wasm;
@@ -49,109 +50,10 @@ impl RewritePattern for FuncOpLowering {
         let Some(wasm_func_op) = opop.downcast_ref::<wasm::ops::FuncOp>() else {
             return Ok(false);
         };
-        // TODO: extract local.gets conversion into a function
-        let mut local_get_ops = Vec::new();
-        wasm_func_op.get_operation().walk_only::<LocalGetOp>(
-            ctx,
-            WalkOrder::PostOrder,
-            &mut |op| {
-                local_get_ops.push(*op);
-                WalkResult::Advance
-            },
-        );
 
-        let fp_func_first_arg: i32 = 12;
-        for local_get_op in local_get_ops {
-            let index: u32 = local_get_op.get_index(ctx).into();
-            if index < wasm_func_op.get_type(ctx).get_inputs().len() as u32 {
-                // this is function paramter
-                let wasm_stack_depth_before_op = local_get_op.get_stack_depth(ctx);
-                let from_fp: i32 = fp_func_first_arg + index as i32 * 4;
-                let to_fp: i32 = fp_from_wasm_stack(wasm_stack_depth_before_op.next()).into();
-                let sw_op = valida::ops::SwOp::new_unlinked(
-                    ctx,
-                    Operands::from_i32(0, to_fp, from_fp, 0, 0),
-                );
-                rewriter.replace_op_with(
-                    ctx,
-                    local_get_op.get_operation(),
-                    sw_op.get_operation(),
-                )?;
-            }
-        }
-
-        // TODO: extract return conversion into a function
-        let mut return_ops = Vec::new();
-        wasm_func_op
-            .get_operation()
-            .walk_only::<ReturnOp>(ctx, WalkOrder::PostOrder, &mut |op| {
-                return_ops.push(*op);
-                WalkResult::Advance
-            });
-        for return_op in return_ops {
-            // TODO: check func signature if there is a return value (after I/O is implemented)
-            // if wasm_func_op.get_type_typed(ctx).get_results().len() == 1 {
-            let wasm_stack_depth_before_op = return_op.get_stack_depth(ctx);
-            let last_stack_value_fp_offset = fp_from_wasm_stack(wasm_stack_depth_before_op);
-            let return_value_fp_offset = 4;
-            let sw_op = valida::ops::SwOp::new_unlinked(
-                ctx,
-                Operands::from_i32(
-                    0,
-                    return_value_fp_offset,
-                    last_stack_value_fp_offset.into(),
-                    0,
-                    0,
-                ),
-            );
-            rewriter.set_insertion_point(return_op.get_operation());
-            rewriter.insert_before(ctx, sw_op.get_operation())?;
-            // } else {
-            //     todo!("wasm.func -> valida: multiple return values are not supported yet");
-            // }
-            let ret_op = valida::ops::JalvOp::new_return_pseudo_op(ctx);
-            rewriter.replace_op_with(ctx, return_op.get_operation(), ret_op.get_operation())?;
-        }
-
-        // TODO: extract call op conversion into a function
-        let mut call_ops = Vec::new();
-        wasm_func_op.get_operation().walk_only::<ozk::ops::CallOp>(
-            ctx,
-            WalkOrder::PostOrder,
-            &mut |op| {
-                call_ops.push(*op);
-                WalkResult::Advance
-            },
-        );
-        for call_op in call_ops {
-            let wasm_stack_depth_before_op = call_op.get_stack_depth(ctx);
-            let last_stack_value_fp_offset: i32 =
-                fp_from_wasm_stack(wasm_stack_depth_before_op).into();
-            let imm32_op = valida::ops::Imm32Op::new_unlinked(
-                ctx,
-                Operands::from_i32(
-                    last_stack_value_fp_offset + 8,
-                    0,
-                    0,
-                    0,
-                    last_stack_value_fp_offset,
-                ),
-            );
-            rewriter.set_insertion_point(call_op.get_operation());
-            rewriter.insert_before(ctx, imm32_op.get_operation())?;
-            let jalsym_op = valida::ops::JalSymOp::new_unlinked(
-                ctx,
-                Operands::from_i32(
-                    last_stack_value_fp_offset,
-                    0,
-                    0,
-                    0,
-                    last_stack_value_fp_offset,
-                ),
-                call_op.get_func_sym(ctx),
-            );
-            rewriter.replace_op_with(ctx, call_op.get_operation(), jalsym_op.get_operation())?;
-        }
+        convert_func_arg_access(wasm_func_op, ctx, rewriter)?;
+        convert_return_ops(wasm_func_op, ctx, rewriter)?;
+        convert_call_ops(wasm_func_op, ctx, rewriter)?;
 
         let func_op = valida::ops::FuncOp::new_unlinked(ctx, wasm_func_op.get_symbol_name(ctx));
         for op in wasm_func_op.op_iter(ctx) {
@@ -161,6 +63,118 @@ impl RewritePattern for FuncOpLowering {
         rewriter.replace_op_with(ctx, wasm_func_op.get_operation(), func_op.get_operation())?;
         Ok(true)
     }
+}
+
+fn convert_call_ops(
+    wasm_func_op: &wasm::ops::FuncOp,
+    ctx: &mut Context,
+    rewriter: &mut dyn PatternRewriter,
+) -> Result<(), anyhow::Error> {
+    let mut call_ops = Vec::new();
+    wasm_func_op.get_operation().walk_only::<ozk::ops::CallOp>(
+        ctx,
+        WalkOrder::PostOrder,
+        &mut |op| {
+            call_ops.push(*op);
+            WalkResult::Advance
+        },
+    );
+    for call_op in call_ops {
+        let wasm_stack_depth_before_op = call_op.get_stack_depth(ctx);
+        let last_stack_value_fp_offset: i32 = fp_from_wasm_stack(wasm_stack_depth_before_op).into();
+        let imm32_op = valida::ops::Imm32Op::new_unlinked(
+            ctx,
+            Operands::from_i32(
+                last_stack_value_fp_offset + 8,
+                0,
+                0,
+                0,
+                last_stack_value_fp_offset,
+            ),
+        );
+        rewriter.set_insertion_point(call_op.get_operation());
+        rewriter.insert_before(ctx, imm32_op.get_operation())?;
+        let jalsym_op = valida::ops::JalSymOp::new_unlinked(
+            ctx,
+            Operands::from_i32(
+                last_stack_value_fp_offset,
+                0,
+                0,
+                0,
+                last_stack_value_fp_offset,
+            ),
+            call_op.get_func_sym(ctx),
+        );
+        rewriter.replace_op_with(ctx, call_op.get_operation(), jalsym_op.get_operation())?;
+    }
+    Ok(())
+}
+
+fn convert_return_ops(
+    wasm_func_op: &wasm::ops::FuncOp,
+    ctx: &mut Context,
+    rewriter: &mut dyn PatternRewriter,
+) -> Result<(), anyhow::Error> {
+    let mut return_ops = Vec::new();
+    wasm_func_op
+        .get_operation()
+        .walk_only::<ReturnOp>(ctx, WalkOrder::PostOrder, &mut |op| {
+            return_ops.push(*op);
+            WalkResult::Advance
+        });
+    for return_op in return_ops {
+        // TODO: check func signature if there is a return value (after I/O is implemented)
+        // if wasm_func_op.get_type_typed(ctx).get_results().len() == 1 {
+        let wasm_stack_depth_before_op = return_op.get_stack_depth(ctx);
+        let last_stack_value_fp_offset = fp_from_wasm_stack(wasm_stack_depth_before_op);
+        let return_value_fp_offset = 4;
+        let sw_op = valida::ops::SwOp::new_unlinked(
+            ctx,
+            Operands::from_i32(
+                0,
+                return_value_fp_offset,
+                last_stack_value_fp_offset.into(),
+                0,
+                0,
+            ),
+        );
+        rewriter.set_insertion_point(return_op.get_operation());
+        rewriter.insert_before(ctx, sw_op.get_operation())?;
+        // } else {
+        //     todo!("wasm.func -> valida: multiple return values are not supported yet");
+        // }
+        let ret_op = valida::ops::JalvOp::new_return_pseudo_op(ctx);
+        rewriter.replace_op_with(ctx, return_op.get_operation(), ret_op.get_operation())?;
+    }
+    Ok(())
+}
+
+fn convert_func_arg_access(
+    wasm_func_op: &wasm::ops::FuncOp,
+    ctx: &mut Context,
+    rewriter: &mut dyn PatternRewriter,
+) -> Result<(), anyhow::Error> {
+    let mut local_get_ops = Vec::new();
+    wasm_func_op
+        .get_operation()
+        .walk_only::<LocalGetOp>(ctx, WalkOrder::PostOrder, &mut |op| {
+            local_get_ops.push(*op);
+            WalkResult::Advance
+        });
+    let fp_func_first_arg: i32 = 12;
+    for local_get_op in local_get_ops {
+        let index: u32 = local_get_op.get_index(ctx).into();
+        if index < wasm_func_op.get_type(ctx).get_inputs().len() as u32 {
+            // this is function paramter
+            let wasm_stack_depth_before_op = local_get_op.get_stack_depth(ctx);
+            let from_fp: i32 = fp_func_first_arg + index as i32 * 4;
+            let to_fp: i32 = fp_from_wasm_stack(wasm_stack_depth_before_op.next()).into();
+            let sw_op =
+                valida::ops::SwOp::new_unlinked(ctx, Operands::from_i32(0, to_fp, from_fp, 0, 0));
+            rewriter.replace_op_with(ctx, local_get_op.get_operation(), sw_op.get_operation())?;
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]
