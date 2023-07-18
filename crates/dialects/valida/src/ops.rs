@@ -498,5 +498,6 @@ pub(crate) fn register(ctx: &mut Context, dialect: &mut Dialect) {
     JalvOp::register(ctx, dialect);
     SwOp::register(ctx, dialect);
     JalOp::register(ctx, dialect);
+    JalSymOp::register(ctx, dialect);
     ExitOp::register(ctx, dialect);
 }

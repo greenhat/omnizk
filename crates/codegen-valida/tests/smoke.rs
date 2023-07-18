@@ -121,7 +121,8 @@ fn test_smoke_func_call() {
                   entry():
                     valida.imm32 -4(fp) 0 0 0 3
                     valida.imm32 -8(fp) 0 0 0 4
-                    wasm.call 0
+                    valida.imm32 0(fp) 0 0 0 -8
+                    valida.jalsym -8(fp) add 0 0 -8
                     valida.sw 0 4(fp) -8(fp) 0 0
                     valida.jalv -4(fp) 0(fp) 8(fp) 0 0
                 }

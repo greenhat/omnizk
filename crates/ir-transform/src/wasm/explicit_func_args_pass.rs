@@ -51,7 +51,7 @@ impl RewritePattern for WasmExplicitFuncArgs {
             .downcast::<wasm::FuncOp>() else {
             panic!("unexpected op {}", op.deref(ctx).with_ctx(ctx));
         };
-        let func_type = func_op.get_type_typed(ctx);
+        let func_type = func_op.get_type(ctx);
         for (idx, _) in func_type.get_inputs().iter().enumerate().rev() {
             let local_set_op = LocalSetOp::new_unlinked(ctx, idx as u32).get_operation();
             local_set_op.insert_at_front(func_op.get_entry_block(ctx), ctx);

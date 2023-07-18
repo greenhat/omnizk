@@ -12,10 +12,12 @@ use pliron::dialect::Dialect;
 use pliron::dialects::builtin::attr_interfaces::TypedAttrInterface;
 use pliron::dialects::builtin::attributes::IntegerAttr;
 use pliron::dialects::builtin::attributes::StringAttr;
+use pliron::dialects::builtin::attributes::TypeAttr;
 use pliron::dialects::builtin::types::FunctionType;
 use pliron::error::CompilerError;
 use pliron::op::Op;
 use pliron::operation::Operation;
+use pliron::r#type::Type;
 use pliron::r#type::TypeObj;
 use pliron::with_context::AttachContext;
 
@@ -23,6 +25,7 @@ use crate::attributes::apint_to_i32;
 use crate::attributes::u32_attr;
 use crate::attributes::FieldElemAttr;
 use crate::ord_n::Ord16;
+use crate::types::FuncSym;
 
 declare_op!(
     /// Pushes numeric constant on the stack.
@@ -187,11 +190,15 @@ impl CallOp {
 
     /// Create a new [CallOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, func_sym: String) -> CallOp {
+    pub fn new_unlinked(ctx: &mut Context, func_sym: FuncSym, func_type: FunctionType) -> CallOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
-            .insert(Self::ATTR_KEY_FUNC_SYM, StringAttr::create(func_sym));
+            .insert(Self::ATTR_KEY_FUNC_SYM, StringAttr::create(func_sym.into()));
+        let ty = Type::register_instance(func_type, ctx);
+        op.deref_mut(ctx)
+            .attributes
+            .insert(Self::ATTR_KEY_FUNC_TYPE, TypeAttr::create(ty));
         CallOp { op }
     }
 

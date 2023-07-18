@@ -63,7 +63,7 @@ impl RewritePattern for FuncOpLowering {
         let fp_func_first_arg: i32 = 12;
         for local_get_op in local_get_ops {
             let index: u32 = local_get_op.get_index(ctx).into();
-            if index < wasm_func_op.get_type_typed(ctx).get_inputs().len() as u32 {
+            if index < wasm_func_op.get_type(ctx).get_inputs().len() as u32 {
                 // this is function paramter
                 let wasm_stack_depth_before_op = local_get_op.get_stack_depth(ctx);
                 let from_fp: i32 = fp_func_first_arg + index as i32 * 4;

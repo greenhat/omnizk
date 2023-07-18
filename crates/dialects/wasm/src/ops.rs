@@ -44,6 +44,8 @@ use pliron::error::CompilerError;
 use pliron::linked_list::ContainsLinkedList;
 use pliron::op::Op;
 use pliron::operation::Operation;
+use pliron::operation::WalkOrder;
+use pliron::operation::WalkResult;
 use pliron::r#type::TypeObj;
 use pliron::with_context::AttachContext;
 
@@ -242,6 +244,19 @@ impl ModuleOp {
             .position(|sym| *sym == func_sym)
             .map(Into::into)
     }
+
+    pub fn get_func(&self, ctx: &Context, func_sym: &FuncSym) -> Option<FuncOp> {
+        for op in self.get_body(ctx, 0).deref(ctx).iter(ctx) {
+            let deref_op = &op.deref(ctx).get_op(ctx);
+            let Some(func_op) = deref_op.downcast_ref::<FuncOp>() else {
+                continue;
+            };
+            if func_op.get_symbol_name(ctx) == func_sym.as_ref() {
+                return Some(*func_op);
+            }
+        }
+        None
+    }
 }
 
 impl OneRegionInterface for ModuleOp {}
@@ -302,7 +317,7 @@ impl FuncOp {
     }
 
     /// Get the function signature (type).
-    pub fn get_type(&self, ctx: &Context) -> Ptr<TypeObj> {
+    pub fn get_type_attr(&self, ctx: &Context) -> Ptr<TypeObj> {
         let opref = self.get_operation().deref(ctx);
         #[allow(clippy::unwrap_used)]
         let ty_attr = opref.attributes.get(Self::ATTR_KEY_FUNC_TYPE).unwrap();
@@ -313,8 +328,8 @@ impl FuncOp {
     }
 
     /// Get the function signature (type).
-    pub fn get_type_typed(&self, ctx: &Context) -> FunctionType {
-        let func_type_obj = self.get_type(ctx).deref(ctx);
+    pub fn get_type(&self, ctx: &Context) -> FunctionType {
+        let func_type_obj = self.get_type_attr(ctx).deref(ctx);
         #[allow(clippy::panic)]
         let Some(func_type) = func_type_obj.downcast_ref::<FunctionType>() else {
             panic!("FuncOp type is not a FunctionType");
@@ -349,7 +364,7 @@ impl DisplayWithContext for FuncOp {
             "{} @{}{} {{\n{}}}",
             self.get_opid().with_ctx(ctx),
             self.get_symbol_name(ctx),
-            self.get_type(ctx).with_ctx(ctx),
+            self.get_type_attr(ctx).with_ctx(ctx),
             indent::indent_all_by(2, region),
         )
     }
@@ -357,7 +372,7 @@ impl DisplayWithContext for FuncOp {
 
 impl Verify for FuncOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
-        let ty = self.get_type(ctx);
+        let ty = self.get_type_attr(ctx);
 
         if !(ty.deref(ctx).is::<FunctionType>()) {
             return Err(CompilerError::VerificationError {
