@@ -181,14 +181,14 @@ fn convert_func_arg_access(
 mod tests {
     use expect_test::expect;
 
-    use crate::tests_util::check_wasm_valida_pass;
+    use crate::tests_util::check_wasm_valida_passes;
     use crate::wasm::track_stack_depth::WasmTrackStackDepthPass;
 
     use super::*;
 
     #[test]
     fn func_op_lowering() {
-        check_wasm_valida_pass(
+        check_wasm_valida_passes(
             vec![
                 Box::<WasmTrackStackDepthPass>::default(),
                 Box::<WasmToValidaFuncLoweringPass>::default(),

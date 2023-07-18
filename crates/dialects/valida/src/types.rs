@@ -69,6 +69,9 @@ use thiserror::Error;
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
 pub struct FramePointer(i32);
 
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
+pub struct ProgramCounter(u32);
+
 #[derive(Copy, Clone, Default, Display, PartialEq, Eq)]
 pub struct Mersenne31(i32);
 

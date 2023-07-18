@@ -28,9 +28,20 @@ use pliron::dialect::Dialect;
 use pliron::dialect::DialectName;
 
 pub fn register(ctx: &mut Context) {
-    let mut dialect = Dialect::new(DialectName::new("ozk"));
+    let mut dialect = Dialect::new(OZK_DIALECT_NAME());
     ops::register(ctx, &mut dialect);
     types::register(&mut dialect);
     attributes::register(&mut dialect);
     dialect.register(ctx);
+}
+
+#[allow(non_snake_case)]
+pub fn OZK_DIALECT_NAME() -> DialectName {
+    DialectName::new("ozk")
+}
+
+#[allow(non_snake_case)]
+pub fn OZK_DIALECT(ctx: &Context) -> &Dialect {
+    #[allow(clippy::expect_used)]
+    Dialect::get_ref(ctx, OZK_DIALECT_NAME()).expect("ozk dialect not registered")
 }

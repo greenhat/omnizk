@@ -1,5 +1,6 @@
 use apint::ApInt;
 use apint::Int;
+use apint::UInt;
 use apint::Width;
 use derive_more::Display;
 use derive_more::From;
@@ -177,4 +178,10 @@ pub fn apint_to_i32(value: ApInt) -> i32 {
     let i = Int::from(value);
     #[allow(clippy::expect_used)]
     i.try_to_i32().expect("32-bit integer")
+}
+
+pub fn apint_to_u32(value: ApInt) -> u32 {
+    let i = UInt::from(value);
+    #[allow(clippy::expect_used)]
+    i.try_to_u32().expect("unsigned 32-bit integer")
 }

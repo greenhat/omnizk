@@ -16,6 +16,7 @@ use pliron::operation::Operation;
 use pliron::with_context::AttachContext;
 
 use crate::op_interfaces::HasOperands;
+use crate::op_interfaces::TrackedProgramCounter;
 use crate::types::Mersenne31;
 use crate::types::Operands;
 
@@ -170,11 +171,17 @@ impl SymbolOpInterface for FuncOp {}
 impl DisplayWithContext for FuncOp {
     fn fmt(&self, ctx: &Context, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let region = self.get_region(ctx).with_ctx(ctx).to_string();
+        let pc_str = if let Some(pc) = self.get_pc_opt(ctx) {
+            format!(" pc={}", pc)
+        } else {
+            "".to_string()
+        };
         write!(
             f,
-            "{} @{} {{\n{}}}",
+            "{} @{}{} {{\n{}}}",
             self.get_opid().with_ctx(ctx),
             self.get_symbol_name(ctx),
+            pc_str,
             indent::indent_all_by(2, region),
         )
     }
