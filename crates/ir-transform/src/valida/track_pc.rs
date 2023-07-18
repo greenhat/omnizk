@@ -48,7 +48,6 @@ impl RewritePattern for ValidaTrackProgramCounter {
             .downcast::<ProgramOp>() else {
             return Ok(false);
         };
-        dbg!("ValidaTrackProgramCounter");
         let mut ops = Vec::new();
         program_op
             .get_operation()
@@ -58,10 +57,8 @@ impl RewritePattern for ValidaTrackProgramCounter {
             });
         let mut pc: u32 = 0;
         for op in ops {
-            dbg!(pc);
             let op_op = op.deref(ctx).get_op(ctx);
             if let Some(tracked_op) = op_cast::<dyn TrackedProgramCounter>(op_op.as_ref()) {
-                dbg!(pc);
                 tracked_op.set_pc(ctx, pc.into());
             }
             if let Some(custom_pc_change_op) =

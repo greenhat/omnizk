@@ -24,7 +24,7 @@ fn test_smoke_ir() {
                 valida.sw 0 4(fp) -24(fp) 0 0
                 valida.exit
               block_4_1():
-                valida.func @main {
+                valida.func @main pc=4 {
                   entry():
                     valida.imm32 -4(fp) 0 0 0 1
                     valida.imm32 -8(fp) 0 0 0 2
@@ -64,7 +64,7 @@ fn test_smoke_add() {
                 valida.sw 0 4(fp) -24(fp) 0 0
                 valida.exit
               block_4_1():
-                valida.func @main {
+                valida.func @main pc=4 {
                   entry():
                     valida.imm32 -4(fp) 0 0 0 3
                     valida.imm32 -8(fp) 0 0 0 4

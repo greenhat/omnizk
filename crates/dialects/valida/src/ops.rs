@@ -122,6 +122,10 @@ impl ProgramOp {
         #[allow(clippy::unwrap_used)]
         self.get_region(ctx).deref(ctx).get_tail().unwrap()
     }
+
+    pub fn get_func(&self, ctx: &Context, sym: &str) -> Option<FuncOp> {
+        todo!()
+    }
 }
 
 impl OneRegionInterface for ProgramOp {}
@@ -399,7 +403,7 @@ impl HasOperands for JalOp {}
 declare_op!(
     /// jump to address and link (symbolic name version)
     /// Store the pc + 1 to local stack variable at offset "a"
-    /// then set pc to the first instruction of a function with given symbolic name.
+    /// then set pc to the first instruction of a function/block with given symbolic name.
     /// Set fp to fp + c.
     JalSymOp,
     "jalsym",
@@ -426,8 +430,8 @@ impl JalSymOp {
         jalv_op
     }
 
-    /// Get the target function symbol
-    pub fn get_func_sym(&self, ctx: &Context) -> String {
+    /// Get the target symbol
+    pub fn get_target_sym(&self, ctx: &Context) -> String {
         let op = self.get_operation().deref(ctx);
         #[allow(clippy::expect_used)]
         let func_sym_attr = op
@@ -452,7 +456,7 @@ impl DisplayWithContext for JalSymOp {
             "{} {}(fp) {} {} {} {}",
             self.get_opid().with_ctx(ctx),
             operands.a(),
-            self.get_func_sym(ctx),
+            self.get_target_sym(ctx),
             operands.c(),
             operands.d(),
             operands.e()

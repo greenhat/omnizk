@@ -72,6 +72,12 @@ pub struct FramePointer(i32);
 #[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, From, Into, Display)]
 pub struct ProgramCounter(u32);
 
+impl From<ProgramCounter> for i32 {
+    fn from(value: ProgramCounter) -> Self {
+        value.0 as i32
+    }
+}
+
 #[derive(Copy, Clone, Default, Display, PartialEq, Eq)]
 pub struct Mersenne31(i32);
 
@@ -124,6 +130,10 @@ impl Operands {
 
     pub fn b(&self) -> Mersenne31 {
         self.0[1]
+    }
+
+    pub fn set_b(&mut self, value: i32) {
+        self.0[1] = Mersenne31(value);
     }
 
     pub fn c(&self) -> Mersenne31 {

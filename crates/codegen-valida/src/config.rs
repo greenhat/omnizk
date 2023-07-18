@@ -3,6 +3,7 @@
 use c2zk_ir_transform::valida::lowering::arith_op_lowering::WasmToValidaArithLoweringPass;
 use c2zk_ir_transform::valida::lowering::func_lowering::WasmToValidaFuncLoweringPass;
 use c2zk_ir_transform::valida::lowering::module_lowering::WasmToValidaModuleLoweringPass;
+use c2zk_ir_transform::valida::lowering::resolve_target_sym_to_pc::ValidaResolveTargetSymToPcPass;
 use c2zk_ir_transform::valida::lowering::WasmToValidaFinalLoweringPass;
 use c2zk_ir_transform::valida::track_pc::ValidaTrackProgramCounterPass;
 use c2zk_ir_transform::wasm::resolve_call_op::WasmCallOpToOzkCallOpPass;
@@ -23,6 +24,7 @@ impl Default for ValidaTargetConfig {
         pass_manager.add_pass(Box::<WasmToValidaFuncLoweringPass>::default());
         pass_manager.add_pass(Box::<WasmToValidaModuleLoweringPass>::default());
         pass_manager.add_pass(Box::<ValidaTrackProgramCounterPass>::default());
+        pass_manager.add_pass(Box::<ValidaResolveTargetSymToPcPass>::default());
         // pass_manager.add_pass(Box::<WasmToValidaFinalLoweringPass>::default());
         Self { pass_manager }
     }
