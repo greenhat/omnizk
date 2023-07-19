@@ -23,6 +23,8 @@ derive_more = { workspace = true }
 itertools = { workspace = true }
 anyhow = { workspace = true }
 bounded-vec = { workspace = true }
+topological-sort = { workspace = true }
+thiserror = { workspace = true }
 
 [dev-dependencies]
 ozk-frontend-wasm = { workspace = true }

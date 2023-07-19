@@ -81,30 +81,24 @@ fn convert_call_ops(
     );
     for call_op in call_ops {
         let wasm_stack_depth_before_op = call_op.get_stack_depth(ctx);
-        let last_stack_value_fp_offset: i32 = fp_from_wasm_stack(wasm_stack_depth_before_op).into();
+        let fp_last_stack_height: i32 = fp_from_wasm_stack(wasm_stack_depth_before_op).into();
+        // 12 is the stack frame size (return fp + return value + return address)
+        let fp_for_return_addrr = fp_last_stack_height - 12;
+        let return_fp_value = fp_for_return_addrr + 8;
         let imm32_op = valida::ops::Imm32Op::new_unlinked(
             ctx,
-            Operands::from_i32(
-                last_stack_value_fp_offset + 8,
-                0,
-                0,
-                0,
-                last_stack_value_fp_offset,
-            ),
+            Operands::from_i32(return_fp_value, 0, 0, 0, -fp_for_return_addrr),
         );
         rewriter.set_insertion_point(call_op.get_operation());
         rewriter.insert_before(ctx, imm32_op.get_operation())?;
         let jalsym_op = valida::ops::JalSymOp::new_unlinked(
             ctx,
-            Operands::from_i32(
-                last_stack_value_fp_offset,
-                0,
-                0,
-                0,
-                last_stack_value_fp_offset,
-            ),
+            Operands::from_i32(fp_for_return_addrr, 0, fp_for_return_addrr, 0, 0),
             call_op.get_func_sym(ctx),
         );
+        // todo!("jal in entry block is wrong(4 instead of main's 9. This makes first sw in add fail");
+        // todo!("anyway, even afte the sw fix, the fp is not in sync with wasm stack (wasm call + 1 and valida call + 3");
+        // TODO: don't use valida calling convention? (swap "return FP" and "Return value")
         rewriter.replace_op_with(ctx, call_op.get_operation(), jalsym_op.get_operation())?;
     }
     Ok(())
