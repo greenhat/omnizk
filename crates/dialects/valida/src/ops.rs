@@ -124,7 +124,15 @@ impl ProgramOp {
     }
 
     pub fn get_func(&self, ctx: &Context, sym: &str) -> Option<FuncOp> {
-        todo!()
+        for func_op in self.get_funcs_block(ctx).deref(ctx).iter(ctx) {
+            let deref_func_op = func_op.deref(ctx).get_op(ctx);
+            if let Some(func_op) = deref_func_op.downcast_ref::<FuncOp>() {
+                if func_op.get_symbol_name(ctx) == sym {
+                    return Some(*func_op);
+                }
+            }
+        }
+        None
     }
 }
 

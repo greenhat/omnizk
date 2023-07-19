@@ -109,7 +109,7 @@ fn test_smoke_func_call() {
                 valida.sw 0 4(fp) -24(fp) 0 0
                 valida.exit
               block_5_2():
-                valida.func @add {
+                valida.func @add pc=4 {
                   entry():
                     valida.sw 0 -4(fp) 12(fp) 0 0
                     valida.sw 0 -8(fp) 16(fp) 0 0
@@ -117,12 +117,12 @@ fn test_smoke_func_call() {
                     valida.sw 0 4(fp) -4(fp) 0 0
                     valida.jalv -4(fp) 0(fp) 8(fp) 0 0
                 }
-                valida.func @main {
+                valida.func @main pc=9 {
                   entry():
                     valida.imm32 -4(fp) 0 0 0 3
                     valida.imm32 -8(fp) 0 0 0 4
                     valida.imm32 0(fp) 0 0 0 -8
-                    valida.jalsym -8(fp) add 0 0 -8
+                    valida.jal -8(fp) 4 0 0 -8
                     valida.sw 0 4(fp) -8(fp) 0 0
                     valida.jalv -4(fp) 0(fp) 8(fp) 0 0
                 }
