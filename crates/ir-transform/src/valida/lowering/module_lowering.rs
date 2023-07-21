@@ -74,7 +74,8 @@ fn build_prog_entry_block(ctx: &mut Context, main_func_sym: String) -> Ptr<Basic
     let size_of_current_stack = 16;
     let call_frame_size = 12;
     let b = size_of_current_stack + call_frame_size;
-    let imm32_op = valida::ops::Imm32Op::new_unlinked(ctx, Operands::from_i32(-b + 8, 0, 0, 0, b));
+    // let imm32_op = valida::ops::Imm32Op::new_unlinked(ctx, Operands::from_i32(-b + 8, 0, 0, 0, b));
+    let imm32_op = valida::ops::Imm32Op::new_unlinked(ctx, Operands::from_i32(-b + 4, 0, 0, 0, b));
     imm32_op.get_operation().insert_at_back(bb, ctx);
     let jal_op = valida::ops::JalSymOp::new_unlinked(
         ctx,
@@ -82,7 +83,10 @@ fn build_prog_entry_block(ctx: &mut Context, main_func_sym: String) -> Ptr<Basic
         main_func_sym,
     );
     jal_op.get_operation().insert_at_back(bb, ctx);
-    let sw_op = valida::ops::SwOp::new_unlinked(ctx, Operands::from_i32(0, 4, -24, 0, 0));
+    // let sw_op = valida::ops::SwOp::new_unlinked(ctx, Operands::from_i32(0, 4, -24, 0, 0));
+    // todo!("return op should sw the return value in arg 1 fp place and 'return jalv' should set the fp accordingly");
+    // TODO: it means that return op should know the arg number of the function it exits
+    let sw_op = valida::ops::SwOp::new_unlinked(ctx, Operands::from_i32(0, 4, -20, 0, 0));
     sw_op.get_operation().insert_at_back(bb, ctx);
     let exit_op = valida::ops::ExitOp::new_unlinked(ctx);
     exit_op.get_operation().insert_at_back(bb, ctx);

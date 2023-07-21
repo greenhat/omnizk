@@ -283,7 +283,8 @@ impl JalvOp {
         let operands = Operands::from_i32(
             -4, // pc + 1
             0,  // pc
-            8,  // fp + 8
+            // 8,  // fp + 8
+            4, // fp + 4
             0, 0,
         );
         jalv_op.set_operands(ctx, operands);

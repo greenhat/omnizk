@@ -117,9 +117,9 @@ mod tests {
             expect![[r#"
                 valida.program {
                   entry():
-                    valida.imm32 -20(fp) 0 0 0 28
+                    valida.imm32 -24(fp) 0 0 0 28
                     valida.jalsym -28(fp) main -28 0 0
-                    valida.sw 0 4(fp) -24(fp) 0 0
+                    valida.sw 0 4(fp) -20(fp) 0 0
                     valida.exit
                   block_5_2():
                     valida.func @add pc=4 {
@@ -127,17 +127,17 @@ mod tests {
                         valida.sw 0 -4(fp) 12(fp) 0 0
                         valida.sw 0 -8(fp) 16(fp) 0 0
                         valida.add -4(fp) -8(fp) -4(fp) 0 0
-                        valida.sw 0 4(fp) -4(fp) 0 0
-                        valida.jalv -4(fp) 0(fp) 8(fp) 0 0
+                        valida.sw 0 16(fp) -4(fp) 0 0
+                        valida.jalv -4(fp) 0(fp) 4(fp) 0 0
                     }
                     valida.func @main pc=9 {
                       entry():
                         valida.imm32 -4(fp) 0 0 0 3
                         valida.imm32 -8(fp) 0 0 0 4
-                        valida.imm32 -12(fp) 0 0 0 20
+                        valida.imm32 -16(fp) 0 0 0 20
                         valida.jalsym -20(fp) add -20 0 0
-                        valida.sw 0 4(fp) -8(fp) 0 0
-                        valida.jalv -4(fp) 0(fp) 8(fp) 0 0
+                        valida.sw 0 8(fp) -4(fp) 0 0
+                        valida.jalv -4(fp) 0(fp) 4(fp) 0 0
                     }
                 }"#]],
         )

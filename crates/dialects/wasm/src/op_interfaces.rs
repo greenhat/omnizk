@@ -63,10 +63,13 @@ pub trait StackDepthChange: Op {
 #[intertrait::cast_to]
 impl TrackedStackDepth for ozk_ozk_dialect::ops::CallOp {}
 
+#[intertrait::cast_to]
 impl StackDepthChange for ozk_ozk_dialect::ops::CallOp {
     fn get_stack_depth_change(&self, ctx: &Context) -> i32 {
         let func_type = self.get_func_type(ctx);
-        -(func_type.get_inputs().len() as i32) + func_type.get_results().len() as i32
+        let change = -(func_type.get_inputs().len() as i32) + func_type.get_results().len() as i32;
+        // dbg!(change);
+        change
     }
 }
 

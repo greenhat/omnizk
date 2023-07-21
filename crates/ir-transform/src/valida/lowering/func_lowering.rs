@@ -82,9 +82,19 @@ fn convert_call_ops(
     for call_op in call_ops {
         let wasm_stack_depth_before_op = call_op.get_stack_depth(ctx);
         let fp_last_stack_height: i32 = fp_from_wasm_stack(wasm_stack_depth_before_op).into();
-        // 12 is the stack frame size (return fp + return value + return address)
+        // 12 is the stack frame size (return value + return fp + return address)
+        // Call convention for wasm:
+        // arg1
+        // arg2
+        // Return value (if no args, otherwise in arg1)
+        // Return FP
+        // Return address (current FP for callee)
+        // Local 1
+        // ...
+        // Local n
+        let new_fp_value = fp_last_stack_height - 12;
+        let return_fp_value = new_fp_value + 4;
         let fp_for_return_addrr = fp_last_stack_height - 12;
-        let return_fp_value = fp_for_return_addrr + 8;
         let imm32_op = valida::ops::Imm32Op::new_unlinked(
             ctx,
             Operands::from_i32(return_fp_value, 0, 0, 0, -fp_for_return_addrr),
@@ -93,11 +103,10 @@ fn convert_call_ops(
         rewriter.insert_before(ctx, imm32_op.get_operation())?;
         let jalsym_op = valida::ops::JalSymOp::new_unlinked(
             ctx,
-            Operands::from_i32(fp_for_return_addrr, 0, fp_for_return_addrr, 0, 0),
+            Operands::from_i32(new_fp_value, 0, new_fp_value, 0, 0),
             call_op.get_func_sym(ctx),
         );
-        // todo!("jal in entry block is wrong(4 instead of main's 9. This makes first sw in add fail");
-        // todo!("anyway, even afte the sw fix, the fp is not in sync with wasm stack (wasm call + 1 and valida call + 3");
+        // todo!("anyway, even afte the sw fix, the fp is not in sync with wasm stack (wasm call for add is -1 and valida call + 3");
         // TODO: don't use valida calling convention? (swap "return FP" and "Return value")
         rewriter.replace_op_with(ctx, call_op.get_operation(), jalsym_op.get_operation())?;
     }
@@ -121,7 +130,9 @@ fn convert_return_ops(
         // if wasm_func_op.get_type_typed(ctx).get_results().len() == 1 {
         let wasm_stack_depth_before_op = return_op.get_stack_depth(ctx);
         let last_stack_value_fp_offset = fp_from_wasm_stack(wasm_stack_depth_before_op);
-        let return_value_fp_offset = 4;
+        // let return_value_fp_offset = 4;
+        let func_arg_num: i32 = wasm_func_op.get_type(ctx).get_inputs().len() as i32;
+        let return_value_fp_offset = 8 + func_arg_num * 4; // Arg 1 cell, or new cell after
         let sw_op = valida::ops::SwOp::new_unlinked(
             ctx,
             Operands::from_i32(
@@ -137,6 +148,7 @@ fn convert_return_ops(
         // } else {
         //     todo!("wasm.func -> valida: multiple return values are not supported yet");
         // }
+        // let c = 12 - (-func_arg_num + wasm_func_op.get_type(ctx).get_results().len() as i32) * 4;
         let ret_op = valida::ops::JalvOp::new_return_pseudo_op(ctx);
         rewriter.replace_op_with(ctx, return_op.get_operation(), ret_op.get_operation())?;
     }
@@ -210,16 +222,16 @@ mod tests {
                         valida.sw 0 -4(fp) 12(fp) 0 0
                         valida.sw 0 -8(fp) 16(fp) 0 0
                         wasm.add
-                        valida.sw 0 4(fp) -4(fp) 0 0
-                        valida.jalv -4(fp) 0(fp) 8(fp) 0 0
+                        valida.sw 0 16(fp) -4(fp) 0 0
+                        valida.jalv -4(fp) 0(fp) 4(fp) 0 0
                     }
                     valida.func @main {
                       entry():
                         wasm.const 0x3: si32
                         wasm.const 0x4: si32
                         wasm.call 0
-                        valida.sw 0 4(fp) -8(fp) 0 0
-                        valida.jalv -4(fp) 0(fp) 8(fp) 0 0
+                        valida.sw 0 8(fp) -8(fp) 0 0
+                        valida.jalv -4(fp) 0(fp) 4(fp) 0 0
                     }
                 }"#]],
         )
