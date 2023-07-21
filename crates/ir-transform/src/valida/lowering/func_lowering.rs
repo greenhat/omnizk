@@ -92,22 +92,20 @@ fn convert_call_ops(
         // Local 1
         // ...
         // Local n
-        let new_fp_value = fp_last_stack_height - 12;
-        let return_fp_value = new_fp_value + 4;
-        let fp_for_return_addrr = fp_last_stack_height - 12;
+        let fp_for_return_address = fp_last_stack_height - 12;
+        let return_fp_value = fp_for_return_address + 4;
+        let fp_to_restore_after_call = fp_last_stack_height - 12;
         let imm32_op = valida::ops::Imm32Op::new_unlinked(
             ctx,
-            Operands::from_i32(return_fp_value, 0, 0, 0, -fp_for_return_addrr),
+            Operands::from_i32(return_fp_value, 0, 0, 0, -fp_to_restore_after_call),
         );
         rewriter.set_insertion_point(call_op.get_operation());
         rewriter.insert_before(ctx, imm32_op.get_operation())?;
         let jalsym_op = valida::ops::JalSymOp::new_unlinked(
             ctx,
-            Operands::from_i32(new_fp_value, 0, new_fp_value, 0, 0),
+            Operands::from_i32(fp_for_return_address, 0, fp_for_return_address, 0, 0),
             call_op.get_func_sym(ctx),
         );
-        // todo!("anyway, even afte the sw fix, the fp is not in sync with wasm stack (wasm call for add is -1 and valida call + 3");
-        // TODO: don't use valida calling convention? (swap "return FP" and "Return value")
         rewriter.replace_op_with(ctx, call_op.get_operation(), jalsym_op.get_operation())?;
     }
     Ok(())
