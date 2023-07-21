@@ -265,14 +265,7 @@ impl SingleBlockRegionInterface for ModuleOp {}
 impl SymbolOpInterface for ModuleOp {}
 
 declare_op!(
-    /// An operation with a name containing a single region.
-    ///
-    /// Attributes:
-    ///
-    /// | key | value |
-    /// |-----|-------|
-    /// | [ATTR_KEY_SYM_NAME](super::ATTR_KEY_SYM_NAME) | [StringAttr](super::attributes::StringAttr) |
-    /// | [ATTR_KEY_FUNC_TYPE](FuncOp::ATTR_KEY_FUNC_TYPE) | [TypeAttr](super::attributes::TypeAttr) |
+    /// Function
     FuncOp,
     "func",
     "wasm"
@@ -281,14 +274,7 @@ declare_op!(
 impl FuncOp {
     /// Attribute key for the function type
     pub const ATTR_KEY_FUNC_TYPE: &str = "func.type";
-
-    /// Create a new [FuncOp].
-    /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
-    /// The returned function has a single region with an empty `entry` block.
-    pub fn new_unlinked(ctx: &mut Context, name: FuncSym, ty: Ptr<TypeObj>) -> FuncOp {
-        let body = BasicBlock::new(ctx, Some("entry".to_string()), vec![]);
-        Self::new_unlinked_with_block(ctx, name, ty, body)
-    }
+    pub const ATTR_KEY_FUNC_LOCALS: &str = "func.locals";
 
     /// Create a new [FuncOp].
     /// The underlying [Operation] is not linked to a [BasicBlock](crate::basic_block::BasicBlock).
@@ -298,13 +284,17 @@ impl FuncOp {
         name: FuncSym,
         ty: Ptr<TypeObj>,
         entry_block: Ptr<BasicBlock>,
+        locals: Vec<Ptr<TypeObj>>,
     ) -> FuncOp {
         let ty_attr = TypeAttr::create(ty);
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
         {
             let opref = &mut *op.deref_mut(ctx);
-            // Set function type attributes.
             opref.attributes.insert(Self::ATTR_KEY_FUNC_TYPE, ty_attr);
+            opref.attributes.insert(
+                Self::ATTR_KEY_FUNC_LOCALS,
+                VecAttr::create(locals.into_iter().map(TypeAttr::create).collect()),
+            );
         }
         let opop = FuncOp { op };
         // Create an empty entry block.
@@ -349,6 +339,27 @@ impl FuncOp {
             .deref(ctx)
             .iter(ctx)
             .flat_map(|bb| bb.deref(ctx).iter(ctx))
+    }
+
+    /// Get the local variables types
+    pub fn get_locals(&self, ctx: &Context) -> Vec<Ptr<TypeObj>> {
+        let self_op = self.get_operation().deref(ctx);
+        let v_attr = self_op
+            .attributes
+            .get(Self::ATTR_KEY_FUNC_LOCALS)
+            .expect("FuncOp has no locals attribute");
+        v_attr
+            .downcast_ref::<VecAttr>()
+            .expect("FuncOp locals attribute is not a VecAttr")
+            .0
+            .iter()
+            .map(|attr: &AttrObj| {
+                attr.downcast_ref::<TypeAttr>()
+                    .expect("FuncOp local is not a TypeAttr")
+                    .clone()
+                    .get_type()
+            })
+            .collect()
     }
 }
 

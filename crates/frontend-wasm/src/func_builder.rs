@@ -53,8 +53,13 @@ impl FuncBuilder {
         })?;
         match self.blocks.pop() {
             Some(BlockBuilder::FuncEntryBlock(entry_bb)) => {
-                let func_op =
-                    FuncOp::new_unlinked_with_block(ctx, self.name.clone(), sig, entry_bb);
+                let func_op = FuncOp::new_unlinked_with_block(
+                    ctx,
+                    self.name.clone(),
+                    sig,
+                    entry_bb,
+                    self.locals,
+                );
                 Ok(func_op)
             }
             _ => todo!("error"),

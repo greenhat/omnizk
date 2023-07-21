@@ -19,7 +19,9 @@ impl Default for ValidaTargetConfig {
     fn default() -> Self {
         let mut pass_manager = PassManager::new();
         pass_manager.add_pass(Box::<WasmCallOpToOzkCallOpPass>::default());
-        pass_manager.add_pass(Box::<WasmTrackStackDepthPass>::default());
+        pass_manager.add_pass(Box::new(
+            WasmTrackStackDepthPass::new_reserve_space_for_locals(),
+        ));
         pass_manager.add_pass(Box::<WasmToValidaArithLoweringPass>::default());
         pass_manager.add_pass(Box::<WasmToValidaFuncLoweringPass>::default());
         pass_manager.add_pass(Box::<WasmToValidaModuleLoweringPass>::default());

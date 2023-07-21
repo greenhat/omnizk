@@ -194,7 +194,7 @@ mod tests {
     fn func_op_lowering() {
         check_wasm_valida_passes(
             vec![
-                Box::<WasmTrackStackDepthPass>::default(),
+                Box::new(WasmTrackStackDepthPass::new_reserve_space_for_locals()),
                 Box::<WasmToValidaFuncLoweringPass>::default(),
             ],
             r#"

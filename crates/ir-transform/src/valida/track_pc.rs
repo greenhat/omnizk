@@ -93,7 +93,7 @@ mod tests {
         check_wasm_valida_passes(
             vec![
                 Box::<WasmCallOpToOzkCallOpPass>::default(),
-                Box::<WasmTrackStackDepthPass>::default(),
+                Box::new(WasmTrackStackDepthPass::new_reserve_space_for_locals()),
                 Box::<WasmToValidaArithLoweringPass>::default(),
                 Box::<WasmToValidaFuncLoweringPass>::default(),
                 Box::<WasmToValidaModuleLoweringPass>::default(),
