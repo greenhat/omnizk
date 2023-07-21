@@ -27,7 +27,7 @@ impl Default for ValidaTargetConfig {
         pass_manager.add_pass(Box::<WasmToValidaModuleLoweringPass>::default());
         pass_manager.add_pass(Box::<ValidaTrackProgramCounterPass>::default());
         pass_manager.add_pass(Box::<ValidaResolveTargetSymToPcPass>::default());
-        // pass_manager.add_pass(Box::<WasmToValidaFinalLoweringPass>::default());
+        pass_manager.add_pass(Box::<WasmToValidaFinalLoweringPass>::default());
         Self { pass_manager }
     }
 }

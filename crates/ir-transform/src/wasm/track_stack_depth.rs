@@ -69,10 +69,10 @@ impl RewritePattern for WasmWriteStackDepth {
             panic!("unexpected op {}", op.deref(ctx).with_ctx(ctx));
         };
         let mut stack_depth: i32 = if self.reserve_space_for_locals {
-            0
-        } else {
             // reserve space for local variables
             func_op.get_locals(ctx).len() as i32
+        } else {
+            0
         };
         let mut ops = Vec::new();
         func_op

@@ -985,7 +985,7 @@ impl LocalSetOp {
     pub const ATTR_KEY_INDEX: &str = "local.set.index";
 
     /// Get the index of the local variable.
-    pub fn get_index(&self, ctx: &Context) -> AttrObj {
+    pub fn get_index_attr(&self, ctx: &Context) -> AttrObj {
         let op = self.get_operation().deref(ctx);
         #[allow(clippy::expect_used)]
         let value = op
@@ -993,6 +993,18 @@ impl LocalSetOp {
             .get(Self::ATTR_KEY_INDEX)
             .expect("no attribute found");
         attribute::clone::<IntegerAttr>(value)
+    }
+
+    /// Get the index of the local variable.
+    pub fn get_index(&self, ctx: &Context) -> LocalIndex {
+        let attr = self.get_index_attr(ctx);
+        let value_u32 = apint_to_i32(
+            attr.downcast_ref::<IntegerAttr>()
+                .expect("index is not an IntegerAttr")
+                .clone()
+                .into(),
+        ) as u32;
+        value_u32.into()
     }
 
     /// Create a new [LocalSetOp].
@@ -1013,14 +1025,14 @@ impl DisplayWithContext for LocalSetOp {
             f,
             "{} {}",
             self.get_opid().with_ctx(ctx),
-            self.get_index(ctx).with_ctx(ctx)
+            self.get_index_attr(ctx).with_ctx(ctx)
         )
     }
 }
 
 impl Verify for LocalSetOp {
     fn verify(&self, ctx: &Context) -> Result<(), CompilerError> {
-        let index = self.get_index(ctx);
+        let index = self.get_index_attr(ctx);
         if let Ok(index_attr) = index.downcast::<IntegerAttr>() {
             #[allow(clippy::unwrap_used)]
             if index_attr.get_type() != u32_type_unwrapped(ctx) {

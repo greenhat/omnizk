@@ -18,6 +18,7 @@ use pliron::rewrite::RewritePatternSet;
 use valida::types::Operands;
 use wasm::op_interfaces::TrackedStackDepth;
 use wasm::ops::LocalGetOp;
+use wasm::ops::LocalSetOp;
 use wasm::ops::ReturnOp;
 
 use crate::valida::fp_from_wasm_stack;
@@ -51,7 +52,7 @@ impl RewritePattern for FuncOpLowering {
             return Ok(false);
         };
 
-        convert_func_arg_access(wasm_func_op, ctx, rewriter)?;
+        convert_func_arg_and_locals(wasm_func_op, ctx, rewriter)?;
         convert_return_ops(wasm_func_op, ctx, rewriter)?;
         convert_call_ops(wasm_func_op, ctx, rewriter)?;
 
@@ -153,7 +154,7 @@ fn convert_return_ops(
     Ok(())
 }
 
-fn convert_func_arg_access(
+fn convert_func_arg_and_locals(
     wasm_func_op: &wasm::ops::FuncOp,
     ctx: &mut Context,
     rewriter: &mut dyn PatternRewriter,
@@ -167,16 +168,37 @@ fn convert_func_arg_access(
         });
     let fp_func_first_arg: i32 = 12;
     for local_get_op in local_get_ops {
-        let index: u32 = local_get_op.get_index(ctx).into();
-        if index < wasm_func_op.get_type(ctx).get_inputs().len() as u32 {
-            // this is function paramter
-            let wasm_stack_depth_before_op = local_get_op.get_stack_depth(ctx);
-            let from_fp: i32 = fp_func_first_arg + index as i32 * 4;
-            let to_fp: i32 = fp_from_wasm_stack(wasm_stack_depth_before_op.next()).into();
-            let sw_op =
-                valida::ops::SwOp::new_unlinked(ctx, Operands::from_i32(0, to_fp, from_fp, 0, 0));
-            rewriter.replace_op_with(ctx, local_get_op.get_operation(), sw_op.get_operation())?;
-        }
+        let zero_based_index: i32 = u32::from(local_get_op.get_index(ctx)) as i32;
+        let wasm_stack_depth_before_op = local_get_op.get_stack_depth(ctx);
+        let to_fp: i32 = fp_from_wasm_stack(wasm_stack_depth_before_op.next()).into();
+        let from_fp: i32 =
+            if zero_based_index < wasm_func_op.get_type(ctx).get_inputs().len() as i32 {
+                // this is function paramter
+                fp_func_first_arg + zero_based_index * 4
+            } else {
+                // this is a local variable
+                -(zero_based_index + 1) * 4
+            };
+        let sw_op =
+            valida::ops::SwOp::new_unlinked(ctx, Operands::from_i32(0, to_fp, from_fp, 0, 0));
+        rewriter.replace_op_with(ctx, local_get_op.get_operation(), sw_op.get_operation())?;
+    }
+
+    let mut local_set_ops = Vec::new();
+    wasm_func_op
+        .get_operation()
+        .walk_only::<LocalSetOp>(ctx, WalkOrder::PostOrder, &mut |op| {
+            local_set_ops.push(*op);
+            WalkResult::Advance
+        });
+    for local_set_op in local_set_ops {
+        let zero_based_index: i32 = u32::from(local_set_op.get_index(ctx)) as i32;
+        let wasm_stack_depth_before_op = local_set_op.get_stack_depth(ctx);
+        let from_fp: i32 = fp_from_wasm_stack(wasm_stack_depth_before_op).into();
+        let to_fp: i32 = -(zero_based_index + 1) * 4;
+        let sw_op =
+            valida::ops::SwOp::new_unlinked(ctx, Operands::from_i32(0, to_fp, from_fp, 0, 0));
+        rewriter.replace_op_with(ctx, local_set_op.get_operation(), sw_op.get_operation())?;
     }
     Ok(())
 }
@@ -186,6 +208,7 @@ mod tests {
     use expect_test::expect;
 
     use crate::tests_util::check_wasm_valida_passes;
+    use crate::valida::lowering::arith_op_lowering::WasmToValidaArithLoweringPass;
     use crate::wasm::track_stack_depth::WasmTrackStackDepthPass;
 
     use super::*;
@@ -229,6 +252,42 @@ mod tests {
                         wasm.const 0x4: si32
                         wasm.call 0
                         valida.sw 0 8(fp) -8(fp) 0 0
+                        valida.jalv -4(fp) 0(fp) 4(fp) 0 0
+                    }
+                }"#]],
+        )
+    }
+
+    #[test]
+    fn smoke_local_var_access() {
+        check_wasm_valida_passes(
+            vec![
+                Box::new(WasmTrackStackDepthPass::new_reserve_space_for_locals()),
+                Box::<WasmToValidaArithLoweringPass>::default(),
+                Box::<WasmToValidaFuncLoweringPass>::default(),
+            ],
+            r#"
+(module
+    (start $main)
+    (func $main
+        (local i32)
+        i32.const 3
+        i32.const 7
+        local.set 0
+        local.get 0
+        return)
+)
+        "#,
+            expect![[r#"
+                wasm.module @module_name {
+                  block_1_0():
+                    valida.func @main {
+                      entry():
+                        valida.imm32 -8(fp) 0 0 0 3
+                        valida.imm32 -12(fp) 0 0 0 7
+                        valida.sw 0 -4(fp) -12(fp) 0 0
+                        valida.sw 0 -12(fp) -4(fp) 0 0
+                        valida.sw 0 8(fp) -12(fp) 0 0
                         valida.jalv -4(fp) 0(fp) 4(fp) 0 0
                     }
                 }"#]],
