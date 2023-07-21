@@ -66,7 +66,7 @@ impl RewritePattern for ValidaResolveTargetSymToPc {
             let b = func_op.get_pc(ctx);
             let mut operands = jalsym_op.get_operands(ctx);
             operands.set_b(b.into());
-            let jal_op = valida::ops::JalOp::new_unlinked(ctx, operands);
+            let jal_op = valida::ops::JalOp::from_operands(ctx, operands);
             rewriter.replace_op_with(ctx, jalsym_op.get_operation(), jal_op.get_operation())?;
         }
 

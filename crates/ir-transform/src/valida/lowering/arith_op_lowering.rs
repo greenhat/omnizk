@@ -104,15 +104,11 @@ impl RewritePattern for ArithOpLowering {
             let wasm_stack_depth_before_op = wasm_add_op.get_stack_depth(ctx);
             // add wasm pops 2 values and pushes 1,
             // so the result ends up on the first argument stack slot
-            let a_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.minus1());
-            let b_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.top());
-            let c_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.minus1());
-            let a = a_fp.into();
-            let b = b_fp.into();
-            let c = c_fp.into();
-            let d = 0;
-            let e = 0;
-            let add_op = valida::ops::AddOp::new_unlinked(ctx, Operands::from_i32(a, b, c, d, e));
+            let result_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.minus1());
+            let arg1_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.top());
+            let arg2_fp = fp_from_wasm_stack(wasm_stack_depth_before_op.minus1());
+            let add_op =
+                valida::ops::AddOp::new(ctx, result_fp.into(), arg1_fp.into(), arg2_fp.into());
             rewriter.replace_op_with(ctx, op, add_op.get_operation())?;
         }
         Ok(())

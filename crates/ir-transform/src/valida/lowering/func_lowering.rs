@@ -102,9 +102,10 @@ fn convert_call_ops(
         );
         rewriter.set_insertion_point(call_op.get_operation());
         rewriter.insert_before(ctx, imm32_op.get_operation())?;
-        let jalsym_op = valida::ops::JalSymOp::new_unlinked(
+        let jalsym_op = valida::ops::JalSymOp::new(
             ctx,
-            Operands::from_i32(fp_for_return_address, 0, fp_for_return_address, 0, 0),
+            fp_for_return_address,
+            fp_for_return_address,
             call_op.get_func_sym(ctx),
         );
         rewriter.replace_op_with(ctx, call_op.get_operation(), jalsym_op.get_operation())?;
@@ -132,15 +133,10 @@ fn convert_return_ops(
         // let return_value_fp_offset = 4;
         let func_arg_num: i32 = wasm_func_op.get_type(ctx).get_inputs().len() as i32;
         let return_value_fp_offset = 8 + func_arg_num * 4; // Arg 1 cell, or new cell after
-        let sw_op = valida::ops::SwOp::new_unlinked(
+        let sw_op = valida::ops::SwOp::new(
             ctx,
-            Operands::from_i32(
-                0,
-                return_value_fp_offset,
-                last_stack_value_fp_offset.into(),
-                0,
-                0,
-            ),
+            return_value_fp_offset,
+            last_stack_value_fp_offset.into(),
         );
         rewriter.set_insertion_point(return_op.get_operation());
         rewriter.insert_before(ctx, sw_op.get_operation())?;
@@ -179,8 +175,7 @@ fn convert_func_arg_and_locals(
                 // this is a local variable
                 -(zero_based_index + 1) * 4
             };
-        let sw_op =
-            valida::ops::SwOp::new_unlinked(ctx, Operands::from_i32(0, to_fp, from_fp, 0, 0));
+        let sw_op = valida::ops::SwOp::new(ctx, to_fp, from_fp);
         rewriter.replace_op_with(ctx, local_get_op.get_operation(), sw_op.get_operation())?;
     }
 
@@ -196,8 +191,7 @@ fn convert_func_arg_and_locals(
         let wasm_stack_depth_before_op = local_set_op.get_stack_depth(ctx);
         let from_fp: i32 = fp_from_wasm_stack(wasm_stack_depth_before_op).into();
         let to_fp: i32 = -(zero_based_index + 1) * 4;
-        let sw_op =
-            valida::ops::SwOp::new_unlinked(ctx, Operands::from_i32(0, to_fp, from_fp, 0, 0));
+        let sw_op = valida::ops::SwOp::new(ctx, to_fp, from_fp);
         rewriter.replace_op_with(ctx, local_set_op.get_operation(), sw_op.get_operation())?;
     }
     Ok(())

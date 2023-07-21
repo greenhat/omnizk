@@ -17,7 +17,6 @@ use pliron::with_context::AttachContext;
 
 use crate::op_interfaces::HasOperands;
 use crate::op_interfaces::TrackedProgramCounter;
-use crate::types::Mersenne31;
 use crate::types::Operands;
 
 declare_op!(
@@ -229,11 +228,15 @@ declare_op!(
 );
 
 impl AddOp {
-    /// Create a new [AddOp]. The underlying [Operation] is not linked to a
-    /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, operands: Operands) -> AddOp {
+    /// add two values
+    /// Compute the unchecked addition of the U32 values at cell offsets b and c
+    /// and write the sum to cell offset a.
+    /// Note that because a full 32-bit value does not fit within one field element,
+    /// we assume that values have been decomposed into 4 8-byte elements. The summed output is stored at cell offset a.
+    pub fn new(ctx: &mut Context, result_fp: i32, arg1_fp: i32, arg2_fp: i32) -> AddOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         let op_op = AddOp { op };
+        let operands = Operands::from_i32(result_fp, arg1_fp, arg2_fp, 0, 0);
         op_op.set_operands(ctx, operands);
         op_op
     }
@@ -327,11 +330,12 @@ declare_op!(
 );
 
 impl SwOp {
-    /// Create a new [SwOp]. The underlying [Operation] is not linked to a
-    /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, operands: Operands) -> SwOp {
+    /// Write the 4 byte values beginning at the address stroed at offset c
+    /// to those beginning at offset b.
+    pub fn new(ctx: &mut Context, to_fp: i32, from_fp: i32) -> SwOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         let op_op = SwOp { op };
+        let operands = Operands::from_i32(0, to_fp, from_fp, 0, 0);
         op_op.set_operands(ctx, operands);
         op_op
     }
@@ -375,9 +379,25 @@ declare_op!(
 impl JalOp {
     /// Create a new [JalOp]. The underlying [Operation] is not linked to a
     /// [BasicBlock](crate::basic_block::BasicBlock).
-    pub fn new_unlinked(ctx: &mut Context, operands: Operands) -> JalOp {
+    pub fn from_operands(ctx: &mut Context, operands: Operands) -> JalOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         let jalv_op = JalOp { op };
+        jalv_op.set_operands(ctx, operands);
+        jalv_op
+    }
+
+    /// Jump to address and link
+    /// Store the pc + 1 to local stack variable at offset "a" then set pc to field element "b".
+    /// Set fp to fp + c.
+    pub fn new_from_i32(
+        ctx: &mut Context,
+        fp_offset_for_pc_plus_1: i32,
+        new_pc: i32,
+        new_fp_offset: i32,
+    ) -> JalOp {
+        let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
+        let jalv_op = JalOp { op };
+        let operands = Operands::from_i32(fp_offset_for_pc_plus_1, new_pc, new_fp_offset, 0, 0);
         jalv_op.set_operands(ctx, operands);
         jalv_op
     }
@@ -420,21 +440,24 @@ declare_op!(
 );
 
 impl JalSymOp {
-    const ATTR_KEY_FUNC_SYM: &str = "jalsym.func_sym";
+    const ATTR_KEY_TARGET_SYM: &str = "jalsym.target_sym";
 
-    /// Create a new [JalSymOp]. The underlying [Operation] is not linked to a
-    /// [BasicBlock](crate::basic_block::BasicBlock).
-    /// Expected operands.b to be zero (unused) which later to be set to the first instruction pc of the given function.
-    pub fn new_unlinked(ctx: &mut Context, operands: Operands, func_sym: String) -> JalSymOp {
-        assert!(
-            operands.b() == Mersenne31::ZERO,
-            "expected operands.b to be zero"
-        );
+    /// jump to address and link (symbolic name version)
+    /// Store the pc + 1 to local stack variable at offset "a"
+    /// then set pc to the first instruction of a function/block with given symbolic name.
+    /// Set fp to fp + c.
+    pub fn new(
+        ctx: &mut Context,
+        fp_offset_for_pc_plus_1: i32,
+        new_fp_offset: i32,
+        target_sym: String,
+    ) -> JalSymOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 0);
         op.deref_mut(ctx)
             .attributes
-            .insert(Self::ATTR_KEY_FUNC_SYM, StringAttr::create(func_sym));
+            .insert(Self::ATTR_KEY_TARGET_SYM, StringAttr::create(target_sym));
         let jalv_op = JalSymOp { op };
+        let operands = Operands::from_i32(fp_offset_for_pc_plus_1, 0, new_fp_offset, 0, 0);
         jalv_op.set_operands(ctx, operands);
         jalv_op
     }
@@ -445,7 +468,7 @@ impl JalSymOp {
         #[allow(clippy::expect_used)]
         let func_sym_attr = op
             .attributes
-            .get(Self::ATTR_KEY_FUNC_SYM)
+            .get(Self::ATTR_KEY_TARGET_SYM)
             .expect("no attribute found");
         #[allow(clippy::expect_used)]
         let func_sym: String = func_sym_attr
