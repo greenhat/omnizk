@@ -1,7 +1,7 @@
 /*
-use c2zk_ir::ir::Func;
-use c2zk_ir::ir::Inst;
-use c2zk_ir::pass::IrPass;
+use ozk_ir::ir::Func;
+use ozk_ir::ir::Inst;
+use ozk_ir::pass::IrPass;
 
 #[derive(Default)]
 pub struct AndMinus8Pass;

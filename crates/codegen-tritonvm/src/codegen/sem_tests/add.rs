@@ -7,11 +7,11 @@ fn test_add() {
     let input = vec![11, 7];
     let secret_input = vec![3];
     let expected_output = vec![21];
-    let native_output = c2zk_rust_wasm_tests_helper::wrap_main_with_io(
-        &c2zk_rust_wasm_tests_add::add::main_add,
+    let native_output = ozk_rust_wasm_tests_helper::wrap_main_with_io(
+        &ozk_rust_wasm_tests_add::add::main_add,
     )(input.clone(), secret_input.clone());
     assert_eq!(native_output, expected_output);
-    let wasm_bytes = c2zk_rust_wasm_tests_helper::compile_rust_wasm_tests("add-bin", "add");
+    let wasm_bytes = ozk_rust_wasm_tests_helper::compile_rust_wasm_tests("add-bin", "add");
     check_wasm(
         &wasm_bytes,
         input,
@@ -23,9 +23,9 @@ fn test_add() {
               (type (;1;) (func (param i64)))
               (type (;2;) (func))
               (type (;3;) (func (param i64 i64) (result i64)))
-              (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
-              (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
-              (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
+              (import "env" "ozk_stdlib_pub_input" (func $ozk_stdlib_pub_input (;0;) (type 0)))
+              (import "env" "ozk_stdlib_pub_output" (func $ozk_stdlib_pub_output (;1;) (type 1)))
+              (import "env" "ozk_stdlib_secret_input" (func $ozk_stdlib_secret_input (;2;) (type 0)))
               (func $__main (;3;) (type 2)
                 call $main_add
               )
@@ -43,14 +43,14 @@ fn test_add() {
                 call $pub_output
               )
               (func $pub_input (;6;) (type 0) (result i64)
-                call $c2zk_stdlib_pub_input
+                call $ozk_stdlib_pub_input
               )
               (func $pub_output (;7;) (type 1) (param i64)
                 local.get 0
-                call $c2zk_stdlib_pub_output
+                call $ozk_stdlib_pub_output
               )
               (func $secret_input (;8;) (type 0) (result i64)
-                call $c2zk_stdlib_secret_input
+                call $ozk_stdlib_secret_input
               )
               (memory (;0;) 16)
               (global $__stack_pointer (;0;) (mut i32) i32.const 1048576)
@@ -69,10 +69,10 @@ fn test_add() {
         expect![[r#"
             call __main
             halt
-            c2zk_stdlib_pub_input:
+            ozk_stdlib_pub_input:
             read_io
             return
-            c2zk_stdlib_pub_output:
+            ozk_stdlib_pub_output:
             push 0
             call globals_get
             push -4
@@ -97,7 +97,7 @@ fn test_add() {
             push 0
             call globals_set
             return
-            c2zk_stdlib_secret_input:
+            ozk_stdlib_secret_input:
             divine
             return
             __main:
@@ -154,7 +154,7 @@ fn test_add() {
             call pub_output
             return
             pub_input:
-            call c2zk_stdlib_pub_input
+            call ozk_stdlib_pub_input
             return
             pub_output:
             push -1
@@ -173,7 +173,7 @@ fn test_add() {
             read_mem
             swap 1
             pop
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             push 0
             call globals_get
             push 4
@@ -182,7 +182,7 @@ fn test_add() {
             call globals_set
             return
             secret_input:
-            call c2zk_stdlib_secret_input
+            call ozk_stdlib_secret_input
             return
             init_mem_for_locals:
             push 00000000002147483647

@@ -1,5 +1,5 @@
 //! Performs translation from a wasm module in binary format to the in-memory form
-//! of c2zk IR.
+//! of ozk IR.
 
 // Coding conventions
 #![deny(unsafe_code)]
@@ -36,5 +36,5 @@ pub use crate::module_translator::parse_module;
 
 // Convenience reexport of the wasmparser crate that we're linking against,
 // since a number of types in `wasmparser` show up in the public API of
-// `c2zk-wasm`.
+// `ozk-wasm`.
 // pub use wasmparser;

@@ -30,10 +30,10 @@ fn test_globals_set_get() {
         expect![[r#"
             call main
             halt
-            c2zk_stdlib_pub_input:
+            ozk_stdlib_pub_input:
             read_io
             return
-            c2zk_stdlib_pub_output:
+            ozk_stdlib_pub_output:
             push -1
             call globals_get
             dup 0
@@ -59,7 +59,7 @@ fn test_globals_set_get() {
             push -1
             call globals_set
             return
-            c2zk_stdlib_secret_input:
+            ozk_stdlib_secret_input:
             divine
             return
             main:
@@ -87,7 +87,7 @@ fn test_globals_set_get() {
             read_mem
             swap 1
             pop
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             push -1
             call globals_get
             push 4

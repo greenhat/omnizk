@@ -1,7 +1,7 @@
 /*
-use c2zk_codegen_shared::CodegenError;
-use c2zk_codegen_shared::Target;
-use c2zk_ir::ir::Module;
+use ozk_codegen_shared::CodegenError;
+use ozk_codegen_shared::Target;
+use ozk_ir::ir::Module;
 use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::operation::Operation;

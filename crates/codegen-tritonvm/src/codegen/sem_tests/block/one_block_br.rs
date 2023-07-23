@@ -9,25 +9,25 @@ fn test_one_block_br() {
     let expected_output = vec![3, 7];
     check_wat(
         r#"
-(module 
+(module
     (type (;0;) (func (result i64)))
     (type (;1;) (func (param i64)))
     (type (;2;) (func))
-    (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
-    (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
-    (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
+    (import "env" "ozk_stdlib_pub_input" (func $ozk_stdlib_pub_input (;0;) (type 0)))
+    (import "env" "ozk_stdlib_pub_output" (func $ozk_stdlib_pub_output (;1;) (type 1)))
+    (import "env" "ozk_stdlib_secret_input" (func $ozk_stdlib_secret_input (;2;) (type 0)))
     (export "main" (func $main))
     (start $main)
-    (func $main 
-        block 
+    (func $main
+        block
           i64.const 3
-          call $c2zk_stdlib_pub_output
+          call $ozk_stdlib_pub_output
           br 0
           i64.const 4
-          call $c2zk_stdlib_pub_output
+          call $ozk_stdlib_pub_output
         end
         i64.const 7
-        call $c2zk_stdlib_pub_output
+        call $ozk_stdlib_pub_output
         return)
 )"#,
         input,
@@ -45,7 +45,7 @@ fn test_one_block_br() {
             write_mem
             pop
             return
-            c2zk_stdlib_pub_output:
+            ozk_stdlib_pub_output:
             push 0
             call globals_get
             push -4
@@ -83,7 +83,7 @@ fn test_one_block_br() {
             call init_mem_for_locals
             call main_l0_b0
             push 7
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             return
             return
             init_mem_for_locals:
@@ -93,10 +93,10 @@ fn test_one_block_br() {
             return
             main_l0_b0:
             push 3
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             return
             push 4
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             return"#]],
     );
 }

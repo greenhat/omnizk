@@ -1,13 +1,13 @@
 #![allow(unused_imports)]
 
-use c2zk_ir_transform::valida::lowering::arith_op_lowering::WasmToValidaArithLoweringPass;
-use c2zk_ir_transform::valida::lowering::func_lowering::WasmToValidaFuncLoweringPass;
-use c2zk_ir_transform::valida::lowering::module_lowering::WasmToValidaModuleLoweringPass;
-use c2zk_ir_transform::valida::lowering::resolve_target_sym_to_pc::ValidaResolveTargetSymToPcPass;
-use c2zk_ir_transform::valida::lowering::WasmToValidaFinalLoweringPass;
-use c2zk_ir_transform::valida::track_pc::ValidaTrackProgramCounterPass;
-use c2zk_ir_transform::wasm::resolve_call_op::WasmCallOpToOzkCallOpPass;
-use c2zk_ir_transform::wasm::track_stack_depth::WasmTrackStackDepthPass;
+use ozk_ir_transform::valida::lowering::arith_op_lowering::WasmToValidaArithLoweringPass;
+use ozk_ir_transform::valida::lowering::func_lowering::WasmToValidaFuncLoweringPass;
+use ozk_ir_transform::valida::lowering::module_lowering::WasmToValidaModuleLoweringPass;
+use ozk_ir_transform::valida::lowering::resolve_target_sym_to_pc::ValidaResolveTargetSymToPcPass;
+use ozk_ir_transform::valida::lowering::WasmToValidaFinalLoweringPass;
+use ozk_ir_transform::valida::track_pc::ValidaTrackProgramCounterPass;
+use ozk_ir_transform::wasm::resolve_call_op::WasmCallOpToOzkCallOpPass;
+use ozk_ir_transform::wasm::track_stack_depth::WasmTrackStackDepthPass;
 use pliron::context::Context;
 use pliron::pass::PassManager;
 

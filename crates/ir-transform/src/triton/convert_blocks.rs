@@ -1,17 +1,17 @@
 /*
-use c2zk_frontend_shared::FuncBuilder;
-use c2zk_ir::ir::ext::TritonExt;
-use c2zk_ir::ir::BlockKind;
-use c2zk_ir::ir::Func;
-use c2zk_ir::ir::FuncIndex;
-use c2zk_ir::ir::FuncType;
-use c2zk_ir::ir::GlobalIndex;
-use c2zk_ir::ir::Inst;
-use c2zk_ir::ir::Module;
-use c2zk_ir::ir::Ty;
-use c2zk_ir::pass::IrPass;
+use ozk_frontend_shared::FuncBuilder;
+use ozk_ir::ir::ext::TritonExt;
+use ozk_ir::ir::BlockKind;
+use ozk_ir::ir::Func;
+use ozk_ir::ir::FuncIndex;
+use ozk_ir::ir::FuncType;
+use ozk_ir::ir::GlobalIndex;
+use ozk_ir::ir::Inst;
+use ozk_ir::ir::Module;
+use ozk_ir::ir::Ty;
+use ozk_ir::pass::IrPass;
 
-// TODO: since it's Triton specific, rename and/or move it to c2zk_ir_transform_tritonvm?
+// TODO: since it's Triton specific, rename and/or move it to ozk_ir_transform_tritonvm?
 pub struct BlocksToFuncPass;
 
 impl Default for BlocksToFuncPass {

@@ -1,11 +1,11 @@
 #![allow(unused_imports)]
 
-use c2zk_ir_transform::miden::lowering::call_op_lowering::WasmToMidenCallOpLoweringPass;
-use c2zk_ir_transform::miden::lowering::WasmToMidenArithLoweringPass;
-use c2zk_ir_transform::miden::lowering::WasmToMidenCFLoweringPass;
-use c2zk_ir_transform::miden::lowering::WasmToMidenFinalLoweringPass;
-use c2zk_ir_transform::wasm::explicit_func_args_pass::WasmExplicitFuncArgsPass;
-use c2zk_ir_transform::wasm::globals_to_mem::WasmGlobalsToMemPass;
+use ozk_ir_transform::miden::lowering::call_op_lowering::WasmToMidenCallOpLoweringPass;
+use ozk_ir_transform::miden::lowering::WasmToMidenArithLoweringPass;
+use ozk_ir_transform::miden::lowering::WasmToMidenCFLoweringPass;
+use ozk_ir_transform::miden::lowering::WasmToMidenFinalLoweringPass;
+use ozk_ir_transform::wasm::explicit_func_args_pass::WasmExplicitFuncArgsPass;
+use ozk_ir_transform::wasm::globals_to_mem::WasmGlobalsToMemPass;
 use pliron::context::Context;
 use pliron::pass::PassManager;
 

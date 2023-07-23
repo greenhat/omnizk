@@ -23,7 +23,7 @@ resolver = "2"
 
 [workspace.package]
 authors = ["Denys Zadorozhny <denys@zadorozhnyi.com>"]
-repository = "https://github.com/greenhat/c2zk"
+repository = "https://github.com/greenhat/omnizk"
 edition = "2021"
 readme = "README.md"
 license = "Apache-2.0"
@@ -35,15 +35,15 @@ ozk-ozk-dialect = { path = "crates/dialects/ozk" }
 ozk-wasm-dialect = { path = "crates/dialects/wasm" }
 ozk-miden-dialect = { path = "crates/dialects/miden" }
 ozk-valida-dialect = { path = "crates/dialects/valida" }
-c2zk-ir-transform = { path = "crates/ir-transform" }
+ozk-ir-transform = { path = "crates/ir-transform" }
 ozk-frontend-wasm = { path = "crates/frontend-wasm" }
-c2zk-codegen-tritonvm = { path = "crates/codegen-tritonvm" }
+ozk-codegen-tritonvm = { path = "crates/codegen-tritonvm" }
 ozk-codegen-midenvm = { path = "crates/codegen-midenvm" }
 ozk-codegen-valida = { path = "crates/codegen-valida" }
-c2zk-stdlib = { path = "crates/stdlib" }
-c2zk-rust-wasm-tests-fib = { path = "crates/rust-wasm-tests/fib" }
-c2zk-rust-wasm-tests-add = { path = "crates/rust-wasm-tests/add" }
-c2zk-rust-wasm-tests-helper = { path = "crates/rust-wasm-tests-helper" }
+ozk-stdlib = { path = "crates/stdlib" }
+ozk-rust-wasm-tests-fib = { path = "crates/rust-wasm-tests/fib" }
+ozk-rust-wasm-tests-add = { path = "crates/rust-wasm-tests/add" }
+ozk-rust-wasm-tests-helper = { path = "crates/rust-wasm-tests-helper" }
 wasmparser = { version = "0.102" }
 wasmprinter = "0.2"
 wat = "1.0.49"

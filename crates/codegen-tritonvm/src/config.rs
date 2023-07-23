@@ -1,11 +1,11 @@
 /*
-use c2zk_ir::pass::IrPass;
-use c2zk_ir_transform::triton::BlocksToFuncPass;
-use c2zk_ir_transform::AndMinus8Pass;
-use c2zk_ir_transform::DceUnusedFunctionsPass;
-use c2zk_ir_transform::GlobalsToMemPass;
-use c2zk_ir_transform::LocalsToMemPass;
-use c2zk_ir_transform::PseudoOpSubPass;
+use ozk_ir::pass::IrPass;
+use ozk_ir_transform::triton::BlocksToFuncPass;
+use ozk_ir_transform::AndMinus8Pass;
+use ozk_ir_transform::DceUnusedFunctionsPass;
+use ozk_ir_transform::GlobalsToMemPass;
+use ozk_ir_transform::LocalsToMemPass;
+use ozk_ir_transform::PseudoOpSubPass;
 
 pub struct TritonTargetConfig {
     pub output_format: TritonOutputFormat,

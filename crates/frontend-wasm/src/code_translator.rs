@@ -3,7 +3,7 @@ use wasmparser::{FuncValidator, Operator, WasmModuleResources};
 
 use crate::{func_builder::FuncBuilder, mod_builder::ModuleBuilder, WasmError};
 
-/// Translates wasm operators into c2zk IR instructions.
+/// Translates wasm operators into ozk IR instructions.
 #[allow(unused_variables)]
 pub fn translate_operator(
     ctx: &mut Context,
