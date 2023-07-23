@@ -40,7 +40,7 @@ impl RewritePattern for ValidaTrackProgramCounter {
         &self,
         ctx: &mut Context,
         op: Ptr<Operation>,
-        rewriter: &mut dyn PatternRewriter,
+        _rewriter: &mut dyn PatternRewriter,
     ) -> Result<bool, anyhow::Error> {
         let Ok(program_op) = op
             .deref(ctx)
