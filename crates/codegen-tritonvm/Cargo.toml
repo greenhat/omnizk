@@ -11,9 +11,7 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
-c2zk-ir = { workspace = true }
 c2zk-ir-transform = { workspace = true }
-c2zk-codegen-shared = { workspace = true }
 ozk-wasm-dialect = { workspace = true }
 pliron = { workspace = true }
 # triton-vm = { path = "../../../triton-vm/triton-vm" }
@@ -23,7 +21,6 @@ triton-opcodes = { version = "0.19" }
 twenty-first = { version = "0.19" }
 
 [dev-dependencies]
-c2zk-frontend = { workspace = true }
 ozk-frontend-wasm = { workspace = true }
 c2zk-rust-wasm-tests-helper = { workspace = true }
 c2zk-rust-wasm-tests-fib = { workspace = true }

@@ -1,6 +1,7 @@
 //! In Miden VM public inputs are stored on the stack. This pass saves the public inputs from the stack
 //! and stores them in the memory
 
+/*
 use c2zk_ir::ir::ext::MidenExt;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
@@ -294,3 +295,4 @@ fn load_pub_outputs_on_stack_func(
         ins,
     )
 }
+*/

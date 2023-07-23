@@ -1,6 +1,6 @@
+/*
 use std::collections::HashMap;
 
-use c2zk_codegen_shared::func_index_to_label;
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncIndex;
 use c2zk_ir::ir::Module;
@@ -81,9 +81,9 @@ mod tests {
     fn test_start_section() {
         check(
             r#"
-(module 
+(module
     (start $f1)
-    (func $f1 
+    (func $f1
         i32.const 1
         return)
 )"#,
@@ -112,3 +112,4 @@ mod tests {
         );
     }
 }
+*/

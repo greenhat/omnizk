@@ -1,4 +1,3 @@
-use c2zk_ir::ir::Inst;
 use pliron::context::Context;
 use pliron::context::Ptr;
 use pliron::op::op_cast;
@@ -14,10 +13,7 @@ use self::emit_instr::EmitMasm;
 mod emit_instr;
 
 #[derive(Debug, Error)]
-pub enum EmitError {
-    #[error("Unsupported instruction: {0:?}")]
-    UnsupportedInstruction(Inst),
-}
+pub enum EmitError {}
 
 pub fn emit_op(
     ctx: &Context,

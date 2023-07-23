@@ -1,3 +1,4 @@
+/*
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::GlobalIndex;
@@ -161,3 +162,4 @@ fn init_mem_for_locals_func(
         ],
     )
 }
+*/

@@ -1,3 +1,4 @@
+/*
 use c2zk_frontend_shared::FuncBuilder;
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::BlockKind;
@@ -307,3 +308,4 @@ fn next_br_propagation(global_index_br_propagation: GlobalIndex) -> Func {
         ins,
     )
 }
+*/

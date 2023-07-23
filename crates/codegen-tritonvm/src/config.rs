@@ -1,3 +1,4 @@
+/*
 use c2zk_ir::pass::IrPass;
 use c2zk_ir_transform::triton::BlocksToFuncPass;
 use c2zk_ir_transform::AndMinus8Pass;
@@ -20,7 +21,6 @@ impl Default for TritonTargetConfig {
                 Box::<BlocksToFuncPass>::default(),
                 // TODO: pass the start address for globals (determine in MemoryLayout)
                 Box::new(GlobalsToMemPass::new(i32::MAX - 1024)),
-                Box::<PseudoOpSubPass>::default(),
                 Box::<DceUnusedFunctionsPass>::default(),
             ],
         }
@@ -33,3 +33,4 @@ pub enum TritonOutputFormat {
 }
 
 // TODO: introduce MemoryLayout to manage the addresses for globals and locals
+*/

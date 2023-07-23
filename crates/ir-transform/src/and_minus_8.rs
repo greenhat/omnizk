@@ -1,3 +1,4 @@
+/*
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::Inst;
 use c2zk_ir::pass::IrPass;
@@ -20,3 +21,5 @@ impl IrPass for AndMinus8Pass {
         }
     }
 }
+
+*/

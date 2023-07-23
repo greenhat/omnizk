@@ -1,4 +1,3 @@
-use c2zk_ir::ir::Ty;
 use ozk_wasm_dialect::types::MemAddress;
 
 /// Miden memory layout.
@@ -18,8 +17,9 @@ impl Default for MidenMemoryLayout {
         let max_public_inputs: u32 = 1024;
         let max_public_outputs: u32 = 1024;
         let inputs_offset: u32 = 0;
-        let outputs_offset: u32 = max_public_inputs * Ty::I64.size() as u32;
-        let globals_offset: u32 = outputs_offset + max_public_outputs * Ty::I64.size() as u32;
+        let i64_size: u32 = 8;
+        let outputs_offset: u32 = max_public_inputs * i64_size;
+        let globals_offset: u32 = outputs_offset + max_public_outputs * i64_size;
         Self {
             pub_inputs_start_address: i32::MAX,
             pub_outputs_start_address: i32::MAX - inputs_offset as i32,

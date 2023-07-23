@@ -11,8 +11,6 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
-c2zk-ir = { workspace = true }
-c2zk-frontend-shared = { workspace = true }
 ozk-frontend-wasm = { workspace = true }
 ozk-ozk-dialect = { workspace = true }
 ozk-wasm-dialect = { workspace = true }

@@ -3,18 +3,12 @@ members = [
   "crates/codegen-tritonvm",
   "crates/codegen-midenvm",
   "crates/codegen-valida",
-  "crates/ir",
   "crates/dialects/ozk",
   "crates/dialects/wasm",
   "crates/dialects/miden",
   "crates/dialects/valida",
   "crates/ir-transform",
-  "crates/frontend",
-  "crates/frontend-shared",
   "crates/frontend-wasm",
-  "crates/codegen",
-  "crates/codegen-shared",
-  "crates/compiler",
   "crates/stdlib",
   "crates/rust-wasm-tests/fib",
   "crates/rust-wasm-tests/add",
@@ -37,18 +31,12 @@ keywords = ["wasm", "webassembly", "zk", "proof", "verification"]
 categories = ["wasm", "no-std", "virtualization"]
 
 [workspace.dependencies]
-ozk-compiler = { path = "crates/compiler" }
 ozk-ozk-dialect = { path = "crates/dialects/ozk" }
 ozk-wasm-dialect = { path = "crates/dialects/wasm" }
 ozk-miden-dialect = { path = "crates/dialects/miden" }
 ozk-valida-dialect = { path = "crates/dialects/valida" }
-c2zk-ir = { path = "crates/ir" }
 c2zk-ir-transform = { path = "crates/ir-transform" }
-c2zk-frontend = { path = "crates/frontend" }
-c2zk-frontend-shared = { path = "crates/frontend-shared" }
 ozk-frontend-wasm = { path = "crates/frontend-wasm" }
-c2zk-codegen = { path = "crates/codegen" }
-c2zk-codegen-shared = { path = "crates/codegen-shared" }
 c2zk-codegen-tritonvm = { path = "crates/codegen-tritonvm" }
 ozk-codegen-midenvm = { path = "crates/codegen-midenvm" }
 ozk-codegen-valida = { path = "crates/codegen-valida" }

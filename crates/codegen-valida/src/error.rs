@@ -1,4 +1,3 @@
-use c2zk_ir::ir::TopoSortError;
 use thiserror::Error;
 
 use crate::EmitError;
@@ -9,6 +8,6 @@ pub enum ValidaError {
     InvalidInst(String),
     #[error("Emit error: {0:?}")]
     Emit(#[from] EmitError),
-    #[error("Topological sort error: {0:?}")]
-    TopoSortError(#[from] TopoSortError),
+    // #[error("Topological sort error: {0:?}")]
+    // TopoSortError(#[from] TopoSortError),
 }
