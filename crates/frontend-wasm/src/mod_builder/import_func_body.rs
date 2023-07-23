@@ -14,14 +14,14 @@ pub struct ImportFuncBody {
 
 impl ImportFuncBody {
     pub const PUB_INPUT_FUNC_MODULE: &str = "env";
-    pub const PUB_INPUT_FUNC_NAME: &str = "c2zk_stdlib_pub_input";
+    pub const PUB_INPUT_FUNC_NAME: &str = "ozk_stdlib_pub_input";
     pub const PUB_INPUT_OP: Inst = Inst::PubInputRead;
 
     pub const PUB_OUTPUT_FUNC_MODULE: &str = "env";
-    pub const PUB_OUTPUT_FUNC_NAME: &str = "c2zk_stdlib_pub_output";
+    pub const PUB_OUTPUT_FUNC_NAME: &str = "ozk_stdlib_pub_output";
 
     pub const SECRET_INPUT_FUNC_MODULE: &str = "env";
-    pub const SECRET_INPUT_FUNC_NAME: &str = "c2zk_stdlib_secret_input";
+    pub const SECRET_INPUT_FUNC_NAME: &str = "ozk_stdlib_secret_input";
     pub const SECRET_INPUT_OP: Inst = Inst::SecretInputRead;
 
     pub fn new_stdlib() -> Self {

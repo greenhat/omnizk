@@ -9,33 +9,33 @@ fn test_nested_block_br_if() {
     let expected_output = vec![3, 8];
     check_wat(
         r#"
-(module 
+(module
     (type (;0;) (func (result i64)))
     (type (;1;) (func (param i64)))
     (type (;2;) (func))
-    (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
-    (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
-    (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
+    (import "env" "ozk_stdlib_pub_input" (func $ozk_stdlib_pub_input (;0;) (type 0)))
+    (import "env" "ozk_stdlib_pub_output" (func $ozk_stdlib_pub_output (;1;) (type 1)))
+    (import "env" "ozk_stdlib_secret_input" (func $ozk_stdlib_secret_input (;2;) (type 0)))
     (export "main" (func $main))
     (start $main)
-    (func $main 
-        block 
-            block 
+    (func $main
+        block
+            block
                 i64.const 3
-                call $c2zk_stdlib_pub_output
-                block 
+                call $ozk_stdlib_pub_output
+                block
                     i64.const 8
-                    call $c2zk_stdlib_pub_output
+                    call $ozk_stdlib_pub_output
                     i32.const 1
                     br_if 2
                     i64.const 11
-                    call $c2zk_stdlib_pub_output
+                    call $ozk_stdlib_pub_output
                 end
                 i64.const 9
-                call $c2zk_stdlib_pub_output
+                call $ozk_stdlib_pub_output
             end
             i64.const 7
-            call $c2zk_stdlib_pub_output
+            call $ozk_stdlib_pub_output
         end
         return)
 )"#,
@@ -54,7 +54,7 @@ fn test_nested_block_br_if() {
             write_mem
             pop
             return
-            c2zk_stdlib_pub_output:
+            ozk_stdlib_pub_output:
             push 0
             call globals_get
             push -4
@@ -104,17 +104,17 @@ fn test_nested_block_br_if() {
             skiz
             return
             push 7
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             return
             main_l0_b0_l1_b0:
             push 3
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             call main_l0_b0_l1_b0_l2_b0
             call next_br_propagation
             skiz
             return
             push 9
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             return
             next_br_propagation:
             push 1
@@ -132,7 +132,7 @@ fn test_nested_block_br_if() {
             return
             main_l0_b0_l1_b0_l2_b0:
             push 8
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             push 1
             push 3
             push 1
@@ -143,7 +143,7 @@ fn test_nested_block_br_if() {
             push 1
             call globals_set
             push 11
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             return"#]],
     );
 }

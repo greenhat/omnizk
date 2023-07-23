@@ -1,7 +1,7 @@
 [package]
-name = "c2zk-stdlib"
+name = "ozk-stdlib"
 version = "0.1.0"
-description = "The standard library for the c2zk Rust programs"
+description = "The standard library for the ozk Rust programs"
 authors.workspace = true
 repository.workspace = true
 edition.workspace = true

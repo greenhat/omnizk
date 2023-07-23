@@ -1,5 +1,5 @@
 [package]
-name = "c2zk-rust-wasm-tests-helper"
+name = "ozk-rust-wasm-tests-helper"
 version = "0.1.0"
 description = "Helper types, functions for Rust-to-Wasm tests"
 authors.workspace = true
@@ -11,8 +11,8 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
-c2zk-stdlib = { workspace = true, features = ["std"] }
-c2zk-rust-wasm-tests-fib = { workspace = true }
-c2zk-rust-wasm-tests-add = { workspace = true }
+ozk-stdlib = { workspace = true, features = ["std"] }
+ozk-rust-wasm-tests-fib = { workspace = true }
+ozk-rust-wasm-tests-add = { workspace = true }
 
 [dev-dependencies]

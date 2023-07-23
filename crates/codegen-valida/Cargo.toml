@@ -11,7 +11,7 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
-c2zk-ir-transform = { workspace = true }
+ozk-ir-transform = { workspace = true }
 ozk-valida-dialect = { workspace = true }
 ozk-wasm-dialect = { workspace = true }
 ozk-ozk-dialect = { workspace = true }
@@ -46,9 +46,9 @@ valida-basic = { path = "../../vendor/valida/basic" }
 
 [dev-dependencies]
 ozk-frontend-wasm = { workspace = true }
-c2zk-rust-wasm-tests-helper = { workspace = true }
-c2zk-rust-wasm-tests-fib = { workspace = true }
-c2zk-rust-wasm-tests-add = { workspace = true }
+ozk-rust-wasm-tests-helper = { workspace = true }
+ozk-rust-wasm-tests-fib = { workspace = true }
+ozk-rust-wasm-tests-add = { workspace = true }
 wat = { workspace = true }
 wasmprinter = { workspace = true }
 expect-test = { workspace = true }

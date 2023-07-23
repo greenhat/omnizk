@@ -9,13 +9,13 @@ fn test_locals_func_exit() {
     let expected_output = vec![5, 16];
     check_wat(
         r#"
-(module 
+(module
     (type (;0;) (func (result i64)))
     (type (;1;) (func (param i64)))
     (type (;2;) (func))
-    (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
-    (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
-    (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
+    (import "env" "ozk_stdlib_pub_input" (func $ozk_stdlib_pub_input (;0;) (type 0)))
+    (import "env" "ozk_stdlib_pub_output" (func $ozk_stdlib_pub_output (;1;) (type 1)))
+    (import "env" "ozk_stdlib_secret_input" (func $ozk_stdlib_secret_input (;2;) (type 0)))
     (export "main" (func $main))
     (start $main)
     (func $add (param i64 i64) (result i64)
@@ -30,8 +30,8 @@ fn test_locals_func_exit() {
         i64.const 7
         call $add
         local.get 0
-        call $c2zk_stdlib_pub_output ;; should return first(0) local value
-        call $c2zk_stdlib_pub_output ;; should return 9+7=16
+        call $ozk_stdlib_pub_output ;; should return first(0) local value
+        call $ozk_stdlib_pub_output ;; should return 9+7=16
         return)
 )"#,
         input,
@@ -49,7 +49,7 @@ fn test_locals_func_exit() {
             write_mem
             pop
             return
-            c2zk_stdlib_pub_output:
+            ozk_stdlib_pub_output:
             push 0
             call globals_get
             push -4
@@ -153,8 +153,8 @@ fn test_locals_func_exit() {
             read_mem
             swap 1
             pop
-            call c2zk_stdlib_pub_output
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             push 0
             call globals_get
             push 4

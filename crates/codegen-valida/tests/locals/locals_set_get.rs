@@ -9,20 +9,20 @@ fn test_locals_set_get() {
     let expected_output = vec![9];
     check_wat(
         r#"
-(module 
+(module
     (type (;0;) (func (result i64)))
     (type (;1;) (func (param i64)))
     (type (;2;) (func))
-    (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
-    (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
-    (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
+    (import "env" "ozk_stdlib_pub_input" (func $ozk_stdlib_pub_input (;0;) (type 0)))
+    (import "env" "ozk_stdlib_pub_output" (func $ozk_stdlib_pub_output (;1;) (type 1)))
+    (import "env" "ozk_stdlib_secret_input" (func $ozk_stdlib_secret_input (;2;) (type 0)))
     (export "main" (func $main))
     (start $main)
     (func $main (local i64)
         i64.const 9
         local.set 0
         local.get 0
-        call $c2zk_stdlib_pub_output
+        call $ozk_stdlib_pub_output
         return)
 )"#,
         input,
@@ -31,10 +31,10 @@ fn test_locals_set_get() {
         expect![[r#"
             call main
             halt
-            c2zk_stdlib_pub_input:
+            ozk_stdlib_pub_input:
             read_io
             return
-            c2zk_stdlib_pub_output:
+            ozk_stdlib_pub_output:
             push -1
             call globals_get
             dup 0
@@ -60,7 +60,7 @@ fn test_locals_set_get() {
             push -1
             call globals_set
             return
-            c2zk_stdlib_secret_input:
+            ozk_stdlib_secret_input:
             divine
             return
             main:
@@ -88,7 +88,7 @@ fn test_locals_set_get() {
             read_mem
             swap 1
             pop
-            call c2zk_stdlib_pub_output
+            call ozk_stdlib_pub_output
             push -1
             call globals_get
             push 4

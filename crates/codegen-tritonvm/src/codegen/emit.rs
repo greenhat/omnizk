@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
-use c2zk_codegen_shared::func_index_to_label;
-use c2zk_ir::ir::ext::Ext;
-use c2zk_ir::ir::ext::TritonExt;
-use c2zk_ir::ir::FuncIndex;
-use c2zk_ir::ir::Inst;
+use ozk_codegen_shared::func_index_to_label;
+use ozk_ir::ir::ext::Ext;
+use ozk_ir::ir::ext::TritonExt;
+use ozk_ir::ir::FuncIndex;
+use ozk_ir::ir::Inst;
 use triton_opcodes::instruction::AnInstruction;
 use triton_opcodes::ord_n::Ord16;
 

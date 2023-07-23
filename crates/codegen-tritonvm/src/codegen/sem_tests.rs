@@ -12,9 +12,9 @@
 
 use std::collections::HashMap;
 
-use c2zk_frontend::translate_old;
-use c2zk_ir::pass::run_ir_passes;
+use ozk_frontend::translate_old;
 use ozk_frontend_wasm::WasmFrontendConfig;
+use ozk_ir::pass::run_ir_passes;
 use triton_vm::op_stack::OpStack;
 use triton_vm::vm::VMState;
 use twenty_first::shared_math::b_field_element::BFieldElement;
@@ -50,7 +50,7 @@ fn check_triton(
     expected_output: Vec<u64>,
     expected_triton: expect_test::Expect,
 ) {
-    use c2zk_frontend::FrontendConfig;
+    use ozk_frontend::FrontendConfig;
 
     let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
     let triton_target_config = TritonTargetConfig::default();
@@ -117,20 +117,20 @@ fn check_wat(
     let wasm = wat::parse_str(source).unwrap();
     let module = Module::from_binary(store.engine(), &wasm).unwrap();
 
-    let c2zk_stdlib_pub_input = Func::wrap(&mut store, |mut caller: Caller<'_, Io>| {
+    let ozk_stdlib_pub_input = Func::wrap(&mut store, |mut caller: Caller<'_, Io>| {
         caller.data_mut().input.pop().unwrap()
     });
-    let c2zk_stdlib_pub_output =
+    let ozk_stdlib_pub_output =
         Func::wrap(&mut store, |mut caller: Caller<'_, Io>, output: i64| {
             caller.data_mut().output.push(output as u64);
         });
-    let c2zk_stdlib_secret_input = Func::wrap(&mut store, |mut caller: Caller<'_, Io>| {
+    let ozk_stdlib_secret_input = Func::wrap(&mut store, |mut caller: Caller<'_, Io>| {
         caller.data_mut().secret_input.pop().unwrap()
     });
     let imports = [
-        c2zk_stdlib_pub_input.into(),
-        c2zk_stdlib_pub_output.into(),
-        c2zk_stdlib_secret_input.into(),
+        ozk_stdlib_pub_input.into(),
+        ozk_stdlib_pub_output.into(),
+        ozk_stdlib_secret_input.into(),
     ];
     let _ = Instance::new(&mut store, &module, &imports).unwrap();
 

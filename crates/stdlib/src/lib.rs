@@ -1,4 +1,4 @@
-//! std lib for c2zk runtime
+//! std lib for ozk runtime
 
 // no_std for wasm32 target
 #![no_std]
@@ -37,7 +37,7 @@ mod io_wasm;
 /// # Example
 ///
 /// ```
-/// c2zk_stdlib::entry!(main);
+/// ozk_stdlib::entry!(main);
 ///
 /// pub fn main() { }
 /// ```

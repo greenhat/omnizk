@@ -1,4 +1,4 @@
-use c2zk_stdlib::*;
+use ozk_stdlib::*;
 
 #[inline(never)]
 #[no_mangle]

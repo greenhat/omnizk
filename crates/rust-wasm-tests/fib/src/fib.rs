@@ -1,4 +1,4 @@
-use c2zk_stdlib::*;
+use ozk_stdlib::*;
 
 #[no_mangle]
 pub fn fib_seq() {

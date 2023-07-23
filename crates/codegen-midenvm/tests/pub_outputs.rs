@@ -15,17 +15,17 @@ fn test_pub_outputs() {
     (type (;0;) (func (result i64)))
     (type (;1;) (func (param i64)))
     (type (;2;) (func))
-    (import "env" "c2zk_stdlib_pub_input" (func $c2zk_stdlib_pub_input (;0;) (type 0)))
-    (import "env" "c2zk_stdlib_pub_output" (func $c2zk_stdlib_pub_output (;1;) (type 1)))
-    (import "env" "c2zk_stdlib_secret_input" (func $c2zk_stdlib_secret_input (;2;) (type 0)))
+    (import "env" "ozk_stdlib_pub_input" (func $ozk_stdlib_pub_input (;0;) (type 0)))
+    (import "env" "ozk_stdlib_pub_output" (func $ozk_stdlib_pub_output (;1;) (type 1)))
+    (import "env" "ozk_stdlib_secret_input" (func $ozk_stdlib_secret_input (;2;) (type 0)))
     (export "main" (func $main))
     (start $main)
     (func $main
         i64.const 3
         i64.const 5
-        call $c2zk_stdlib_pub_output
+        call $ozk_stdlib_pub_output
         i64.const 7
-        call $c2zk_stdlib_pub_output
+        call $ozk_stdlib_pub_output
         i64.const 9
         return)
 )"#,
@@ -142,7 +142,7 @@ fn test_pub_outputs() {
 
             end
 
-            proc.c2zk_stdlib_pub_output.1
+            proc.ozk_stdlib_pub_output.1
             loc_store.0
             loc_load.0
             exec.omni_miden_pub_output
@@ -151,9 +151,9 @@ fn test_pub_outputs() {
             proc.main.0
             push.3
             push.5
-            exec.c2zk_stdlib_pub_output
+            exec.ozk_stdlib_pub_output
             push.7
-            exec.c2zk_stdlib_pub_output
+            exec.ozk_stdlib_pub_output
             push.9
             end
 

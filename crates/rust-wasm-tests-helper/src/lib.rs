@@ -18,17 +18,17 @@
 #![deny(clippy::unimplemented)]
 #![deny(clippy::panic)]
 
-extern crate c2zk_rust_wasm_tests_add;
-extern crate c2zk_rust_wasm_tests_fib;
+extern crate ozk_rust_wasm_tests_add;
+extern crate ozk_rust_wasm_tests_fib;
 
 #[allow(clippy::type_complexity)]
 pub fn wrap_main_with_io(
     main_func: &'static dyn Fn(),
 ) -> Box<dyn Fn(Vec<u64>, Vec<u64>) -> Vec<u64>> {
     Box::new(|input: Vec<u64>, secret_input: Vec<u64>| {
-        c2zk_stdlib::io_native::init_io(input, secret_input);
+        ozk_stdlib::io_native::init_io(input, secret_input);
         main_func();
-        c2zk_stdlib::io_native::get_pub_output()
+        ozk_stdlib::io_native::get_pub_output()
     })
 }
 
@@ -38,7 +38,7 @@ pub fn compile_rust_wasm_tests(bundle_name: &str, bin_name: &str) -> Vec<u8> {
     let manifest_path = format!("../rust-wasm-tests/{}/Cargo.toml", bundle_name);
     // let pwd = std::process::Command::new("pwd").output().unwrap();
     // dbg!(&pwd);
-    let target_dir = format!("/tmp/c2zk-rust-wasm-tests/{}", bundle_name);
+    let target_dir = format!("/tmp/ozk-rust-wasm-tests/{}", bundle_name);
     let comp_status = std::process::Command::new("cargo")
         .arg("build")
         .arg("--manifest-path")

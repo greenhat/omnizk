@@ -1,9 +1,9 @@
 /*
 use std::collections::HashMap;
 
-use c2zk_ir::ir::Func;
-use c2zk_ir::ir::FuncIndex;
-use c2zk_ir::ir::Module;
+use ozk_ir::ir::Func;
+use ozk_ir::ir::FuncIndex;
+use ozk_ir::ir::Module;
 
 mod inst_buf;
 pub use inst_buf::InstBuffer;
@@ -60,9 +60,9 @@ mod tests {
 
     #[cfg(test)]
     fn check(input: &str, expected_tree: expect_test::Expect) {
-        use c2zk_frontend::translate_old;
-        use c2zk_frontend::FrontendConfig;
-        use c2zk_ir::pass::run_ir_passes;
+        use ozk_frontend::translate_old;
+        use ozk_frontend::FrontendConfig;
+        use ozk_ir::pass::run_ir_passes;
         use ozk_frontend_wasm::WasmFrontendConfig;
 
         let source = wat::parse_str(input).unwrap();

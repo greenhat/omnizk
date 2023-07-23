@@ -15,7 +15,7 @@ ozk-wasm-dialect = { workspace = true }
 ozk-ozk-dialect = { workspace = true }
 pliron = { workspace = true }
 thiserror = { workspace = true }
-c2zk-stdlib = { workspace = true }
+ozk-stdlib = { workspace = true }
 wasmparser = { workspace = true }
 derive_more = { workspace = true }
 log = { workspace = true }
