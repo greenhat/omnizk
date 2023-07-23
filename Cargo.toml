@@ -1,19 +1,24 @@
 [workspace]
 members = [
-  "crates/wasm",
   "crates/codegen-tritonvm",
-  "crates/ir",
+  "crates/codegen-midenvm",
+  "crates/codegen-valida",
+  "crates/dialects/ozk",
+  "crates/dialects/wasm",
+  "crates/dialects/miden",
+  "crates/dialects/valida",
   "crates/ir-transform",
-  "crates/frontend",
-  "crates/codegen",
-  "crates/codegen-shared",
-  "crates/compiler",
+  "crates/frontend-wasm",
   "crates/stdlib",
   "crates/rust-wasm-tests/fib",
   "crates/rust-wasm-tests/add",
   "crates/rust-wasm-tests-helper",
 ]
-exclude = ["crates/rust-wasm-tests/fib-bin", "crates/rust-wasm-tests/add-bin"]
+exclude = [
+  "crates/rust-wasm-tests/fib-bin",
+  "crates/rust-wasm-tests/add-bin",
+  "vendor",
+]
 resolver = "2"
 
 [workspace.package]
@@ -26,26 +31,48 @@ keywords = ["wasm", "webassembly", "zk", "proof", "verification"]
 categories = ["wasm", "no-std", "virtualization"]
 
 [workspace.dependencies]
-c2zk-wasm = { path = "crates/wasm" }
-c2zk-ir = { path = "crates/ir" }
+ozk-ozk-dialect = { path = "crates/dialects/ozk" }
+ozk-wasm-dialect = { path = "crates/dialects/wasm" }
+ozk-miden-dialect = { path = "crates/dialects/miden" }
+ozk-valida-dialect = { path = "crates/dialects/valida" }
 c2zk-ir-transform = { path = "crates/ir-transform" }
-c2zk-frontend = { path = "crates/frontend" }
-c2zk-frontend-shared = { path = "crates/frontend-shared" }
-c2zk-codegen = { path = "crates/codegen" }
-c2zk-codegen-shared = { path = "crates/codegen-shared" }
+ozk-frontend-wasm = { path = "crates/frontend-wasm" }
 c2zk-codegen-tritonvm = { path = "crates/codegen-tritonvm" }
+ozk-codegen-midenvm = { path = "crates/codegen-midenvm" }
+ozk-codegen-valida = { path = "crates/codegen-valida" }
 c2zk-stdlib = { path = "crates/stdlib" }
 c2zk-rust-wasm-tests-fib = { path = "crates/rust-wasm-tests/fib" }
 c2zk-rust-wasm-tests-add = { path = "crates/rust-wasm-tests/add" }
 c2zk-rust-wasm-tests-helper = { path = "crates/rust-wasm-tests-helper" }
-wasmparser = { version = "0.94", features = ["deterministic"] }
+wasmparser = { version = "0.102" }
+wasmprinter = "0.2"
+wat = "1.0.49"
+wasmtime = "7.0.0"
 log = { version = "0.4.8", default-features = false }
 smallvec = { version = "1.6.1", features = ["union"] }
-wat = "1.0.49"
-wasmprinter = "0.2"
 target-lexicon = { version = "0.12.3", default-features = false }
 derive_more = "0.99"
-thiserror = "1.0"
+thiserror = "1.0.40"
 lazy_static = "1.4.0"
 spin = "0.9.4"
 itertools = "0.10.5"
+indexmap = "1.9"
+topological-sort = "0.2"
+pliron = { git = "https://github.com/greenhat/pliron", rev = "bb097a402d6b5fbf524f0b9f6d0943e8aaa16b58" }
+# pliron = { path = "../pliron" }
+apint = "0.2.0"
+paste = "1.0"
+inventory = "0.3"
+intertrait = "0.2.2"
+# Required by intertrait
+linkme = "0.2"
+indent = "0.1.1"
+once_cell = "1.15.0"
+anyhow = "1.0.44"
+bounded-vec = "0.7.1"
+expect-test = "1.0.1"
+
+[profile.release]
+# Need this for linkme crate to work on macOS
+# see https://github.com/dtolnay/linkme/issues/61
+lto = "thin"

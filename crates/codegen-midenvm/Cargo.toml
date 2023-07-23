@@ -1,0 +1,39 @@
+[package]
+name = "ozk-codegen-midenvm"
+version = "0.1.0"
+description = "Miden VM backend for OmniZK"
+authors.workspace = true
+repository.workspace = true
+edition.workspace = true
+readme.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+c2zk-ir-transform = { workspace = true }
+ozk-miden-dialect = { workspace = true }
+ozk-wasm-dialect = { workspace = true }
+pliron = { workspace = true }
+rustc-hash = "1.1.0"
+intertrait = { workspace = true }
+# intertait dependency
+linkme = { workspace = true }
+winter-math = { version = "0.6", default-features = false }
+derive_more = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+topological-sort = { workspace = true }
+
+[dev-dependencies]
+miden-assembly = "0.5"
+miden-stdlib = "0.4"
+miden-processor = "0.5"
+ozk-frontend-wasm = { workspace = true }
+c2zk-rust-wasm-tests-helper = { workspace = true }
+c2zk-rust-wasm-tests-fib = { workspace = true }
+c2zk-rust-wasm-tests-add = { workspace = true }
+wat = { workspace = true }
+wasmprinter = { workspace = true }
+expect-test = { workspace = true }
+wasmtime = { workspace = true }

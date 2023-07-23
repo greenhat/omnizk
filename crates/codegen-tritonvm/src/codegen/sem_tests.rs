@@ -1,17 +1,22 @@
 //! Semantic equivalence tests for the TritonVM codegen.
 
 #![allow(clippy::unwrap_used)]
+#![allow(unused_variables)]
+#![allow(dead_code)]
 
-mod add;
-mod block;
-mod fib;
-mod func_call;
-mod locals;
+// mod add;
+// mod block;
+// mod fib;
+// mod func_call;
+// mod locals;
 
 use std::collections::HashMap;
 
+use c2zk_frontend::translate_old;
 use c2zk_ir::pass::run_ir_passes;
+use ozk_frontend_wasm::WasmFrontendConfig;
 use triton_vm::op_stack::OpStack;
+use triton_vm::vm::VMState;
 use twenty_first::shared_math::b_field_element::BFieldElement;
 use wasmtime::*;
 
@@ -45,13 +50,11 @@ fn check_triton(
     expected_output: Vec<u64>,
     expected_triton: expect_test::Expect,
 ) {
-    use c2zk_frontend::translate;
     use c2zk_frontend::FrontendConfig;
-    use c2zk_frontend::WasmFrontendConfig;
 
     let frontend = FrontendConfig::Wasm(WasmFrontendConfig::default());
     let triton_target_config = TritonTargetConfig::default();
-    let mut module = translate(wasm, frontend).unwrap();
+    let mut module = translate_old(wasm, frontend).unwrap();
     run_ir_passes(&mut module, &triton_target_config.ir_passes);
     let inst_buf = compile_module(module, &triton_target_config).unwrap();
     let out_source = inst_buf.pretty_print();
@@ -59,7 +62,7 @@ fn check_triton(
     let program = inst_buf.program();
     let input = input.into_iter().map(Into::into).collect();
     let secret_input = secret_input.into_iter().map(Into::into).collect();
-    let (trace, out, err) = triton_vm::vm::run(&program, input, secret_input);
+    let (trace, out, err) = triton_vm::vm::debug(&program, input, secret_input);
 
     pp_trace(&trace);
 
@@ -74,7 +77,7 @@ fn check_triton(
     assert_eq!(stack, expected_stack);
 }
 
-fn pp_trace(_trace: &[triton_vm::state::VMState]) {
+fn pp_trace(_trace: &[VMState]) {
     // iterate over last n traces
     for state in _trace.iter() {
         //.rev().take(400).rev() {

@@ -156,31 +156,28 @@ fn test_fib() {
             read_io
             return
             c2zk_stdlib_pub_output:
-            push -1
+            push 0
             call globals_get
-            dup0
-            swap2
-            write_mem
-            pop
-            pop
             push -4
             add
-            push -1
+            push 0
             call globals_set
-            push -1
+            push 0
+            call globals_get
+            swap 1
+            write_mem
+            pop
+            push 0
+            call globals_get
+            read_mem
+            swap 1
+            pop
+            write_io
+            push 0
             call globals_get
             push 4
             add
             push 0
-            read_mem
-            swap1
-            pop
-            write_io
-            push -1
-            call globals_get
-            push 4
-            add
-            push -1
             call globals_set
             return
             c2zk_stdlib_secret_input:
@@ -188,80 +185,66 @@ fn test_fib() {
             return
             __main:
             call init_mem_for_locals
-            call fib_seq
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E
             return
-            fib_seq:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E:
             push -1
             call globals_get
             push -16
             add
-            push -1
+            push 0
             call globals_set
-            call fib_seq_l0_b0
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0
             push -1
             call globals_get
-            push 12
+            push 8
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
-            call pub_output
+            call _ZN11c2zk_stdlib10pub_output17h88275f26ad69ad8bE
             push -1
             call globals_get
             push 16
             add
-            push -1
+            push 0
             call globals_set
             return
-            pub_input:
+            _ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E:
             call c2zk_stdlib_pub_input
             return
-            pub_output:
+            _ZN11c2zk_stdlib10pub_output17h88275f26ad69ad8bE:
             push -1
             call globals_get
-            dup0
-            swap2
-            write_mem
-            pop
-            pop
             push -4
             add
-            push -1
+            push 0
             call globals_set
-            push -1
+            push 0
+            call globals_get
+            swap 1
+            write_mem
+            pop
+            push 0
+            call globals_get
+            read_mem
+            swap 1
+            pop
+            call c2zk_stdlib_pub_output
+            push 0
             call globals_get
             push 4
             add
             push 0
-            read_mem
-            swap1
-            pop
-            call c2zk_stdlib_pub_output
-            push -1
-            call globals_get
-            push 4
-            add
-            push -1
             call globals_set
             return
             secret_input:
             call c2zk_stdlib_secret_input
             return
             init_mem_for_locals:
-            push 00000000002147483635
-            push -1
-            call globals_set
-            return
-            globals_get:
-            push 4
-            mul
             push 00000000002147483647
-            add
             push 0
-            read_mem
-            swap1
-            pop
+            call globals_set
             return
             globals_set:
             push 4
@@ -273,187 +256,170 @@ fn test_fib() {
             pop
             pop
             return
-            fib_seq_l0_b0:
-            call fib_seq_l0_b0_l1_b0
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0:
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b0
             call next_br_propagation
             skiz
             return
-            push -1
-            call globals_get
-            push 16
-            add
             push 0
+            call globals_get
+            push 12
+            add
             read_mem
-            swap1
+            swap 1
             pop
             push 7
             and
-            push -1
+            push 0
             call globals_get
-            swap1
-            swap1
-            push 8
+            swap 1
+            swap 1
+            push 4
             add
-            swap1
+            swap 1
             write_mem
             pop
             pop
-            call fib_seq_l0_b0_l1_b1
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1
             call next_br_propagation
             skiz
             return
-            push -1
-            call globals_get
-            push 8
-            add
             push 0
+            call globals_get
+            push 4
+            add
             read_mem
-            swap1
+            swap 1
             pop
             push 0
             eq
             skiz
             return
-            push -1
-            call globals_get
-            push 12
-            add
             push 0
-            read_mem
-            swap1
-            pop
-            push -1
             call globals_get
-            swap1
-            swap1
-            push 4
+            push 8
             add
-            swap1
+            read_mem
+            swap 1
+            pop
+            push 0
+            call globals_get
+            swap 1
             write_mem
             pop
             pop
-            call fib_seq_l0_b0_l1_b2
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b2
             call next_br_propagation
             skiz
             return
             return
-            fib_seq_l0_b0_l1_b0:
-            call pub_input
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b0:
+            call _ZN11c2zk_stdlib9pub_input17had951df5cd6b60c2E
             dup0
             push -1
             call globals_get
-            swap1
-            swap1
-            push 16
+            swap 1
+            swap 1
+            push 12
             add
-            swap1
+            swap 1
             write_mem
-            pop
             pop
             skiz
             return
             push 0
-            push -1
+            push 0
             call globals_get
-            swap1
-            swap1
-            push 12
+            swap 1
+            swap 1
+            push 8
             add
-            swap1
+            swap 1
             write_mem
             pop
-            pop
             push 2
-            push -2
+            push 1
             call globals_set
             return
             return
             next_br_propagation:
-            push -2
+            push 1
             call globals_get
-            dup0
+            dup 0
             push 0
             eq
             skiz
             return
             push -1
             add
-            dup0
-            push -2
+            dup 0
+            push 1
             call globals_set
             return
-            fib_seq_l0_b0_l1_b1:
-            call fib_seq_l0_b0_l1_b1_l2_b0
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1:
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1_l2_b0
             call next_br_propagation
             skiz
             return
-            push -1
-            call globals_get
-            push 16
-            add
             push 0
+            call globals_get
+            push 12
+            add
             read_mem
-            swap1
+            swap 1
             pop
             push 00000000002147483640
             and
-            push -1
+            push 0
             call globals_get
-            swap1
-            swap1
-            push 4
-            add
-            swap1
+            swap 1
             write_mem
-            pop
             pop
             push 1
-            push -1
-            call globals_get
-            swap1
-            swap1
-            push 16
-            add
-            swap1
-            write_mem
-            pop
-            pop
             push 0
-            push -1
             call globals_get
-            swap1
-            swap1
+            swap 1
+            swap 1
             push 12
             add
-            swap1
+            swap 1
+            write_mem
+            pop
+            push 0
+            push 0
+            call globals_get
+            swap 1
+            swap 1
+            push 8
+            add
+            swap 1
             write_mem
             pop
             pop
-            call fib_seq_l0_b0_l1_b1_l2_b1
+            call _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1_l2_b1
             call next_br_propagation
             skiz
             return
             return
-            fib_seq_l0_b0_l1_b1_l2_b0:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1_l2_b0:
             push -1
             call globals_get
-            push 16
+            push 12
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             push -1
             add
             push 7
-            swap1
-            dup1
-            dup1
+            swap 1
+            dup 1
+            dup 1
             lt
             push 0
             eq
-            swap2
-            swap1
+            swap 2
+            swap 1
             eq
             add
             push 1
@@ -461,220 +427,197 @@ fn test_fib() {
             skiz
             return
             push 1
-            push -1
-            call globals_get
-            swap1
-            swap1
-            push 16
-            add
-            swap1
-            write_mem
-            pop
-            pop
             push 0
-            push -1
             call globals_get
-            swap1
-            swap1
+            swap 1
+            swap 1
             push 12
             add
-            swap1
+            swap 1
             write_mem
             pop
+            push 0
+            push 0
+            call globals_get
+            swap 1
+            swap 1
+            push 8
+            add
+            swap 1
+            write_mem
             pop
             push 2
-            push -2
+            push 1
             call globals_set
             return
             return
-            fib_seq_l0_b0_l1_b1_l2_b1:
+            _ZN28c2zk_rust_wasm_tests_bundle13fib7fib_seq17h2de4f42386e38ca7E_l0_b0_l1_b1_l2_b1:
             push -1
             call globals_get
             push 16
             add
             push 0
-            read_mem
-            swap1
-            pop
-            push -1
             call globals_get
             push 12
             add
-            push 0
             read_mem
-            swap1
+            swap 1
+            pop
+            push 0
+            call globals_get
+            push 8
+            add
+            read_mem
+            swap 1
             pop
             add
-            dup0
-            push -1
+            dup 0
+            push 0
             call globals_get
-            swap1
-            swap1
-            push 12
+            swap 1
+            swap 1
+            push 8
             add
-            swap1
+            swap 1
             write_mem
             pop
-            pop
-            push -1
-            call globals_get
-            push 16
-            add
             push 0
-            read_mem
-            swap1
-            pop
-            add
-            dup0
-            push -1
-            call globals_get
-            swap1
-            swap1
-            push 16
-            add
-            swap1
-            write_mem
-            pop
-            pop
-            push -1
             call globals_get
             push 12
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             add
-            dup0
-            push -1
+            dup 0
+            push 0
             call globals_get
-            swap1
-            swap1
+            swap 1
+            swap 1
             push 12
             add
-            swap1
+            swap 1
             write_mem
             pop
-            pop
-            push -1
-            call globals_get
-            push 16
-            add
             push 0
+            call globals_get
+            push 8
+            add
             read_mem
-            swap1
+            swap 1
             pop
             add
-            dup0
-            push -1
+            dup 0
+            push 0
             call globals_get
-            swap1
-            swap1
-            push 16
+            swap 1
+            swap 1
+            push 8
             add
-            swap1
+            swap 1
             write_mem
             pop
-            pop
-            push -1
+            push 0
             call globals_get
             push 12
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             add
-            dup0
-            push -1
+            dup 0
+            push 0
             call globals_get
-            swap1
-            swap1
+            swap 1
+            swap 1
             push 12
             add
-            swap1
+            swap 1
             write_mem
             pop
-            pop
-            push -1
-            call globals_get
-            push 16
-            add
             push 0
+            call globals_get
+            push 8
+            add
             read_mem
-            swap1
+            swap 1
             pop
             add
-            dup0
-            push -1
+            dup 0
+            push 0
             call globals_get
-            swap1
-            swap1
-            push 16
+            swap 1
+            swap 1
+            push 8
             add
-            swap1
+            swap 1
             write_mem
             pop
-            pop
-            push -1
+            push 0
             call globals_get
             push 12
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             add
-            dup0
-            push -1
+            dup 0
+            push 0
             call globals_get
-            swap1
-            swap1
+            swap 1
+            swap 1
             push 12
             add
-            swap1
+            swap 1
             write_mem
             pop
-            pop
-            push -1
-            call globals_get
-            push 16
-            add
             push 0
+            call globals_get
+            push 8
+            add
             read_mem
-            swap1
+            swap 1
             pop
             add
-            push -1
+            dup 0
+            push 0
             call globals_get
-            swap1
-            swap1
-            push 16
+            swap 1
+            swap 1
+            push 8
             add
-            swap1
+            swap 1
             write_mem
             pop
-            pop
-            push -1
+            push 0
             call globals_get
-            push 4
+            push 12
+            add
+            read_mem
+            swap 1
+            pop
             add
             push 0
+            call globals_get
+            swap 1
+            swap 1
+            push 12
+            add
+            swap 1
+            write_mem
+            pop
+            push 0
+            call globals_get
             read_mem
-            swap1
+            swap 1
             pop
             push -8
             add
-            dup0
-            push -1
+            dup 0
+            push 0
             call globals_get
-            swap1
-            swap1
-            push 4
-            add
-            swap1
+            swap 1
             write_mem
-            pop
             pop
             skiz
             recurse
@@ -682,83 +625,87 @@ fn test_fib() {
             fib_seq_l0_b0_l1_b2:
             push -1
             call globals_get
-            push 16
-            add
-            push 0
-            read_mem
-            swap1
-            pop
-            dup0
-            push -1
-            call globals_get
-            swap1
-            swap1
             push 12
             add
-            swap1
+            read_mem
+            swap 1
+            pop
+            dup 0
+            push 0
+            call globals_get
+            swap 1
+            swap 1
+            push 8
+            add
+            swap 1
             write_mem
             pop
-            pop
-            push -1
+            push 0
             call globals_get
-            push 4
+            read_mem
+            swap 1
+            pop
             add
             push 0
-            read_mem
-            swap1
-            pop
-            add
-            push -1
             call globals_get
-            swap1
-            swap1
-            push 16
-            add
-            swap1
-            write_mem
-            pop
-            pop
-            push -1
-            call globals_get
+            swap 1
+            swap 1
             push 12
             add
-            push 0
-            read_mem
-            swap1
-            pop
-            push -1
-            call globals_get
-            swap1
-            swap1
-            push 4
-            add
-            swap1
+            swap 1
             write_mem
             pop
-            pop
-            push -1
+            push 0
             call globals_get
             push 8
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
-            push -1
-            add
-            dup0
-            push -1
+            push 0
             call globals_get
-            swap1
-            swap1
-            push 8
-            add
-            swap1
+            swap 1
             write_mem
             pop
+            push 0
+            call globals_get
+            push 4
+            add
+            read_mem
+            swap 1
+            pop
+            push -1
+            add
+            dup 0
+            push 0
+            call globals_get
+            swap 1
+            swap 1
+            push 4
+            add
+            swap 1
+            write_mem
             pop
             skiz
             recurse
+            return
+            globals_get:
+            push -4
+            mul
+            push 00000000002147482623
+            add
+            read_mem
+            swap 1
+            pop
+            return
+            globals_set:
+            push -4
+            mul
+            push 00000000002147482623
+            add
+            swap 1
+            write_mem
+            pop
             return"#]],
     )
 }

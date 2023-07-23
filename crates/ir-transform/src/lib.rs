@@ -19,13 +19,13 @@
 #![deny(clippy::panic)]
 
 mod and_minus_8;
-mod convert_blocks;
-mod globals_to_mem;
 mod locals_to_mem;
-mod pseudo_op_sub;
+mod save_stack_pub_inputs;
 
-pub use and_minus_8::AndMinus8Pass;
-pub use convert_blocks::BlocksToFuncPass;
-pub use globals_to_mem::GlobalsToMemPass;
-pub use locals_to_mem::LocalsToMemPass;
-pub use pseudo_op_sub::PseudoOpSubPass;
+pub mod miden;
+pub mod triton;
+pub mod valida;
+pub mod wasm;
+
+#[cfg(test)]
+mod tests_util;

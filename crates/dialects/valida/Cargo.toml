@@ -1,0 +1,30 @@
+[package]
+name = "ozk-valida-dialect"
+version = "0.1.0"
+description = "Valida VM dialect for OmniZK"
+authors.workspace = true
+repository.workspace = true
+edition.workspace = true
+readme.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+ozk-ozk-dialect = { workspace = true }
+
+derive_more = { workspace = true }
+thiserror = { workspace = true }
+pliron = { workspace = true }
+intertrait = { workspace = true }
+# Required by intertrait
+linkme = { workspace = true }
+paste = { workspace = true }
+inventory = { workspace = true }
+indent = { workspace = true }
+apint = { workspace = true }
+
+# valida
+valida-machine = { path = "../../../vendor/valida/machine" }
+
+[dev-dependencies]

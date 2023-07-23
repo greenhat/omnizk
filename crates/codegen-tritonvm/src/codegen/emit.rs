@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+use c2zk_codegen_shared::func_index_to_label;
 use c2zk_ir::ir::ext::Ext;
 use c2zk_ir::ir::ext::TritonExt;
 use c2zk_ir::ir::FuncIndex;
@@ -16,7 +19,7 @@ pub fn emit_inst(
     ins: &Inst,
     config: &TritonTargetConfig,
     sink: &mut InstBuffer,
-    func_names: &[String],
+    func_names: &HashMap<FuncIndex, String>,
 ) -> Result<(), TritonError> {
     match ins {
         Inst::Unreachable => (),
@@ -105,6 +108,7 @@ pub fn emit_inst(
         // -------------------------------------
         Inst::Swap { idx } => sink.push(AnInstruction::Swap(ord16_u8(*idx)?)),
         Inst::Dup { idx } => sink.push(AnInstruction::Dup(ord16_u8(*idx)?)),
+        Inst::Drop => sink.push(AnInstruction::Pop),
         // Extention instructions for target arch
         Inst::Ext(Ext::Triton(eop)) => match eop {
             TritonExt::Pop => sink.push(AnInstruction::Pop),
@@ -113,6 +117,9 @@ pub fn emit_inst(
             TritonExt::Lsb => todo!("it's pseudo op now"),
             TritonExt::Assert => sink.push(AnInstruction::Assert),
         },
+
+        // Extention instructions for unsupported architecures
+        Inst::Ext(_) => return Err(unexpected_inst(ins)),
         // Should not be emitted (eliminated in the IR transformation passes)
         Inst::Block { blockty } => return Err(unexpected_inst(ins)),
         Inst::Loop { block_type } => return Err(unexpected_inst(ins)),
@@ -141,8 +148,7 @@ fn write_mem(sink: &mut InstBuffer, offset: &u32) {
         sink.push(AnInstruction::Swap(Ord16::ST1));
     }
     sink.push(AnInstruction::WriteMem);
-    // remove the top two elements from the stack (the value and the pointer)
-    sink.push(AnInstruction::Pop);
+    // remove the pointer from the stack
     sink.push(AnInstruction::Pop);
 }
 
@@ -151,19 +157,10 @@ fn read_mem(sink: &mut InstBuffer, offset: &u32) {
         sink.push(AnInstruction::Push(felt_i32(*offset as i32)));
         sink.push(AnInstruction::Add);
     }
-    // push 0 on top of the stack since read_mem overrites the top of the stack with the read value
-    sink.push(AnInstruction::Push(felt_i32(0)));
     sink.push(AnInstruction::ReadMem);
     // swap the read value with the pointer (it's left after the read)
     sink.push(AnInstruction::Swap(Ord16::ST1));
     sink.push(AnInstruction::Pop);
-}
-
-pub(crate) fn func_index_to_label(func_index: FuncIndex, func_names: &[String]) -> String {
-    func_names
-        .get(usize::from(func_index))
-        .unwrap_or(&format!("f{}", u32::from(func_index)))
-        .to_string()
 }
 
 fn ord16_u8(x: u8) -> Result<Ord16, TritonError> {

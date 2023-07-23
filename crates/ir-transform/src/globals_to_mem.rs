@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use c2zk_ir::ir::Func;
 use c2zk_ir::ir::FuncType;
 use c2zk_ir::ir::GlobalIndex;
@@ -8,13 +6,18 @@ use c2zk_ir::ir::Module;
 use c2zk_ir::ir::Ty;
 use c2zk_ir::pass::IrPass;
 
-#[derive(Default)]
-pub struct GlobalsToMemPass;
+pub struct GlobalsToMemPass {
+    start_addr: i32,
+}
+
+impl GlobalsToMemPass {
+    pub fn new(start_addr: i32) -> Self {
+        Self { start_addr }
+    }
+}
 
 const GLOBALS_GET_FUNC_NAME: &str = "globals_get";
 const GLOBALS_SET_FUNC_NAME: &str = "globals_set";
-
-const GLOBAL_MEMORY_BASE: u32 = i32::MAX as u32;
 
 #[derive(Debug, Clone)]
 enum GlobalInst {
@@ -35,15 +38,15 @@ impl IrPass for GlobalsToMemPass {
     fn run_mod_pass(&self, module: &mut Module) {
         let global_get_func_idx = module
             .function_idx_by_name(GLOBALS_GET_FUNC_NAME)
-            .unwrap_or_else(|| module.push_function(global_get_func()));
+            .unwrap_or_else(|| module.push_function(global_get_func(self.start_addr)));
         let global_set_func_idx = module
             .function_idx_by_name(GLOBALS_SET_FUNC_NAME)
-            .unwrap_or_else(|| module.push_function(global_set_func()));
+            .unwrap_or_else(|| module.push_function(global_set_func(self.start_addr)));
 
         // dbg!(global_get_func_idx);
         // dbg!(global_set_func_idx);
 
-        for func in module.functions_mut().iter_mut() {
+        for (_idx, func) in module.functions_iter_mut() {
             let found_globals: Vec<(usize, GlobalInst)> = func
                 .instructions()
                 .iter()
@@ -73,7 +76,7 @@ impl IrPass for GlobalsToMemPass {
                 func.instructions_as_vec_mut().insert(
                     idx + offset,
                     Inst::I32Const {
-                        value: -(u32::from(global_inst.global_idx()) as i32),
+                        value: u32::from(global_inst.global_idx()) as i32,
                     },
                 );
             }
@@ -104,16 +107,15 @@ fn to_global_inst(idx: usize, inst: &Inst) -> Option<(usize, GlobalInst)> {
     }
 }
 
-fn global_get_func() -> Func {
+fn global_get_func(start_addr: i32) -> Func {
     let ins = vec![
         // treat each global value size as 4 bytes (i32)
         Inst::I32Const {
-            value: Ty::I32.size() as i32,
+            value: -Ty::I32.size(),
         },
         Inst::I32Mul,
-        Inst::I32Const {
-            value: GLOBAL_MEMORY_BASE as i32,
-        },
+        Inst::I32Const { value: start_addr },
+        // it's actually a decrease (see negative type size above)
         Inst::I32Add,
         Inst::I32Load { offset: 0 },
         Inst::Return,
@@ -126,21 +128,19 @@ fn global_get_func() -> Func {
         },
         vec![],
         ins,
-        HashMap::new(),
     )
 }
 
-fn global_set_func() -> Func {
+fn global_set_func(start_addr: i32) -> Func {
     // first value, next pointer
     let ins = vec![
         // treat each global value size as 4 bytes (i32)
         Inst::I32Const {
-            value: Ty::I32.size() as i32,
+            value: -Ty::I32.size(),
         },
         Inst::I32Mul,
-        Inst::I32Const {
-            value: GLOBAL_MEMORY_BASE as i32,
-        },
+        Inst::I32Const { value: start_addr },
+        // it's actually a decrease (see negative type size above)
         Inst::I32Add,
         Inst::Swap { idx: 1 },
         Inst::I32Store { offset: 0 },
@@ -154,6 +154,5 @@ fn global_set_func() -> Func {
         },
         vec![],
         ins,
-        HashMap::new(),
     )
 }

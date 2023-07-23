@@ -73,31 +73,28 @@ fn test_add() {
             read_io
             return
             c2zk_stdlib_pub_output:
-            push -1
+            push 0
             call globals_get
-            dup0
-            swap2
-            write_mem
-            pop
-            pop
             push -4
             add
-            push -1
+            push 0
             call globals_set
-            push -1
+            push 0
+            call globals_get
+            swap 1
+            write_mem
+            pop
+            push 0
+            call globals_get
+            read_mem
+            swap 1
+            pop
+            write_io
+            push 0
             call globals_get
             push 4
             add
             push 0
-            read_mem
-            swap1
-            pop
-            write_io
-            push -1
-            call globals_get
-            push 4
-            add
-            push -1
             call globals_set
             return
             c2zk_stdlib_secret_input:
@@ -110,44 +107,42 @@ fn test_add() {
             add:
             push -1
             call globals_get
-            dup0
-            swap2
-            write_mem
-            pop
-            pop
-            push -4
+            push -8
             add
-            dup0
-            swap2
-            write_mem
-            pop
-            pop
-            push -4
-            add
-            push -1
+            push 0
             call globals_set
-            push -1
+            push 0
+            call globals_get
+            swap 1
+            swap 1
+            push 4
+            add
+            swap 1
+            write_mem
+            pop
+            push 0
+            call globals_get
+            swap 1
+            write_mem
+            pop
+            push 0
+            call globals_get
+            read_mem
+            swap 1
+            pop
+            push 0
             call globals_get
             push 4
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
-            push -1
+            add
+            push 0
             call globals_get
             push 8
             add
             push 0
-            read_mem
-            swap1
-            pop
-            add
-            push -1
-            call globals_get
-            push 8
-            add
-            push -1
             call globals_set
             return
             main_add:
@@ -164,57 +159,52 @@ fn test_add() {
             pub_output:
             push -1
             call globals_get
-            dup0
-            swap2
-            write_mem
-            pop
-            pop
             push -4
             add
-            push -1
+            push 0
             call globals_set
-            push -1
+            push 0
+            call globals_get
+            swap 1
+            write_mem
+            pop
+            push 0
+            call globals_get
+            read_mem
+            swap 1
+            pop
+            call c2zk_stdlib_pub_output
+            push 0
             call globals_get
             push 4
             add
             push 0
-            read_mem
-            swap1
-            pop
-            call c2zk_stdlib_pub_output
-            push -1
-            call globals_get
-            push 4
-            add
-            push -1
             call globals_set
             return
             secret_input:
             call c2zk_stdlib_secret_input
             return
             init_mem_for_locals:
-            push 00000000002147483635
-            push -1
+            push 00000000002147483647
+            push 0
             call globals_set
             return
             globals_get:
-            push 4
+            push -4
             mul
-            push 00000000002147483647
+            push 00000000002147482623
             add
-            push 0
             read_mem
-            swap1
+            swap 1
             pop
             return
             globals_set:
-            push 4
+            push -4
             mul
-            push 00000000002147483647
+            push 00000000002147482623
             add
-            swap1
+            swap 1
             write_mem
-            pop
             pop
             return"#]],
     )

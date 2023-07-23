@@ -11,9 +11,20 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
-c2zk-ir = { workspace = true }
-c2zk-frontend-shared = { workspace = true }
+ozk-frontend-wasm = { workspace = true }
+ozk-ozk-dialect = { workspace = true }
+ozk-wasm-dialect = { workspace = true }
+ozk-miden-dialect = { workspace = true }
+ozk-valida-dialect = { workspace = true }
+pliron = { workspace = true }
 derive_more = { workspace = true }
 itertools = { workspace = true }
+anyhow = { workspace = true }
+bounded-vec = { workspace = true }
+topological-sort = { workspace = true }
+thiserror = { workspace = true }
 
 [dev-dependencies]
+ozk-frontend-wasm = { workspace = true }
+expect-test = { workspace = true }
+wat = { workspace = true }
