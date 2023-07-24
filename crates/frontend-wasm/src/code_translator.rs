@@ -1,7 +1,7 @@
 use pliron::context::Context;
 use wasmparser::{FuncValidator, Operator, WasmModuleResources};
 
-use crate::{func_builder::FuncBuilder, mod_builder::ModuleBuilder, WasmError};
+use crate::{func_builder::FuncBuilder, WasmError};
 
 /// Translates wasm operators into ozk IR instructions.
 #[allow(unused_variables)]
