@@ -1,0 +1,28 @@
+[package]
+name = "ozk-frontend-clif"
+version = "0.1.0"
+description = "Build OmniZK dialects from Cranelift CLIF IR"
+authors.workspace = true
+repository.workspace = true
+edition.workspace = true
+readme.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+ozk-wasm-dialect = { workspace = true }
+ozk-ozk-dialect = { workspace = true }
+pliron = { workspace = true }
+thiserror = { workspace = true }
+ozk-stdlib = { workspace = true }
+derive_more = { workspace = true }
+log = { workspace = true }
+cranelift-wasm = "0.98"
+cranelift-codegen = "0.98"
+# cranelift dependencies
+target-lexicon = "0.12"
+
+[dev-dependencies]
+expect-test = { workspace = true }
+wat = { workspace = true }

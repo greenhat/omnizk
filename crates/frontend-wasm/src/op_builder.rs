@@ -24,6 +24,7 @@ use wasmparser::BlockType;
 use crate::func_builder::FuncBuilder;
 use crate::func_builder::FuncBuilderError;
 
+// TODO: remove FuncBuilder dep and move to wasm dialect crate?
 pub struct OpBuilder<'a> {
     fbuilder: &'a mut FuncBuilder,
 }

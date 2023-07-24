@@ -19,6 +19,7 @@
 #![deny(clippy::panic)]
 
 pub mod attributes;
+pub mod op_builder;
 pub mod ops;
 pub mod ord_n;
 pub mod types;
