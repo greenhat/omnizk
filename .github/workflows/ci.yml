@@ -66,6 +66,9 @@ jobs:
   clippy:
     name: Clippy (linter)
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
     steps:
       - uses: actions/checkout@v2
         with:
