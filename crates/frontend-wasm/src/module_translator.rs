@@ -211,7 +211,7 @@ fn parse_code_section_entry(
         let op = reader.read_operator()?;
         // dbg!(&op);
         validator.op(pos, &op)?;
-        translate_operator(ctx, validator, &op, &mut builder, mod_builder)?;
+        translate_operator(ctx, validator, &op, &mut builder)?;
     }
     mod_builder.push_func_builder(builder);
     Ok(())

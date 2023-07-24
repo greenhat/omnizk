@@ -1,7 +1,7 @@
 [package]
 name = "ozk-frontend-wasm"
 version = "0.1.0"
-description = "Wasm dialect builder for OmniZK"
+description = "Wasm parser and dialect builder for OmniZK"
 authors.workspace = true
 repository.workspace = true
 edition.workspace = true

@@ -10,7 +10,6 @@ pub fn translate_operator(
     validator: &mut FuncValidator<impl WasmModuleResources>,
     op: &Operator,
     func_builder: &mut FuncBuilder,
-    mod_builder: &mut ModuleBuilder,
 ) -> Result<(), WasmError> {
     match op {
         Operator::Unreachable => {
