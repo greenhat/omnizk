@@ -22,7 +22,7 @@ pub struct FuncBuilder {
 
 impl FuncBuilder {
     /// Create a new FuncBuilder
-    pub fn new(ctx: &mut Context, name: FuncSym) -> FuncBuilder {
+    pub fn new(name: FuncSym) -> FuncBuilder {
         FuncBuilder {
             name,
             sig: None,

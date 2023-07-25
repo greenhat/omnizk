@@ -41,7 +41,7 @@ fn build_func(
     ctx: &mut Context,
     func: &cranelift_codegen::ir::Function,
 ) -> Result<FuncBuilder, ModuleError> {
-    let mut fb = FuncBuilder::new(ctx, func.name.to_string().into());
+    let mut fb = FuncBuilder::new(func.name.to_string().into());
     // TODO: set signature
     for clif_block in func.layout.blocks() {
         if func.layout.first_inst(clif_block).is_none() {

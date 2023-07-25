@@ -23,7 +23,6 @@
 
 mod code_translator;
 mod config;
-mod error;
 mod func_builder;
 mod func_op_builder;
 mod mod_builder;
