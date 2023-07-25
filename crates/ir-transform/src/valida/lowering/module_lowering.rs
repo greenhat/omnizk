@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use ozk_valida_dialect as valida;
 use ozk_wasm_dialect as wasm;
 use pliron::basic_block::BasicBlock;
@@ -60,7 +61,9 @@ impl RewritePattern for ModuleLowering {
         for op in &func_ops {
             op.unlink(ctx);
         }
-        let main_func_sym = wasm_module_op.get_start_func_sym(ctx);
+        let Some(main_func_sym) = wasm_module_op.get_start_func_sym(ctx) else {
+            return Err(anyhow!("error. no start function in module"));
+        };
         let entry_block = build_prog_entry_block(ctx, main_func_sym.into());
         let prog_op = valida::ops::ProgramOp::new(ctx, entry_block, func_ops);
         rewriter.replace_op_with(ctx, wasm_module_op.get_operation(), prog_op.get_operation())?;

@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use bounded_vec::NonEmptyVec;
 use derive_more::From;
 use ozk_miden_dialect::ops as miden;
@@ -67,8 +68,10 @@ impl RewritePattern for ControlFlowLowering {
             funcs.push(func_op);
         }
         let main_proc_op = miden::ProcOp::new_unlinked(ctx, "ozk_miden_main_proc");
-        let start_func_call_op =
-            miden::ExecOp::new_unlinked(ctx, module_op.get_start_func_sym(ctx));
+        let Some(callee_name) = module_op.get_start_func_sym(ctx) else {
+            return Err(anyhow!("error. no start function in module"));
+        };
+        let start_func_call_op = miden::ExecOp::new_unlinked(ctx, callee_name);
         start_func_call_op
             .get_operation()
             .insert_at_back(main_proc_op.get_entry_block(ctx), ctx);

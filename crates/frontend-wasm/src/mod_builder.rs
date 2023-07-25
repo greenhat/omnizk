@@ -137,8 +137,7 @@ impl ModuleBuilder {
 
             let module_op = ModuleOp::new(
                 ctx,
-                "module_name",
-                start_func_name,
+                Some(start_func_name),
                 all_func_syms,
                 funcs,
                 Vec::new(),
