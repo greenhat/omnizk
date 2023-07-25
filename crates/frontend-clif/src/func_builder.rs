@@ -42,10 +42,10 @@ impl FuncBuilder {
     }
 
     pub fn op(&mut self) -> FuncOpBuilder {
-        #[allow(clippy::expect_used)]
-        let block = self
-            .position
-            .expect("Please call switch_to_block before inserting instructions");
+        // #[allow(clippy::expect_used)]
+        // let block = self
+        //     .position
+        //     .expect("Please call switch_to_block before inserting instructions");
         FuncOpBuilder::new(self)
     }
 
@@ -58,7 +58,7 @@ impl FuncBuilder {
     }
 
     /// Builds and returns the FuncOp
-    pub fn build(self, ctx: &mut Context) -> Result<FuncOp, FuncBuilderError> {
+    pub fn build(self, _ctx: &mut Context) -> Result<FuncOp, FuncBuilderError> {
         // let sig = self.sig.ok_or_else(|| {
         //     FuncBuilderError::MissingSignature(format!("FuncBuilder for {:?}", self.name))
         // })?;

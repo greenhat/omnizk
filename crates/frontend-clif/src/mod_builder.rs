@@ -1,4 +1,6 @@
 use ozk_ozk_dialect::types::FuncSym;
+use ozk_wasm_dialect::ops::ModuleOp;
+use pliron::context::Context;
 use pliron::error::CompilerError;
 use std::collections::HashMap;
 
@@ -26,7 +28,32 @@ pub struct ModuleBuilder {
     func_types: HashMap<FuncIndex, TypeIndex>,
 }
 
-impl ModuleBuilder {}
+impl ModuleBuilder {
+    pub fn new() -> Self {
+        Self {
+            types: Vec::new(),
+            start_func_idx: None,
+            functions: Vec::new(),
+            func_names: HashMap::new(),
+            func_types: HashMap::new(),
+            import_functions: Vec::new(),
+        }
+    }
+
+    pub fn push_func_builder(&mut self, func_builder: FuncBuilder) {
+        self.functions.push(func_builder);
+    }
+
+    pub fn build(self, _ctx: &mut Context) -> Result<ModuleOp, ModuleBuilderError> {
+        todo!()
+    }
+}
+
+impl Default for ModuleBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[derive(Error, Debug)]
 pub enum ModuleBuilderError {

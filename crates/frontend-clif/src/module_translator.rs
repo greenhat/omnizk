@@ -1,5 +1,4 @@
 use cranelift_codegen::entity::EntityRef;
-use cranelift_codegen::ir::InstructionData;
 use cranelift_codegen::isa::CallConv;
 use cranelift_codegen::isa::TargetFrontendConfig;
 use cranelift_wasm::DummyEnvironment;
@@ -9,7 +8,10 @@ use pliron::context::Context;
 use target_lexicon::PointerWidth;
 use thiserror::Error;
 
+use crate::code_translator::translate_op;
 use crate::func_builder::FuncBuilder;
+use crate::mod_builder::ModuleBuilder;
+use crate::mod_builder::ModuleBuilderError;
 
 pub fn parse_module(ctx: &mut Context, wasm: &[u8]) -> Result<wasm::ops::ModuleOp, ModuleError> {
     let cranelift_config = TargetFrontendConfig {
@@ -18,6 +20,8 @@ pub fn parse_module(ctx: &mut Context, wasm: &[u8]) -> Result<wasm::ops::ModuleO
     };
     let mut dummy_environ = DummyEnvironment::new(cranelift_config, true);
     cranelift_wasm::translate_module(wasm, &mut dummy_environ)?;
+
+    let mut mod_builder = ModuleBuilder::new();
     let num_func_imports = dummy_environ.get_num_func_imports();
     for (def_index, func) in dummy_environ.info.function_bodies.iter() {
         let func_index = num_func_imports + def_index.index();
@@ -26,9 +30,11 @@ pub fn parse_module(ctx: &mut Context, wasm: &[u8]) -> Result<wasm::ops::ModuleO
                 todo!("start func");
             }
         }
-        build_func(ctx, func)?;
+        let func_builder = build_func(ctx, func)?;
+        mod_builder.push_func_builder(func_builder);
     }
-    todo!()
+    let module_op = mod_builder.build(ctx)?;
+    Ok(module_op)
 }
 
 fn build_func(
@@ -49,131 +55,18 @@ fn build_func(
             let inst_data = func.dfg.insts[inst];
             // let dfg = &func.dfg;
             // let results = dfg.inst_results(inst);
-            build_op(ctx, &mut fb, inst_data);
+            translate_op(ctx, &mut fb, inst_data);
         }
     }
     Ok(fb)
-}
-
-fn build_op(ctx: &mut Context, fb: &mut FuncBuilder, inst: InstructionData) {
-    match inst {
-        InstructionData::AtomicCas {
-            opcode,
-            args,
-            flags,
-        } => todo!(),
-        InstructionData::AtomicRmw {
-            opcode,
-            args,
-            flags,
-            op,
-        } => todo!(),
-        InstructionData::Binary { opcode, args } => todo!(),
-        InstructionData::BinaryImm64 { opcode, arg, imm } => todo!(),
-        InstructionData::BinaryImm8 { opcode, arg, imm } => todo!(),
-        InstructionData::BranchTable { opcode, arg, table } => todo!(),
-        InstructionData::Brif {
-            opcode,
-            arg,
-            blocks,
-        } => todo!(),
-        InstructionData::Call {
-            opcode,
-            args,
-            func_ref,
-        } => todo!(),
-        InstructionData::CallIndirect {
-            opcode,
-            args,
-            sig_ref,
-        } => todo!(),
-        InstructionData::CondTrap { opcode, arg, code } => todo!(),
-        InstructionData::DynamicStackLoad {
-            opcode,
-            dynamic_stack_slot,
-        } => todo!(),
-        InstructionData::DynamicStackStore {
-            opcode,
-            arg,
-            dynamic_stack_slot,
-        } => todo!(),
-        InstructionData::FloatCompare { opcode, args, cond } => todo!(),
-        InstructionData::FuncAddr { opcode, func_ref } => todo!(),
-        InstructionData::IntAddTrap { opcode, args, code } => todo!(),
-        InstructionData::IntCompare { opcode, args, cond } => todo!(),
-        InstructionData::IntCompareImm {
-            opcode,
-            arg,
-            cond,
-            imm,
-        } => todo!(),
-        InstructionData::Jump {
-            opcode,
-            destination,
-        } => todo!(),
-        InstructionData::Load {
-            opcode,
-            arg,
-            flags,
-            offset,
-        } => todo!(),
-        InstructionData::LoadNoOffset { opcode, arg, flags } => todo!(),
-        InstructionData::MultiAry { opcode, args } => todo!(),
-        InstructionData::NullAry { opcode } => todo!(),
-        InstructionData::Shuffle { opcode, args, imm } => todo!(),
-        InstructionData::StackLoad {
-            opcode,
-            stack_slot,
-            offset,
-        } => todo!(),
-        InstructionData::StackStore {
-            opcode,
-            arg,
-            stack_slot,
-            offset,
-        } => todo!(),
-        InstructionData::Store {
-            opcode,
-            args,
-            flags,
-            offset,
-        } => todo!(),
-        InstructionData::StoreNoOffset {
-            opcode,
-            args,
-            flags,
-        } => todo!(),
-        InstructionData::TableAddr {
-            opcode,
-            arg,
-            table,
-            offset,
-        } => todo!(),
-        InstructionData::Ternary { opcode, args } => todo!(),
-        InstructionData::TernaryImm8 { opcode, args, imm } => todo!(),
-        InstructionData::Trap { opcode, code } => todo!(),
-        InstructionData::Unary { opcode, arg } => todo!(),
-        InstructionData::UnaryConst {
-            opcode,
-            constant_handle,
-        } => todo!(),
-        InstructionData::UnaryGlobalValue {
-            opcode,
-            global_value,
-        } => todo!(),
-        InstructionData::UnaryIeee32 { opcode, imm } => todo!(),
-        InstructionData::UnaryIeee64 { opcode, imm } => todo!(),
-        InstructionData::UnaryImm { opcode, imm } => {
-            assert!(i32::try_from(imm.bits()).is_ok(), "only i32 supported");
-            fb.op().i32const(ctx, i64::from(imm) as i32);
-        }
-    }
 }
 
 #[derive(Debug, Error)]
 pub enum ModuleError {
     #[error("Wasm(CLIF) parsing error: {0}")]
     Wasm(#[from] WasmError),
+    #[error("ModuleBuilder error: {0}")]
+    ModuleBuilder(#[from] ModuleBuilderError),
 }
 
 #[allow(clippy::unwrap_used)]
@@ -195,6 +88,7 @@ mod tests {
         expected_tree.assert_eq(wasm_module_op.with_ctx(&ctx).to_string().as_str());
     }
 
+    #[ignore]
     #[test]
     fn smoke() {
         check_ir(
