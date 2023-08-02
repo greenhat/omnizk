@@ -230,7 +230,7 @@ mod tests {
 )
         "#,
             expect![[r#"
-                wasm.module @module_name {
+                wasm.module {
                   block_2_0():
                     valida.func @add {
                       entry():
@@ -273,7 +273,7 @@ mod tests {
 )
         "#,
             expect![[r#"
-                wasm.module @module_name {
+                wasm.module {
                   block_1_0():
                     valida.func @main {
                       entry():
