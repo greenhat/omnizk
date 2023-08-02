@@ -78,9 +78,8 @@ impl DisplayWithContext for ModuleOp {
         let region = self.get_region(ctx).with_ctx(ctx).to_string();
         write!(
             f,
-            "{} @{} {{\n{}}}",
+            "{} {{\n{}}}",
             self.get_opid().with_ctx(ctx),
-            self.get_symbol_name(ctx),
             indent::indent_all_by(2, region),
         )
     }
@@ -97,12 +96,8 @@ impl Verify for ModuleOp {
 impl ModuleOp {
     /// Attribute key for the the start function symbol.
     pub const ATTR_KEY_START_FUNC_SYM: &str = "module.start_func_sym";
-    // /// Attribute key for the import functions dictionary (function name -> type)
-    // pub const ATTR_KEY_DICT_IMPORT_FUNCTION_TYPE: &str = "module.dict_import_function_type";
-    // /// Attribute key for the import functions dictionary (function name -> module name)
-    // pub const ATTR_KEY_DICT_IMPORT_FUNCTION_MODULE: &str = "module.dict_import_function_module";
-    /// Attribute key for all function (defined + imports) symbols
-    pub const ATTR_KEY_FUNC_INDICES: &str = "module.func_indices";
+    /// Attribute key for the all function symbols in this module (including imports).
+    pub const ATTR_KEY_FUNC_SYMBOLS: &str = "module.func_symbols";
     /// Attribute key for the import function types.
     pub const ATTR_KEY_IMPORT_FUNC_TYPES: &str = "module.import_func_types";
     /// Attribute key for the import function modules.
@@ -113,8 +108,7 @@ impl ModuleOp {
     /// The returned module has a single [crate::region::Region] with a single (BasicBlock)[crate::basic_block::BasicBlock].
     pub fn new(
         ctx: &mut Context,
-        name: &str,
-        start_func_name: FuncSym,
+        start_func_name: Option<FuncSym>,
         all_func_syms: Vec<FuncSym>,
         functions: Vec<FuncOp>,
         import_func_types: Vec<Ptr<TypeObj>>,
@@ -123,13 +117,14 @@ impl ModuleOp {
         let op = Operation::new(ctx, Self::get_opid_static(), vec![], vec![], 1);
         {
             let opref = &mut *op.deref_mut(ctx);
-            // Set function type attributes.
+            if let Some(start_func_sym) = start_func_name {
+                opref.attributes.insert(
+                    Self::ATTR_KEY_START_FUNC_SYM,
+                    StringAttr::create(start_func_sym.into()),
+                );
+            }
             opref.attributes.insert(
-                Self::ATTR_KEY_START_FUNC_SYM,
-                StringAttr::create(start_func_name.into()),
-            );
-            opref.attributes.insert(
-                Self::ATTR_KEY_FUNC_INDICES,
+                Self::ATTR_KEY_FUNC_SYMBOLS,
                 VecAttr::create(
                     all_func_syms
                         .into_iter()
@@ -158,7 +153,6 @@ impl ModuleOp {
         }
 
         let opop = ModuleOp { op };
-        opop.set_symbol_name(ctx, name);
 
         // Create an empty block.
         let region = opop.get_region(ctx);
@@ -179,7 +173,7 @@ impl ModuleOp {
             #[allow(clippy::expect_used)]
             let func_indices_attr = self_op
                 .attributes
-                .get_mut(Self::ATTR_KEY_FUNC_INDICES)
+                .get_mut(Self::ATTR_KEY_FUNC_SYMBOLS)
                 .expect("ModuleOp has no function symbols vector attribute")
                 .downcast_mut::<VecAttr>()
                 .expect("ModuleOp function symbols vector attribute is not a VecAttr");
@@ -193,26 +187,26 @@ impl ModuleOp {
     }
 
     /// Return the start function symbol name
-    pub fn get_start_func_sym(&self, ctx: &Context) -> FuncSym {
+    pub fn get_start_func_sym(&self, ctx: &Context) -> Option<FuncSym> {
         let self_op = self.get_operation().deref(ctx);
-        let s_attr = self_op
+        self_op
             .attributes
             .get(Self::ATTR_KEY_START_FUNC_SYM)
-            .expect("ModuleOp has no start function symbol attribute");
-        String::from(
-            s_attr
-                .downcast_ref::<StringAttr>()
-                .expect("ModuleOp start function symbol attribute is not a StringAttr")
-                .clone(),
-        )
-        .into()
+            .map(|s_attr| {
+                String::from(
+                    s_attr
+                        .downcast_ref::<StringAttr>()
+                        .expect("ModuleOp start function symbol attribute is not a StringAttr")
+                        .clone(),
+                ).into()
+            })
     }
 
     fn get_func_syms(&self, ctx: &Context) -> Vec<FuncSym> {
         let self_op = self.get_operation().deref(ctx);
         let v_attr = self_op
             .attributes
-            .get(Self::ATTR_KEY_FUNC_INDICES)
+            .get(Self::ATTR_KEY_FUNC_SYMBOLS)
             .expect("ModuleOp has no function symbols vector attribute");
         v_attr
             .downcast_ref::<VecAttr>()
@@ -261,8 +255,6 @@ impl ModuleOp {
 
 impl OneRegionInterface for ModuleOp {}
 impl SingleBlockRegionInterface for ModuleOp {}
-#[cast_to]
-impl SymbolOpInterface for ModuleOp {}
 
 declare_op!(
     /// Function

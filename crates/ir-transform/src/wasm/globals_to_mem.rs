@@ -163,7 +163,7 @@ mod tests {
 )
 "#,
             expect![[r#"
-                wasm.module @module_name {
+                wasm.module {
                   block_1_0():
                     wasm.func @main() -> () {
                       entry():

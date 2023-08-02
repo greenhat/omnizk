@@ -1,5 +1,4 @@
-//! Performs translation from a wasm module in binary format to the in-memory form
-//! of ozk IR.
+//! Performs translation from a CLIF to ozk dialects
 
 // Coding conventions
 #![deny(unsafe_code)]
@@ -24,12 +23,7 @@
 
 mod code_translator;
 mod config;
-mod error;
-pub mod func_builder;
+mod func_builder;
+mod func_op_builder;
 mod mod_builder;
 mod module_translator;
-mod op_builder;
-
-pub use crate::config::WasmFrontendConfig;
-pub use crate::error::WasmError;
-pub use crate::module_translator::parse_module;
