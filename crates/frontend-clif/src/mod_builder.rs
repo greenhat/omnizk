@@ -1,13 +1,9 @@
-use ozk_ozk_dialect::types::FuncSym;
 use ozk_wasm_dialect::ops::ModuleOp;
 use pliron::context::Context;
 use pliron::error::CompilerError;
-use std::collections::HashMap;
 
 use ozk_wasm_dialect::types::FuncIndex;
 use ozk_wasm_dialect::types::TypeIndex;
-use pliron::context::Ptr;
-use pliron::r#type::TypeObj;
 use thiserror::Error;
 
 use crate::func_builder::FuncBuilder;
@@ -20,22 +16,16 @@ pub struct ImportFuncLabel {
 }
 
 pub struct ModuleBuilder {
-    types: Vec<Ptr<TypeObj>>,
     start_func_idx: Option<FuncIndex>,
     functions: Vec<FuncBuilder>,
     import_functions: Vec<(ImportFuncLabel, TypeIndex)>,
-    func_names: HashMap<FuncIndex, FuncSym>,
-    func_types: HashMap<FuncIndex, TypeIndex>,
 }
 
 impl ModuleBuilder {
     pub fn new() -> Self {
         Self {
-            types: Vec::new(),
             start_func_idx: None,
             functions: Vec::new(),
-            func_names: HashMap::new(),
-            func_types: HashMap::new(),
             import_functions: Vec::new(),
         }
     }
@@ -44,8 +34,21 @@ impl ModuleBuilder {
         self.functions.push(func_builder);
     }
 
-    pub fn build(self, _ctx: &mut Context) -> Result<ModuleOp, ModuleBuilderError> {
-        todo!()
+    pub fn build(self, ctx: &mut Context) -> Result<ModuleOp, ModuleBuilderError> {
+        let all_func_syms = Vec::new();
+        let functions = Vec::new();
+        let import_func_types = Vec::new();
+        let import_func_modules = Vec::new();
+        let module_op = ModuleOp::new(
+            ctx,
+            None,
+            all_func_syms,
+            functions,
+            import_func_types,
+            import_func_modules,
+        );
+        todo!("build module");
+        // Ok(module_op)
     }
 }
 
